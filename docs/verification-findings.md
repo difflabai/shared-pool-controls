@@ -121,9 +121,10 @@ check compares with a violation of 0:
 In this configuration no later call helps: the record never becomes
 terminal, and the pool can never be observed again. In other
 configurations a later admission that lowers metric 0 can let
-`settle(true)` pass, as in F-2. On a local chain the executor commits "completed", and its
-notification to the pool fails `Bounds`. The executor then refuses to change
-its answer, so the two contracts disagree permanently.
+`settle(true)` pass, as in F-2. On a local chain the executor commits
+"completed", and its notification to the pool fails `Bounds`. The executor
+then refuses to change its answer, so the two contracts disagree
+permanently.
 
 **Why it matters.** spec:46 says a checked inverse "can fail if another
 commitment depends on its contribution" and to "resolve dependent work
@@ -289,9 +290,11 @@ terminal and fails `Full` only while it is open. That record can be
 closed: by its actor or the owner while it is Reserved, and by its
 executor's report once it is dispatched (F-1's fix makes each of these
 calls succeed). Until a dispatched oldest record's executor reports,
-submit stays `Full`, even if the other 255 records are terminal. Prerequisites count completed units over the pool's
-life. The executor forgets jobs 256 ids behind the newest it has executed.
-Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
+submit stays `Full`, even if the other 255 records are terminal.
+Prerequisites count completed units over the pool's life. The executor
+forgets jobs 256 ids behind the newest it has executed and holds at most
+512 jobs; [api.md](api.md#executor-protocol) says when that cap can block
+the operator's confirmations. Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
 `f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract
 and executor `f3_*` tests, and the sandbox test
 `window_of_300_records_through_the_executor`. Formal re-verification

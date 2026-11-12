@@ -62,10 +62,11 @@ unit tests, seeded random tests and the sandbox suite.
 - Record window. The pool keeps the 256 most recent commitments. A submit
   prunes the oldest one when it is completed or cancelled, and fails `Full`
   while it is open. A dispatched oldest record closes only when its executor
-  reports, so a silent executor can hold submit at `Full`. Ids keep counting, and a pruned id is `NotFound`
-  (including a repeated executor `settle`, which v1.0.0 accepted). `get_pool`
-  gains `first_id` and `completed_units`; prerequisites count completed units
-  over the pool's life. `get_commitments` takes `from` as an id.
+  reports, so a silent executor can hold submit at `Full`. Ids keep
+  counting, and a pruned id is `NotFound` (including a repeated executor
+  `settle`, which v1.0.0 accepted). `get_pool` gains `first_id` and
+  `completed_units`; prerequisites count completed units over the pool's
+  life. `get_commitments` takes `from` as an id.
 - `cancel` of a Completed record fails `InvalidState` (was `Pending`).
   Dispatched, Active and Unknown records still fail `Pending`.
 - Version reserve: submit, dispatch, `set_paused` and `observe` fail
