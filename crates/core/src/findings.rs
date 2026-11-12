@@ -219,7 +219,7 @@ fn f2b_release_outside_value_range_fails_arithmetic() {
 
 /// F-3 (low): one actor fills the 256 lifetime records with submit and
 /// cancel. Every later submit, by any actor, fails Full, also after an
-/// observe. formalver trace 207.
+/// observe. formalver trace 207 (a smaller config).
 #[test]
 fn f3_submit_cancel_cycles_exhaust_lifetime_records() {
     let mut p = pool("gpu");
@@ -237,7 +237,8 @@ fn f3_submit_cancel_cycles_exhaust_lifetime_records() {
 
 /// F-4 (low): validate accepts a recipe whose actor is its executor, and
 /// one whose actor and executor are the owner. In the hiring fixture each
-/// of them accepts its own work (spec:64). formalver trace 210.
+/// of them accepts its own work (spec:64). formalver trace 210 (a smaller
+/// config).
 #[test]
 fn f4_validate_accepts_actor_or_owner_as_executor() {
     const WORKER: &str = "research.test.near";
@@ -308,7 +309,7 @@ fn f5_paused_pool_at_version_max_cannot_unpause() {
 /// F-6 (low): the risk fixture has max_age 300 and was observed at 100. At
 /// now = 401, with one record still Active, submit and dispatch fail
 /// SnapshotExpired and observe fails Pending until the executor settles it.
-/// formalver trace 211.
+/// formalver trace 211 (a smaller config).
 #[test]
 fn f6_open_record_blocks_the_snapshot_refresh() {
     let mut p = pool("risk");

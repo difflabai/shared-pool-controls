@@ -20,7 +20,11 @@ Every finding below applies to v1.0.0.
 draft [PR #31](https://github.com/difflabai/formalver/pull/31), under
 [`projects/shared-pool/`](https://github.com/difflabai/formalver/tree/b9c495b8fa47e395d662a348f1cc7e352018aea5/projects/shared-pool)
 at commit `b9c495b`. Paths in this page are relative to that directory.
-Section 4 of its `strategy.md` is the full record.
+Section 4 of its `strategy.md` is the full record. The **Evidence**
+paragraphs below cite results as that section reports them. Only the
+reproducer tests in `crates/core/src/findings.rs` run in this repository.
+The TLC, Lean, Prolog, shell and sandbox results were not re-run for this
+page.
 
 ## How the findings were found
 
@@ -193,7 +197,7 @@ settle(executor, 0, true)                     Ok
 
 **Evidence.**
 - Trace 209 (`f2-risk`, from `f2_risk()` in `conformance/src/main.rs`),
-  equal under TLC, Lean, Prolog (MC-2) and the shell.
+  reported equal under TLC, Lean, Prolog (MC-2) and the shell.
 - Prolog: `prolog/tests/test_model.pl` "F-2 witness" (7-unit hedge). The
   C-5 release search (`prolog/verification/consistency.pl`) finds 20
   counterexamples in `risk` and none in `gpu`, `friday`, `inventory` or
@@ -232,7 +236,8 @@ settle(X, 0, true)                                Ok
 ```
 
 **Evidence.** Trace 208 (`release-arith`, from `release_arith()` in
-`conformance/src/main.rs`), equal under TLC, Lean, Prolog and the shell.
+`conformance/src/main.rs`), reported equal under TLC, Lean, Prolog and the
+shell.
 
 ### F-3 (low): lifetime record exhaustion
 
@@ -247,7 +252,7 @@ growth." They do, but the bound is also a lifetime budget that one actor can
 spend for everyone. api:8 states the limit without this consequence.
 
 **Reproducer.** `f3_submit_cancel_cycles_exhaust_lifetime_records`;
-formalver trace 207.
+formalver trace 207 (a smaller config).
 
 ```text
 fixture  gpu
@@ -258,8 +263,8 @@ submit(evaluation, {recipe 2, units 1})       Full
 ```
 
 **Evidence.**
-- Trace 207 (`full`, 515 calls), replayed by TLC (it also kills TLA+
-  mutants 13 and 25), Lean (REF-5L), Prolog (MC-2) and
+- Trace 207 (`full`, 515 calls), reported replayed by TLC (it also kills
+  TLA+ mutants 13 and 25), Lean (REF-5L), Prolog (MC-2) and
   `near-tests/tests/traces.rs`.
 - Sandbox: RES-1 (`sandbox/tests/resources.rs`). Submit #257 fails `Full`
   on chain.
@@ -291,7 +296,8 @@ paid lifetime = 5, with no independent acceptance
 ```
 
 **Evidence.**
-- Trace 210 (`f4-self`), equal under TLC, Lean, Prolog and the shell.
+- Trace 210 (`f4-self`), reported equal under TLC, Lean, Prolog and the
+  shell.
 - Prolog: `prolog/tests/test_model.pl` "F-4 witness".
   `prolog/extract.py` records that `validate` has no role checks.
 
@@ -375,7 +381,8 @@ submit(equity, recipe 1 x 1)       Ok
 ```
 
 **Evidence.**
-- Trace 211 (`f6-stale`), equal under TLC, Lean, Prolog and the shell.
+- Trace 211 (`f6-stale`), reported equal under TLC, Lean, Prolog and the
+  shell.
 - Prolog: `prolog/tests/test_model.pl` "F-6 witness", on the risk fixture.
 
 ## Shell, build and runtime findings
