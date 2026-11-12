@@ -92,7 +92,8 @@ Severity rates the harm to a property the docs promise.
 outcome of every open record (stay open, complete, release), and compares
 each metric's interval violation with the smaller of its violation before
 the request and after the reservation. In this configuration the hedge is
-refused (`Bounds`), and every open record can always be resolved.
+refused (`Bounds`). Every open record can now be resolved: a Reserved one
+by cancel, a dispatched one by its executor's report.
 Regression tests: `f1_hedge_that_cures_by_reservation_is_refused`,
 `f1_recovery_by_completion_is_admitted_and_live`, `live_all_on_random_runs`.
 Formal re-verification pending.
@@ -278,8 +279,11 @@ shell.
 
 **Status.** Fixed in v1.1.0 (`1f01d43`). The pool keeps a window of the
 256 most recent records. A submit prunes the oldest record when it is
-terminal and fails `Full` only while it is open; that record can always be
-closed (F-1's fix). Prerequisites count completed units over the pool's
+terminal and fails `Full` only while it is open. That record can be
+closed: by its actor or the owner while it is Reserved, and by its
+executor's report once it is dispatched (F-1's fix makes each of these
+calls succeed). Until a dispatched oldest record's executor reports,
+submit stays `Full`, even if the other 255 records are terminal. Prerequisites count completed units over the pool's
 life. The executor forgets jobs 256 ids behind the newest it has executed.
 Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
 `f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract

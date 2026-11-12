@@ -16,7 +16,8 @@ unit tests, seeded random tests and the sandbox suite.
 
 - F-1 (high): a hedge admitted after an `observe` broke a bound could never
   settle. Admission now counts every outcome of every open record, including
-  its release, so every open record can always be resolved.
+  its release. Every open record can now be resolved: a Reserved one by
+  cancel, a dispatched one by its executor's report.
   [F-1](docs/verification-findings.md#f-1-high-disturbed-state-hedge-wedge)
 - F-2 (high): in the `risk` fixture, a position that a completed hedge relied
   on could not be released. A hedge must now stay in bounds if the position is
@@ -59,7 +60,8 @@ unit tests, seeded random tests and the sandbox suite.
   position open, the largest admitted selloff hedge is 6 units, not 8.
 - Record window. The pool keeps the 256 most recent commitments. A submit
   prunes the oldest one when it is completed or cancelled, and fails `Full`
-  while it is open. Ids keep counting, and a pruned id is `NotFound`
+  while it is open. A dispatched oldest record closes only when its executor
+  reports, so a silent executor can hold submit at `Full`. Ids keep counting, and a pruned id is `NotFound`
   (including a repeated executor `settle`, which v1.0.0 accepted). `get_pool`
   gains `first_id` and `completed_units`; prerequisites count completed units
   over the pool's life. `get_commitments` takes `from` as an id.

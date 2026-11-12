@@ -25,7 +25,7 @@ Request example:
 {"recipe":0,"units":4,"version":0,"expires_at":1794500000}
 ```
 
-A submit prunes the oldest retained record when 256 are retained and it is terminal; while it is open, submit fails `Full`. Every call on a pruned id fails `NotFound`, including a repeated executor `settle` (v1.0.0 returned Ok). The event log keeps pruned records.
+A submit prunes the oldest retained record when 256 are retained and it is terminal; while it is open, submit fails `Full`, even if the other 255 are terminal. A Reserved oldest record can be cancelled by its actor or the owner. A Dispatched, Active or Unknown one closes only when its executor reports (`settle`, or a `reconcile` that returns `completed` or `cancelled`), so an executor that never reports keeps submit at `Full`. Every call on a pruned id fails `NotFound`, including a repeated executor `settle` (v1.0.0 returned Ok). The event log keeps pruned records.
 
 Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every effective state transition increments version by exactly 1. Calls that change nothing return Ok and leave the version alone: a repeated terminal settlement, a repeated cancel, an acknowledgment that does not change the status, a late acknowledgment. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
 
