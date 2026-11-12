@@ -484,27 +484,40 @@ fn f3_submit_cancel_cycles_exhaust_lifetime_records() {
     assert_eq!(submit(&mut p, 2, 1, 101), Err(Error::Full));
 }
 
-/// F-4 (low): validate accepts a recipe whose actor is its executor, and
-/// one whose actor and executor are the owner. In the hiring fixture each
-/// of them accepts its own work (spec:64). formalver trace 210 (a smaller
-/// config).
+/// F-4 (low), fixed: v1.0.0 accepted a recipe whose actor is its executor,
+/// and one whose actor and executor are both the owner; in the hiring
+/// fixture each could then accept its own work (spec:64). v1.1 rejects
+/// both. The owner may still be a recipe's actor or its executor, but not
+/// both. formalver trace 210 (a smaller config).
 #[test]
-fn f4_validate_accepts_actor_or_owner_as_executor() {
+fn f4_actor_cannot_be_its_own_executor() {
     const WORKER: &str = "research.test.near";
     let mut c = fixtures::config("hiring").unwrap();
     c.recipes[0].executor = WORKER.into();
+    assert_eq!(c.validate(), Err(Error::InvalidConfig));
+    assert_eq!(Pool::new(c, 100), Err(Error::InvalidConfig));
+    let mut c = fixtures::config("hiring").unwrap();
     c.recipes[1].actor = OWNER.into();
     c.recipes[1].executor = OWNER.into();
-    assert_eq!(c.validate(), Ok(()));
+    assert_eq!(c.validate(), Err(Error::InvalidConfig));
+    assert_eq!(Pool::new(c, 100), Err(Error::InvalidConfig));
+
+    // Owner as actor, with an independent executor: valid and usable.
+    let mut c = fixtures::config("hiring").unwrap();
+    c.recipes[1].actor = OWNER.into();
     let mut p = Pool::new(c, 100).unwrap();
-    let w = submit(&mut p, 0, 2, 100).unwrap();
-    dispatch_active(&mut p, w, 100);
-    p.settle(WORKER, w, true).unwrap();
     let o = submit(&mut p, 1, 3, 100).unwrap();
     dispatch_active(&mut p, o, 100);
-    p.settle(OWNER, o, true).unwrap();
-    // Paid lifetime 2 + 3, with no independent acceptance.
-    assert_eq!(p.values[6], 5);
+    assert_eq!(p.settle(OWNER, o, true), Err(Error::Unauthorized));
+    p.settle(EXEC, o, true).unwrap();
+    assert_eq!(p.values[6], 3);
+    // Owner as executor of another account's recipe: valid.
+    let mut c = fixtures::config("hiring").unwrap();
+    c.recipes[1].executor = OWNER.into();
+    assert_eq!(c.validate(), Ok(()));
+    for name in fixtures::NAMES {
+        assert_eq!(fixtures::config(name).map(|c| c.validate()), Ok(Ok(())));
+    }
 }
 
 /// F-5 (low): at version u32::MAX every transition fails Arithmetic,

@@ -39,7 +39,7 @@ The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({i
 
 1. Build with `scripts/build.sh`; retain Wasm and manifest. It sets `RUSTFLAGS="--cfg near"`, the flag `cargo near` sets, so a failed call reports its error name (for example `Smart contract panicked: Pending`). Without the flag near-sdk drops every panic message. The script fails if either Wasm does not import `env.panic_utf8`. Any other build of the deployed Wasm must also set `--cfg near`.
 2. Create/fund a lock account, executor account, owner/operator account and agent accounts on your selected network using your normal NEAR tooling.
-3. Copy a generated `scenarios/*/config.json`; replace owner, all actor identities and executor identities with those accounts. Keep policy coefficients unchanged unless deliberately designing a new policy.
+3. Copy a generated `scenarios/*/config.json`; replace owner, all actor identities and executor identities with those accounts. A recipe's actor and executor must be different accounts; `new` rejects the config otherwise (`InvalidConfig`). Keep policy coefficients unchanged unless deliberately designing a new policy.
 4. Deploy pool_contract.wasm and pool_executor.wasm. Initialize each contract from its own deployment account (private initializer), setting the configured owner/operator and the lock ID. Prefer an atomic deploy-and-initialize transaction.
 5. Verify code hashes, config, funding and account access keys. Load `ui/live.html` with your account and expected code hash.
 6. Preview/submit as the recipe actor; dispatch; independently confirm through the executor. Never put full-access keys in the static UI.

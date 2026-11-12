@@ -112,9 +112,11 @@ impl Config {
             }
         }
         for (i, r) in self.recipes.iter().enumerate() {
+            // An actor that is also its recipe's executor would attest its own work.
             if !short(&r.name)
                 || !short(&r.actor)
                 || !short(&r.executor)
+                || r.actor == r.executor
                 || r.reserve.len() != n
                 || r.complete.len() != n
                 || r.max_units == 0

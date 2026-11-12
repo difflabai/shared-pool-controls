@@ -6,7 +6,7 @@ This document specifies the implemented prototype, not a claim of completed form
 
 `Pool = (config, values, version, observed_at, paused, records)`.
 
-Config is immutable. It contains one owner, bounded named metrics, potential terms and recipes. Each recipe has one exact actor account, one exact executor account, reservation effects, completion effects, a maximum quantity and earlier-recipe completion prerequisites `(recipe_id, minimum_completed_units)`. The dependency order is acyclic by construction.
+Config is immutable. It contains one owner, bounded named metrics, potential terms and recipes. Each recipe has one exact actor account, one exact executor account distinct from the actor, reservation effects, completion effects, a maximum quantity and earlier-recipe completion prerequisites `(recipe_id, minimum_completed_units)`. The dependency order is acyclic by construction.
 
 Both initializers are private to their own deployment account, preventing initialization by an unrelated caller. The NEAR wrapper authorizes by immediate predecessor account, not a JSON actor field and not `signer_account_id`. Calls through an intermediary are attributed to that intermediary. Account owners and deployed account code are part of the trust boundary. Preview accepts a proposed actor but conveys no authorization.
 
