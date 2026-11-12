@@ -26,6 +26,8 @@ jobs:
           mkdir _site
           cp -R ui/. _site/
           cp -R scenarios _site/scenarios
+          mkdir _site/images
+          cp docs/images/social-preview.jpg _site/images/
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         with:
