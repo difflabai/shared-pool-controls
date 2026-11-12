@@ -3,12 +3,13 @@
 This page lists the problems an outside verification effort found in
 v1.0.0 of the contract.
 
-**Status.** v1.1.0 fixes every finding below. Each finding has a
-**Status** line with the fixing commit and the tests that check the fix;
-[CHANGELOG.md](../CHANGELOG.md) lists the changes. The formal results cited
-here apply to v1.0.0. v1.1.0 has not been formally re-verified: its fixes
-are checked by tests in this repository only. The commit hashes on this
-page are commits of
+**Status.** v1.1.0 fixes every finding below. For F-4 it rejects only a
+recipe whose actor is its executor; the owner may still be a recipe's
+executor. Each finding has a **Status** line with the fixing commit and
+the tests that check the fix; [CHANGELOG.md](../CHANGELOG.md) lists the
+changes. The formal results cited here apply to v1.0.0. v1.1.0 has not
+been formally re-verified: its fixes are checked by tests in this
+repository only. The commit hashes on this page are commits of
 [PR #4](https://github.com/difflabai/shared-pool-controls/pull/4), which
 lists them.
 
@@ -81,7 +82,7 @@ Severity rates the harm to a property the docs promise.
 | F-2 | high | In the supplied `risk` fixture, with every metric in bounds, a position that a completed hedge relied on cannot be released by `settle(false)` or `cancel`. | `f2_risk_position_cannot_be_released_after_hedge_completes`, `f2_risk_reserved_position_is_stuck_after_hedge_completes` | fixed in v1.1.0 (`59e404f`) |
 | F-2b | high (part of F-2) | A release is not bounded by the envelope, so it can fail `Arithmetic`. | `f2b_release_outside_value_range_fails_arithmetic` | fixed in v1.1.0 (`59e404f`) |
 | F-3 | low | One actor can use all 256 lifetime records with free submit-and-cancel cycles. Every later `submit` fails `Full`. | `f3_submit_cancel_cycles_exhaust_lifetime_records` | fixed in v1.1.0 (`1f01d43`) |
-| F-4 | low | `validate` accepts a recipe whose actor is its executor, or the owner. That account settles its own work. | `f4_validate_accepts_actor_or_owner_as_executor` | fixed in v1.1.0 (`dc774f8`) |
+| F-4 | low | `validate` accepts a recipe whose actor is its executor, or the owner. That account settles its own work. | `f4_validate_accepts_actor_or_owner_as_executor` | fixed in v1.1.0 for actor = executor (`dc774f8`); the owner may still be a recipe's executor |
 | F-5 | low | At version u32::MAX every transition fails `Arithmetic`, including settlement and unpausing. | `f5_version_max_freezes_settlement_and_every_transition`, `f5_paused_pool_at_version_max_cannot_unpause` | fixed in v1.1.0 (`da43188`) |
 | F-6 | low | With `max_age_seconds > 0`, one long-open record blocks `observe`, so `submit` and `dispatch` fail `SnapshotExpired` until it settles. | `f6_open_record_blocks_the_snapshot_refresh` | fixed in v1.1.0 (`3eaf1cb`) |
 | NT-F1 | medium (diagnostics, not safety) | The documented build omits `--cfg near`. Every on-chain failure is a bare trap with no message. | formalver `near-tests`, `sandbox` | fixed in v1.1.0 (`effd174`) |

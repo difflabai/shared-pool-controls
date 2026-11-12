@@ -30,7 +30,8 @@ unit tests, seeded random tests and the sandbox suite.
   submit-and-cancel cycles. The pool now keeps a window of the 256 most recent
   records. [F-3](docs/verification-findings.md#f-3-low-lifetime-record-exhaustion)
 - F-4 (low): a recipe's actor could be its own executor. `new` now rejects
-  such a config (`InvalidConfig`).
+  such a config (`InvalidConfig`). The owner may still be a recipe's
+  executor.
   [F-4](docs/verification-findings.md#f-4-low-a-principal-can-attest-its-own-work)
 - F-5 (low): at version u32::MAX every transition failed, including
   settlement. Submit, dispatch, pause and observe now stop 768 versions
