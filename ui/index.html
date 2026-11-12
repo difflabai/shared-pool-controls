@@ -116,6 +116,48 @@ next = reserve(state, recipe, quantity);
 <span class="code-dim">// Reserve first. Dispatch second.</span>
 commit(next);</code></pre><p>Recovery from an externally disturbed state has additional checks. See the full specification for exact semantics.</p></div>
   <div class="technical-points"><article><span>01</span><div><h3>A pure Rust core</h3><p>Bounded data, checked integer arithmetic, fixed recipes. No NEAR dependency in the core’s default build.</p></div></article><article><span>02</span><div><h3>A NEAR execution boundary</h3><p>The synthetic adapter accepts execution only from the lock. Callback failure does not automatically release a commitment.</p></div></article><article><span>03</span><div><h3>A precise claim</h3><p>Accepted reservations do not increase the configured potential. External events can. Lean model proofs and TLA+ checks are complete; Rust-core verification remains in progress. <a href="https://github.com/difflabai/formalver/pull/31">Explore the formal verification.</a></p></div></article></div></div>
+  <div class="deploy-guide" id="deploy" aria-labelledby="deploy-title">
+    <div class="deploy-intro"><span class="eyebrow">Make it yours</span><h3 id="deploy-title">Configure it for your own contention problem. Deploy it on NEAR.</h3><p data-detail="1">Everything that makes the six scenarios different is data. Describe your shared resource in one JSON policy, then deploy the same tested Wasm.</p></div>
+    <ol class="deploy-steps">
+      <li><span class="step-number">01</span><div><h4>Name what is scarce.</h4><p data-detail="1">Each <code>metric</code> is a quantity the pool tracks, with hard <code>min</code> and <code>max</code> bounds: GPU blocks, MW, inventory, budget.</p><p data-detail="2">Add one metric per window or bucket you need to protect separately. A protected reserve is simply a lower <code>max</code> on the shared bucket.</p></div></li>
+      <li><span class="step-number">02</span><div><h4>Say what “worse” means.</h4><p data-detail="1">Each <code>term</code> scores imbalance: <code>Target</code> distance, <code>Excess</code> over a line, or <code>Deficit</code> below one. Admission requires the total never rises.</p><p data-detail="2">Weights decide which problems matter most. Hard bounds and the score are separate checks; a lower score never buys a breach.</p></div></li>
+      <li><span class="step-number">03</span><div><h4>Give each agent a recipe.</h4><p data-detail="1">A <code>recipe</code> fixes who may ask (<code>actor</code>), who executes (<code>executor</code>), what is reserved, and what completion changes. Agents choose only a recipe and a quantity.</p><p data-detail="2"><code>requires</code> chains recipes, so a later step can need an earlier one to finish first.</p></div></li>
+      <li><span class="step-number">04</span><div><h4>Build, deploy, initialize.</h4><p data-detail="1">Policy is immutable once <code>new</code> runs, so review it first. Deploy and initialize in one transaction from the contract’s own account.</p><p data-detail="2">Then check the code hash, preview as an agent, and submit.</p></div></li>
+    </ol>
+    <div class="code-panel deploy-code"><div class="code-header"><span>Shape of a policy</span><span>config.json</span></div><pre><code>{
+  "name": "api-budget",
+  "owner": "you.near",
+  "max_age_seconds": 0,
+  "metrics": [{ "name": "Requests booked", "unit": "req/min",
+                "initial": 0, "min": 0, "max": 100 }],
+  "terms":   [{ "metric": 0, "target": 80,
+                "weight": 10, "shape": "Excess" }],
+  "recipes": [{ "name": "Crawler: batch", "actor": "crawler.near",
+                "executor": "api-gateway.near",
+                "reserve": [1], "complete": [0],
+                "max_units": 40, "requires": [] }]
+}</code></pre></div>
+    <div class="deploy-commands">
+      <details><summary>Build and deploy commands <span aria-hidden="true">+</span></summary><div class="detail-body">
+<pre><code># 1. Build both Wasm contracts and a provenance manifest
+./scripts/build.sh
+
+# 2. Deploy and initialize the lock in one transaction
+#    (near-cli-rs syntax; check `near contract deploy --help` for your version)
+near contract deploy pool.you.near \
+  use-file target/wasm32-unknown-unknown/release/pool_contract.wasm \
+  with-init-call new json-args "$(jq -c '{config: .}' config.json)" \
+  prepaid-gas '100 Tgas' attached-deposit '0 NEAR' \
+  network-config testnet sign-with-keychain send
+
+# 3. Read it back and compare the code hash to your build manifest
+near contract call-function as-read-only pool.you.near get_pool \
+  json-args {} network-config testnet now</code></pre>
+        <p>Use <a href="https://github.com/difflabai/shared-pool-controls/blob/main/docs/api.md#deployment-preparation">the deployment checklist</a> for account setup, then open <a href="live.html">the NEAR console</a> with your account and expected code hash.</p>
+      </div></details>
+      <details><summary>Before you deploy for real <span aria-hidden="true">+</span></summary><div class="detail-body"><p>Replace every <code>executor</code> with an adapter you control. The bundled executor is synthetic: it proves the gate, not a connection to your GPUs, warehouse, or funds. A real adapter must implement the <code>execute</code> and <code>status</code> protocol, idempotency, and authoritative cancellation, and it must leave agents no route around the lock.</p><p>Policy and principals cannot be edited after initialization. A pool holds at most 32 metrics, 32 recipes, and 256 lifetime commitments; deploy a fresh pool to rotate. The contract is not independently audited and its formal verification is in progress, so test on testnet first.</p></div></details>
+    </div>
+  </div>
   <div class="contract-details">
     <details><summary>What exactly does an agent submit? <span aria-hidden="true">+</span></summary><div class="detail-body"><p>A recipe ID, an exact integer quantity, the state version it reviewed, and a short expiry. Recipes fix the actor, executor, effects, and prerequisites. The agent cannot supply its own risk estimate or ledger delta.</p><pre><code>{
   "recipe": 0,
@@ -128,19 +170,19 @@ commit(next);</code></pre><p>Recovery from an externally disturbed state has add
     <details><summary>Inspect the selected scenario’s policy <span aria-hidden="true">+</span></summary><div class="detail-body"><pre id="policy"></pre></div></details>
     <details><summary>Inspect the last Rust decision <span aria-hidden="true">+</span></summary><div class="detail-body"><pre id="raw">Run a scenario decision to inspect its response.</pre></div></details>
   </div>
-  <div class="resource-links"><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/docs/spec.md"><span>Read the specification</span><span aria-hidden="true">↗</span></a><a href="https://github.com/difflabai/shared-pool-controls/tree/feat/shared-pool-controls/crates/core"><span>Explore the Rust core</span><span aria-hidden="true">↗</span></a><a href="live.html"><span>Open the NEAR console</span><span aria-hidden="true">↗</span></a></div>
+  <div class="resource-links"><a href="https://github.com/difflabai/shared-pool-controls/blob/main/docs/spec.md"><span>Read the specification</span><span aria-hidden="true">↗</span></a><a href="https://github.com/difflabai/shared-pool-controls/tree/feat/shared-pool-controls/crates/core"><span>Explore the Rust core</span><span aria-hidden="true">↗</span></a><a href="live.html"><span>Open the NEAR console</span><span aria-hidden="true">↗</span></a></div>
 </section>
 <section class="evidence-section wrap" id="evidence" aria-labelledby="evidence-title">
   <div class="section-kicker"><span>04 / Evidence for review</span><span>Run it. Inspect it. Check the boundary.</span></div>
   <div class="section-heading"><h2 id="evidence-title">A visible decision.<br><em>A testable claim.</em></h2><p>The deliverable is an MIT-licensed contract for the NEAR ecosystem. Fork it, define the shared resources and policy for your application, and connect an enforced executor. The six scripted scenarios show how the same admission rule applies across businesses.</p></div>
   <div class="evidence-grid">
-    <article><span class="eyebrow">Policy enforcement</span><h3>Reject the harmful commitment.</h3><p>The GPU trace includes a request that passes hard capacity bounds but raises energy. It is denied without reserving resources.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/scenarios/gpu/trace.json">Inspect the Rust-generated trace ↗</a></article>
-    <article><span class="eyebrow">Execution authority</span><h3>Try going around the gate.</h3><p>NEAR sandbox tests attempt direct executor calls and agent-authored settlement. Both fail; registered execution evidence is required.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/crates/sandbox/tests/integration.rs">Inspect the bypass tests ↗</a></article>
-    <article><span class="eyebrow">Asynchronous safety</span><h3>Keep uncertain work reserved.</h3><p>Sandbox tests exercise stale requests, unknown execution outcomes, and reconciliation. A failed callback alone does not free capacity.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/docs/verification-handoff.md">Inspect the verification handoff ↗</a></article>
+    <article><span class="eyebrow">Policy enforcement</span><h3>Reject the harmful commitment.</h3><p>The GPU trace includes a request that passes hard capacity bounds but raises energy. It is denied without reserving resources.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/main/scenarios/gpu/trace.json">Inspect the Rust-generated trace ↗</a></article>
+    <article><span class="eyebrow">Execution authority</span><h3>Try going around the gate.</h3><p>NEAR sandbox tests attempt direct executor calls and agent-authored settlement. Both fail; registered execution evidence is required.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/main/crates/sandbox/tests/integration.rs">Inspect the bypass tests ↗</a></article>
+    <article><span class="eyebrow">Asynchronous safety</span><h3>Keep uncertain work reserved.</h3><p>Sandbox tests exercise stale requests, unknown execution outcomes, and reconciliation. A failed callback alone does not free capacity.</p><a href="https://github.com/difflabai/shared-pool-controls/blob/main/docs/verification-handoff.md">Inspect the verification handoff ↗</a></article>
   </div>
   <div class="near-boundary"><h3>Formal verification, with evidence you can inspect</h3><p>Dedicated verification of the contract includes Lean model proofs, bounded TLA+ checks, and conformance traces against the Rust core. The work targets source revision <code>a4bb5c3</code>. Kani verification of the Rust implementation remains pending; the PR reports high-severity settlement/liveness findings F-1 and F-2.</p><a href="https://github.com/difflabai/formalver/pull/31">Read the formal verification results, scope &amp; findings ↗</a></div>
   <div class="review-status"><div><h3>What you can verify today</h3><p>Rust kernel, NEAR lock and synthetic executor, six deterministic scenarios, local Wasm integration tests, and a static explorer. The browser demo is a simulation or recorded replay—not a public-chain transaction.</p></div><div><h3>Where the prototype stops</h3><p>No public-network deployment, real payments, live LLM agents, NEAR Intents integration, or production provider adapters. Not independently audited. Formal verification is in progress and has identified settlement/liveness findings. Policy quality and trusted observations remain assumptions.</p></div></div>
-  <div class="resource-links"><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/docs/judges-guide.md"><span>Reproduce the demo &amp; tests</span><span aria-hidden="true">↗</span></a><a href="https://github.com/difflabai/shared-pool-controls/actions"><span>Inspect CI runs</span><span aria-hidden="true">↗</span></a><a href="https://nearhackathon.com/"><span>Track: AI Security &amp; Defense</span><span aria-hidden="true">↗</span></a></div>
+  <div class="resource-links"><a href="https://github.com/difflabai/shared-pool-controls/blob/main/docs/judges-guide.md"><span>Reproduce the demo &amp; tests</span><span aria-hidden="true">↗</span></a><a href="https://github.com/difflabai/shared-pool-controls/actions"><span>Inspect CI runs</span><span aria-hidden="true">↗</span></a><a href="https://nearhackathon.com/"><span>Track: AI Security &amp; Defense</span><span aria-hidden="true">↗</span></a></div>
 </section>
 <section class="closing wrap"><p class="eyebrow">Open source · MIT licensed · Built for the NEAR ecosystem</p><h2>Your shared resources.<br><em>Your deployed contract.</em></h2><p>Modify the contract and policy for your application. Review the verification findings, connect your execution adapter, and deploy a gate your agents share.</p><a class="button primary" href="https://github.com/difflabai/shared-pool-controls">Get the contract <span aria-hidden="true">↗</span></a></section>
 </main>

@@ -15,6 +15,8 @@ Agents submit an owner-defined recipe and exact integer quantity. The core check
 
 ## Hackathon review path
 
+Submission details, category, team, and the matching formal verification are in [`nearhackathon.md`](nearhackathon.md).
+
 Track: **AI Security & Defense**. The deliverable is an open-source contract that ecosystem teams can adapt and deploy for shared compute, delivery capacity, inventory, worker funding, and risk budgets. The explorer demonstrates those applications. See the [judge walkthrough](docs/judges-guide.md) for a 90-second demo script and a claim-to-evidence map.
 
 Start the lab below, then click **Begin docking sequence**. Atlas reserves 4 MW and Lyra 2 MW. Vega asks for 4 MW: **WAIT TO DOCK**. The station has 12 MW per window, but 4 MW is protected for life support; docking cannot exceed 8 MW. The denied request leaves 6 MW booked. Click **Request Vega docking in window 02** to submit a fresh request against the second window. The animation reflects Rust decisions, not a JavaScript policy implementation. The original GPU scenario remains available as a separate example of an energy-only denial.
