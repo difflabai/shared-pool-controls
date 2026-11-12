@@ -259,7 +259,7 @@ fn main() {
                 )
                 .unwrap();
             }
-            println!("Exported all five Rust fixture traces.");
+            println!("Exported all Rust fixture traces.");
         }
         "trace" => {
             let name = args.get(2).map(String::as_str).unwrap_or("gpu");

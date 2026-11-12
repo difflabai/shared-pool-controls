@@ -293,3 +293,19 @@ fn completion_envelope_prevents_overcommitting_incoming_capacity() {
     assert_eq!(submit(&mut p, 0, 1), Err(Error::Bounds));
     assert_eq!(p, prior);
 }
+
+#[test]
+fn station_waits_without_spending_life_support_reserve() {
+    let mut p = pool("station");
+    submit(&mut p, 0, 4).unwrap();
+    submit(&mut p, 2, 2).unwrap();
+    let before = p.clone();
+    assert_eq!(submit(&mut p, 4, 4), Err(Error::Bounds));
+    assert_eq!(p, before);
+    assert_eq!(p.values[3], 6);
+    // Waiting is not a queued authorization: the next window needs a new request.
+    submit(&mut p, 5, 4).unwrap();
+    submit(&mut p, 3, 2).unwrap();
+    assert_eq!(&p.values[3..5], &[6, 6]);
+    assert_eq!(p.energy(&p.values), Ok(0));
+}
