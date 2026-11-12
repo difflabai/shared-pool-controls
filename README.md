@@ -34,6 +34,8 @@ The server binds only to loopback. It serves plain HTML/CSS/JavaScript and evalu
 
 Use **Run next decision** to walk the trace; **Preview** and **Submit exact quantity** to explore; **Suggest a smaller quantity** to ask the bounded Rust planner for a suggestion. Unknown outcomes, confirmed nonexecution, duplicate completion, and a risk-market observation can be explored through the lifecycle controls.
 
+The `pages` workflow publishes the UI and recorded traces to GitHub Pages on every push to `main` (enable it once under Settings → Pages → Source: GitHub Actions). The hosted site is a replay with manual submissions disabled.
+
 For a completely static replay, serve the repository root with `python3 -m http.server 8081`, then open `/ui/`. The same page falls back to checked-in traces produced by Rust; manual submissions are disabled and the mode is clearly labeled. Generate them with:
 
 ```sh

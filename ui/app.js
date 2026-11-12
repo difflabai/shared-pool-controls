@@ -24,7 +24,13 @@ function node(tag, text, cls) {
   if (cls) n.className = cls;
   return n;
 }
+// The Rust server only exists on a local host; elsewhere (GitHub Pages) replay recorded traces.
+const localHosts = ['localhost', '127.0.0.1', '[::1]'];
+const hasServer = localHosts.includes(location.hostname);
+// Source checkout serves /ui/ with scenarios one level up; the Pages build has them beside index.html.
+const scenarioRoot = /\/ui(\/|\/index\.html)?$/.test(location.pathname) ? '../scenarios/' : 'scenarios/';
 async function api(path, data = {}) {
+  if (!hasServer) throw Error('No local Rust server');
   const r = await fetch('/api/' + path, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ scenario, ...data })
@@ -221,7 +227,7 @@ async function reset() {
   try {
     pool = (await api('reset')).pool; steps = (await api('trace')).steps; offline = false;
   } catch (_) {
-    const r = await fetch('../scenarios/' + scenario + '/trace.json');
+    const r = await fetch(scenarioRoot + scenario + '/trace.json');
     if (!r.ok) throw Error('The scenario could not load. Serve the repository root for static replay, or start the local Rust demo server.');
     const trace = await r.json(); pool = trace.initial; steps = trace.steps; offline = true;
   }
