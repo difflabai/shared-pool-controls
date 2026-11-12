@@ -1,10 +1,10 @@
 # Shared Pool Controls
 
-**Independent agents. One shared limit.** An MIT-licensed, open-source Rust / NEAR contract for commitments against a shared pool. Built for the **AI Security & Defense** track of NEAR Hackathon, it gives ecosystem developers a contract they can modify, configure, and deploy to address this class of shared-resource problems. Six scenarios use the same core and contract:
-
 **[Try the live site →](https://difflabai.github.io/shared-pool-controls/)**
 
 [![Shared Pool Controls: three ships, one power grid. Vega is told to wait to dock.](docs/images/site-preview.jpg)](https://difflabai.github.io/shared-pool-controls/)
+
+**Independent agents. One shared limit.** An MIT-licensed, open-source Rust / NEAR contract for commitments against a shared pool. Built for the **AI Security & Defense** track of NEAR Hackathon, it gives ecosystem developers a contract they can modify, configure, and deploy to address this class of shared-resource problems. Six scenarios use the same core and contract:
 
 1. **Every ship wants to dock** — station power, a protected life-support allocation, and an explicit wait before requesting a later window.
 2. **Every team needs the GPU now** — shared compute, protected inference capacity, smaller or later allocations.
