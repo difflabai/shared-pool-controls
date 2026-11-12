@@ -43,7 +43,9 @@ Hard constraints are axis-aligned metric bounds. Coupled constraints use additio
 - Same completion/cancellation repeated: idempotent. Conflicting terminal evidence: reject.
 - Late acknowledgment after terminal settlement: ignored.
 
-Admission refuses any commitment whose outcomes could make a metric worse than now, so the checked inverse cannot fail its bounds or range check in a reachable state. There is still no forced administrative release.
+Admission refuses any commitment whose outcomes could make a metric worse than now, so the checked inverse cannot fail in a reachable state. There is still no forced administrative release.
+
+Version reserve: submit (as its last check, so `preview` reports it), dispatch, `set_paused` and `observe` fail `Arithmetic` once version reaches `VERSION_CAP = u32::MAX - 768`. Acknowledgment, settlement and cancellation keep the plain checked increment. An open record needs at most three more increments (Dispatched -> Unknown -> Active -> terminal) and there are at most 256 records, so these never overflow. At the cap the pool admits nothing new but every open record can still be resolved.
 
 No automatic expiry of a dispatched request. A deadline does not prove nonexecution. Reconciliation queries the fixed executor by immutable ID. Unknown is distinct from cancelled. An executed but unacknowledged job remains a liability.
 

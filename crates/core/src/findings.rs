@@ -529,54 +529,114 @@ fn f4_actor_cannot_be_its_own_executor() {
     }
 }
 
-/// F-5 (low): at version u32::MAX every transition fails Arithmetic,
-/// including settlement of in-flight records. Reaching it takes 2^32 - 1
-/// effective transitions, so the test sets the field.
+/// F-5 (low), fixed: v1.0.0 froze every transition at version u32::MAX,
+/// settlement of in-flight records included. v1.1 stops submit, dispatch,
+/// set_paused and observe at VERSION_CAP, 768 versions below u32::MAX, and
+/// keeps the rest as a reserve: acknowledgment, settlement and cancellation
+/// still work above the cap. Reaching the cap takes about 2^32 effective
+/// transitions, so the test sets the field.
 #[test]
-fn f5_version_max_freezes_settlement_and_every_transition() {
+fn f5_open_records_resolve_above_the_version_cap() {
     let mut p = pool("gpu");
     let flight = submit(&mut p, 0, 1, 100).unwrap();
     p.dispatch("research.test.near", flight, 100).unwrap();
     let reserved = submit(&mut p, 2, 1, 100).unwrap();
-    p.version = u32::MAX;
+    p.version = VERSION_CAP;
     let frozen = p.clone();
-    assert_eq!(p.settle(EXEC, flight, true), Err(Error::Arithmetic));
-    assert_eq!(p.settle(EXEC, flight, false), Err(Error::Arithmetic));
-    assert_eq!(p.acknowledge(flight, true), Err(Error::Arithmetic));
-    assert_eq!(p.acknowledge(flight, false), Err(Error::Arithmetic));
+    // preview now agrees with submit (v1.0.0 said allowed here).
+    let q = req(&p, 4, 1);
+    let d = p.preview("data.test.near", &q, 100);
+    assert!(!d.allowed);
+    assert_eq!(d.reason, "Arithmetic");
+    assert_eq!(p.best_quantity("data.test.near", &q, 100), None);
+    assert_eq!(p.submit("data.test.near", q, 100), Err(Error::Arithmetic));
     assert_eq!(
         p.dispatch("evaluation.test.near", reserved, 100),
         Err(Error::Arithmetic)
     );
-    assert_eq!(
-        p.cancel("evaluation.test.near", reserved, 100),
-        Err(Error::Arithmetic)
-    );
     assert_eq!(p.set_paused(OWNER, true), Err(Error::Arithmetic));
-    // v1.0.0 said Pending here; since the F-6 fix a restatement of the
-    // current values passes the open-record check and fails at the version.
     assert_eq!(
         p.observe(OWNER, frozen.values.clone(), 100),
         Err(Error::Arithmetic)
     );
-    // Observation, not a finding: preview says allowed, submit fails.
-    let q = req(&p, 4, 1);
-    assert!(p.preview("data.test.near", &q, 100).allowed);
-    assert_eq!(p.submit("data.test.near", q, 100), Err(Error::Arithmetic));
     assert_eq!(p, frozen);
+    assert_live(&p);
+    // The longest path of the in-flight record, and the cancel.
+    p.acknowledge(flight, false).unwrap();
+    p.acknowledge(flight, true).unwrap();
+    p.settle(EXEC, flight, true).unwrap();
+    p.cancel("evaluation.test.near", reserved, 100).unwrap();
+    assert_eq!(p.version, VERSION_CAP + 4);
+    assert!(p.records.iter().all(|c| !open(&c.status)));
+    // The pool is retired: nothing new starts, also with every record terminal.
+    let values = p.values.clone();
+    assert_eq!(p.observe(OWNER, values, 100), Err(Error::Arithmetic));
+    assert_eq!(submit(&mut p, 4, 1, 100), Err(Error::Arithmetic));
 }
 
-/// F-5, paused form: a paused pool at version u32::MAX cannot be unpaused
-/// or observed.
+/// F-5, paused form, fixed: in v1.0.0 a paused pool at version u32::MAX
+/// could not be unpaused, observed or settled. In v1.1 the last pause that
+/// fits takes the version to VERSION_CAP. From there pause, unpause and
+/// observe fail Arithmetic, and the open records still resolve.
 #[test]
-fn f5_paused_pool_at_version_max_cannot_unpause() {
+fn f5_paused_pool_at_the_cap_still_settles() {
     let mut p = pool("gpu");
+    let initial = p.values.clone();
+    let flight = submit(&mut p, 0, 1, 100).unwrap();
+    p.dispatch("research.test.near", flight, 100).unwrap();
+    let reserved = submit(&mut p, 2, 1, 100).unwrap();
+    p.version = VERSION_CAP - 1;
     p.set_paused(OWNER, true).unwrap();
-    p.version = u32::MAX;
+    assert_eq!(p.version, VERSION_CAP);
     let frozen = p.clone();
     assert_eq!(p.set_paused(OWNER, false), Err(Error::Arithmetic));
-    assert_eq!(p.observe(OWNER, vec![0; 5], 100), Err(Error::Arithmetic));
+    assert_eq!(p.set_paused(OWNER, true), Err(Error::Arithmetic));
+    assert_eq!(
+        p.observe(OWNER, frozen.values.clone(), 100),
+        Err(Error::Arithmetic)
+    );
     assert_eq!(p, frozen);
+    assert_live(&p);
+    p.settle(EXEC, flight, false).unwrap();
+    p.cancel(OWNER, reserved, 100).unwrap();
+    assert_eq!(p.values, initial);
+    assert_eq!(p.version, VERSION_CAP + 2);
+    assert!(p.paused);
+}
+
+/// F-5: the reserve is exactly enough. All 256 records are Dispatched when
+/// the version reaches VERSION_CAP. Each then takes the longest path
+/// (Unknown, Active, Completed), three increments, and the version ends at
+/// exactly u32::MAX.
+#[test]
+fn f5_reserve_is_exactly_enough() {
+    const A: &str = "agent.test.near";
+    assert_eq!(
+        u64::from(VERSION_CAP) + 3 * MAX_RECORDS as u64,
+        u64::from(u32::MAX)
+    );
+    let c = config(
+        vec![metric(0, 10, 5), metric(-100, 100, 5)],
+        vec![recipe(A, vec![0, 0], vec![0, 0], 1)],
+    );
+    let mut p = Pool::new(c, 100).unwrap();
+    let last = MAX_RECORDS as u32 - 1;
+    for id in 0..last {
+        assert_eq!(submit(&mut p, 0, 1, 100), Ok(id));
+        p.dispatch(A, id, 100).unwrap();
+    }
+    // The last submit and dispatch are the last two increments below the cap.
+    p.version = VERSION_CAP - 2;
+    assert_eq!(submit(&mut p, 0, 1, 100), Ok(last));
+    p.dispatch(A, last, 100).unwrap();
+    assert_eq!(p.version, VERSION_CAP);
+    for id in 0..=last {
+        p.acknowledge(id, false).unwrap();
+        p.acknowledge(id, true).unwrap();
+        p.settle(EXEC, id, true).unwrap();
+    }
+    assert_eq!(p.version, u32::MAX);
+    assert!(p.records.iter().all(|c| c.status == Status::Completed));
 }
 
 /// F-6 (low), fixed: the risk fixture has max_age 300 and was observed at

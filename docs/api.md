@@ -23,7 +23,7 @@ Request example:
 {"recipe":0,"units":4,"version":0,"expires_at":1794500000}
 ```
 
-Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every successful state transition changes version; terminal duplicate settlement is idempotent.
+Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every successful state transition changes version; terminal duplicate settlement is idempotent. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
 
 Decision fields: `allowed`, `reason`, decimal-string `before` and optional `after`, decimal-string per-term scores, candidate metric vector. Reasons include Unauthorized, Paused, Stale, Expired, SnapshotExpired, InvalidRecipe, InvalidUnits, Prerequisite, Full, Arithmetic, Bounds, Energy. `after` can be present for a rejected request to explain its prospective score; it is not accepted state.
 

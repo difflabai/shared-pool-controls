@@ -15,6 +15,12 @@ pub const MAX_RECORDS: usize = 256;
 pub const MAX_VALUE: i64 = 1_000_000;
 pub const MAX_WEIGHT: u32 = 1_000;
 pub const MAX_UNITS: u32 = 100;
+/// Submit, dispatch, set_paused and observe fail Arithmetic from this
+/// version on. The 3 * MAX_RECORDS versions above it are a reserve: an open
+/// record needs at most three more increments to become terminal
+/// (Dispatched -> Unknown -> Active -> terminal), so acknowledgment,
+/// settlement and cancellation can never overflow the version.
+pub const VERSION_CAP: u32 = u32::MAX - 3 * MAX_RECORDS as u32;
 
 macro_rules! data {
     ($($item:item)*) => {$ (
@@ -304,6 +310,9 @@ impl Pool {
         {
             return Err(Error::Energy);
         }
+        if self.version >= VERSION_CAP {
+            return Err(Error::Arithmetic);
+        }
         Ok(next)
     }
     pub fn preview(&self, caller: &str, req: &Request, now: u64) -> Decision {
@@ -364,6 +373,14 @@ impl Pool {
         self.version = self.version.checked_add(1).ok_or(Error::Arithmetic)?;
         Ok(())
     }
+    /// The increment for calls that start or administer work. It stops at
+    /// VERSION_CAP, which keeps the reserve for resolving open records.
+    fn bump_new(&mut self) -> Result<(), Error> {
+        if self.version >= VERSION_CAP {
+            return Err(Error::Arithmetic);
+        }
+        self.bump()
+    }
     pub fn dispatch(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {
         let c = self.record(id)?;
         let r = &self.config.recipes[c.recipe as usize];
@@ -387,7 +404,7 @@ impl Pool {
         {
             return Err(Error::SnapshotExpired);
         }
-        self.bump()?;
+        self.bump_new()?;
         self.records[id as usize].status = Status::Dispatched;
         Ok(())
     }
@@ -472,7 +489,7 @@ impl Pool {
         if caller != self.config.owner {
             return Err(Error::Unauthorized);
         }
-        self.bump()?;
+        self.bump_new()?;
         self.paused = paused;
         Ok(())
     }
@@ -491,7 +508,7 @@ impl Pool {
             return Err(Error::Bounds);
         }
         self.energy(&values)?;
-        self.bump()?;
+        self.bump_new()?;
         self.values = values;
         self.observed_at = now;
         Ok(())
