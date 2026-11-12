@@ -1,6 +1,6 @@
 # NEAR API
 
-One immutable pool per deployment. All mutating methods are nonpayable; fund storage by transferring NEAR to the deployment account separately. Local demonstration credits have no relationship to attached deposits.
+One immutable pool per deployment. All mutating methods are nonpayable, including `reconcile`; fund storage by transferring NEAR to the deployment account separately. Local demonstration credits have no relationship to attached deposits.
 
 | Method | Arguments | Authority / result |
 |---|---|---|
@@ -15,7 +15,7 @@ One immutable pool per deployment. All mutating methods are nonpayable; fund sto
 | `cancel` | `{id}` | Actor or owner; only undispatched Reserved records. Dispatched, Active or Unknown: `Pending`. Completed: `InvalidState`. Already Cancelled: Ok, no change. |
 | `set_paused` | `{paused}` | Owner; blocks admission and dispatch. |
 | `observe` | `{values}` | Owner; new values only when every record is terminal. Restating the current values is allowed at any time and renews the snapshot timestamp. May raise energy. |
-| `on_result` | `{id}` plus runtime promise result | Private callback, not a public evidence submission endpoint. |
+| `on_result` | `{id}` plus runtime promise result | Private callback, not a public evidence submission endpoint. It never panics on its input: a result for an id with no record changes nothing and is logged (`reconciled` with `error: "NotFound"`). |
 
 Request example:
 
@@ -31,7 +31,7 @@ There is no `dampen` mutation: a caller previews an explicit reduced quantity an
 
 ## Executor protocol
 
-`execute({id,recipe,units}) -> "active" | "cancelled" | "unknown"`. Only the lock may call. `status({id})` additionally returns `"completed"`. Runtime failures and unexpected strings become Unknown in the wrapper. Fixed executor identity plus immutable recipe/quantity bind dispatch to the reservation. A production adapter must implement idempotency, authoritative cancellation and fill semantics.
+`execute({id,recipe,units}) -> "active" | "cancelled" | "unknown"`. Only the lock may call. `status({id})` additionally returns `"completed"`. In the wrapper, any result that is not one JSON string of at most 64 bytes becomes Unknown: a runtime failure, a number, `null`, an object, invalid bytes, a longer result. So does an unexpected string. Fixed executor identity plus immutable recipe/quantity bind dispatch to the reservation. A production adapter must implement idempotency, authoritative cancellation and fill semantics.
 
 The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({id,completed})`, `confirm_not_executed({id,recipe,units})`, and `get_jobs({})`. Modes normal/reject/unknown/panic support fault injection. These are testing features, not a real asset gateway.
 

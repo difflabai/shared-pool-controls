@@ -1,5 +1,5 @@
 //! Real Wasm/receipt integration. Run scripts/sandbox.sh after building both Wasm files.
-use near_workspaces::{Account, Contract};
+use near_workspaces::{types::NearToken, Account, Contract};
 use pool_core::{fixtures, Pool, Request, Status};
 use serde_json::{json, Value};
 use std::{
@@ -36,9 +36,21 @@ async fn call(a: &Account, c: &Contract, method: &str, args: Value) -> Value {
 /// The call must fail with a panic message that contains `expected`. A Wasm
 /// built without `--cfg near` traps with no message, so this also checks the build.
 async fn fail(a: &Account, c: &Contract, method: &str, args: Value, expected: &str) {
+    fail_paying(a, c, method, args, NearToken::from_yoctonear(0), expected).await
+}
+/// `fail` with a deposit attached.
+async fn fail_paying(
+    a: &Account,
+    c: &Contract,
+    method: &str,
+    args: Value,
+    deposit: NearToken,
+    expected: &str,
+) {
     let r = a
         .call(c.id(), method)
         .args_json(args)
+        .deposit(deposit)
         .max_gas()
         .transact()
         .await
@@ -190,6 +202,17 @@ async fn unknown_outcomes_stale_requests_and_reconciliation() {
     assert_eq!(state(&lock).await.records[0].status, Status::Unknown);
     fail(&actor, &lock, "cancel", json!({"id":0}), "Pending").await;
     assert_eq!(state(&lock).await.values[3], 4);
+    // NT-F2: reconcile is nonpayable like every other mutating method.
+    fail_paying(
+        &actor,
+        &lock,
+        "reconcile",
+        json!({"id":0}),
+        NearToken::from_yoctonear(1),
+        "Method reconcile doesn't accept deposit",
+    )
+    .await;
+    assert_eq!(state(&lock).await.records[0].status, Status::Unknown);
     call(&actor, &lock, "reconcile", json!({"id":0})).await;
     assert_eq!(state(&lock).await.records[0].status, Status::Active);
     call(

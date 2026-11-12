@@ -366,7 +366,8 @@ impl Pool {
         self.version = version;
         Ok(id)
     }
-    fn record(&self, id: u32) -> Result<&Commitment, Error> {
+    /// The record with this id, or `NotFound`.
+    pub fn record(&self, id: u32) -> Result<&Commitment, Error> {
         self.records.get(id as usize).ok_or(Error::NotFound)
     }
     fn bump(&mut self) -> Result<(), Error> {
