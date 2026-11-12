@@ -72,7 +72,7 @@ python3 scripts/smoke.py     # local HTTP demo; start server first
 
 One pool per deployment; immutable recipes, principals and policy. At most 32 metrics, 32 recipes, 64 potential terms and 256 lifetime commitments. Fixed limits bound computation and storage. The 257th commitment is rejected; rotate to a new deployment rather than pruning replay protection. The owner funds storage. This favors inspection and verification over indefinite production operation.
 
-Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updated implementation plan](docs/implementation-plan.md), and [verification handoff](docs/verification-handoff.md).
+Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updated implementation plan](docs/implementation-plan.md), [verification handoff](docs/verification-handoff.md), and [verification findings](docs/verification-findings.md).
 
 ## Important boundaries
 
