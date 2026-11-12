@@ -1668,3 +1668,25 @@ body:not(.story-site) .row {
 }
 
 .orbital-scene { scroll-margin-top:16px; }
+
+/* Deploy guide: configure and deploy the contract for your own problem. */
+.deploy-guide { display:grid; grid-template-columns:1.1fr .9fr; gap:28px 56px; margin:56px 0 12px; padding-top:44px; border-top:1px solid var(--line); align-items:start; }
+.deploy-intro { grid-column:1 / -1; max-width:720px; }
+.deploy-intro h3 { font-size:clamp(1.5rem,2.6vw,2.1rem); line-height:1.2; margin:10px 0 14px; }
+.deploy-intro p { color:var(--muted); font-size:.9rem; line-height:1.8; margin:0; }
+.deploy-steps { list-style:none; margin:0; padding:0; display:grid; gap:2px; }
+.deploy-steps li { display:flex; gap:22px; padding:20px 0; border-bottom:1px solid var(--line); }
+.deploy-steps li:first-child { padding-top:4px; }
+.deploy-steps li:last-child { border-bottom:0; }
+.deploy-steps .step-number { font-size:1.6rem; margin:0; min-width:44px; }
+.deploy-steps h4 { font-size:1rem; margin:0 0 8px; }
+.deploy-steps p { font-size:.82rem; color:var(--muted); line-height:1.75; margin:0 0 8px; }
+.deploy-steps code, .deploy-code + .deploy-commands code { font-size:.78em; }
+.deploy-code { position:sticky; top:24px; }
+.deploy-code pre { font-size:.7rem; line-height:1.75; white-space:pre; overflow-x:auto; }
+.deploy-commands { grid-column:1 / -1; }
+.deploy-commands pre { white-space:pre; overflow-x:auto; font-size:.74rem; line-height:1.8; }
+@media(max-width:900px) {
+  .deploy-guide { grid-template-columns:1fr; gap:28px; }
+  .deploy-code { position:static; }
+}

@@ -306,7 +306,7 @@ guarded(reset);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const revealAll = $('reveal-all');
   if (!('IntersectionObserver' in window) || reducedMotion.matches) return;
-  const groups = document.querySelectorAll('.hero-copy, .orbital-scene, .premise-heading, .mechanism article, .energy-note, .section-heading, .demo-guide > div, .technical-points article, .evidence-grid article, .review-status > div, .near-boundary, .closing');
+  const groups = document.querySelectorAll('.hero-copy, .orbital-scene, .premise-heading, .mechanism article, .energy-note, .deploy-guide, .section-heading, .demo-guide > div, .technical-points article, .evidence-grid article, .review-status > div, .near-boundary, .closing');
   const timers = new Map();
   const clear = group => {
     (timers.get(group) || []).forEach(clearTimeout);
