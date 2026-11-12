@@ -376,12 +376,18 @@ impl Pool {
         if !matches!(c.status, Status::Dispatched | Status::Unknown) {
             return Ok(());
         }
-        self.bump()?;
-        self.records[id as usize].status = if accepted {
+        let next = if accepted {
             Status::Active
         } else {
             Status::Unknown
         };
+        // reconcile is permissionless: a no-op must not bump the version, or
+        // anyone could repeatedly invalidate every in-flight request.
+        if self.records[id as usize].status == next {
+            return Ok(());
+        }
+        self.bump()?;
+        self.records[id as usize].status = next;
         Ok(())
     }
     pub fn cancel(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {

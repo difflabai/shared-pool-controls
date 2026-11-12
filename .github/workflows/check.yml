@@ -1,5 +1,8 @@
 name: check
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
 permissions:
   contents: read
 jobs:
@@ -17,7 +20,8 @@ jobs:
       - run: ./scripts/sandbox.sh
       - name: HTTP smoke
         run: |
-          cargo run -p pool-demo -- serve 8080 > /tmp/pool-demo.log 2>&1 &
+          cargo build -p pool-demo --locked
+          cargo run -p pool-demo --locked -- serve 8080 > /tmp/pool-demo.log 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid"' EXIT
           python3 scripts/smoke.py

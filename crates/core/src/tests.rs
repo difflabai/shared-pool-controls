@@ -111,6 +111,16 @@ fn stale_and_unauthorized_leave_state_unchanged() {
     assert_eq!(p.submit("research.test.near", q, 100), Err(Error::Stale));
 }
 #[test]
+fn repeated_unknown_reconciliation_does_not_change_version() {
+    let mut p = pool("gpu");
+    let id = submit(&mut p, 0, 4).unwrap();
+    p.dispatch("research.test.near", id, 100).unwrap();
+    p.acknowledge(id, false).unwrap();
+    let before = p.clone();
+    p.acknowledge(id, false).unwrap();
+    assert_eq!(before, p);
+}
+#[test]
 fn unknown_execution_retains_reservations() {
     let mut p = pool("gpu");
     let id = submit(&mut p, 0, 4).unwrap();

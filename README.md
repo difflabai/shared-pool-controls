@@ -59,7 +59,7 @@ python3 scripts/smoke.py     # local HTTP demo; start server first
 
 One pool per deployment; immutable recipes, principals and policy. At most 32 metrics, 32 recipes, 64 potential terms and 256 lifetime commitments. Fixed limits bound computation and storage. The 257th commitment is rejected; rotate to a new deployment rather than pruning replay protection. The owner funds storage. This favors inspection and verification over indefinite production operation.
 
-Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updated implementation plan](docs/implementation-plan.md), [verification handoff](docs/verification-handoff.md), and [validation record](docs/validation.md).
+Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updated implementation plan](docs/implementation-plan.md), and [verification handoff](docs/verification-handoff.md).
 
 ## Important boundaries
 
@@ -71,4 +71,4 @@ Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updat
 - The adapter boundary is real in the sandbox. Real brokers, cloud providers or warehouses would need enforceable integrations with no alternate credentials/path around the gate.
 - The prototype uses no real escrow token. Hiring credits are accounting fixtures, not NEAR balances.
 
-The architecture follows [`difflabai/trust-framework`](https://github.com/difflabai/trust-framework/tree/249f932d84b91fbc6f82abd0668cac6c0503fc42/contracts/approval): a pure core and thin wrapper. Its proofs do **not** apply to this code. Formal verification is deliberately left to a separate session.
+The architecture follows [`difflabai/trust-framework`](https://github.com/difflabai/trust-framework/tree/249f932d84b91fbc6f82abd0668cac6c0503fc42/contracts/approval): a pure core and thin wrapper. Its proofs do **not** apply to this code. Formal verification is deliberately left to separate follow-up work.

@@ -1,6 +1,6 @@
-# Handoff for the formal-verification session
+# Handoff for formal verification
 
-No formal proof is claimed in this repository. The implementation session intentionally focused on small Rust APIs, tests, synthetic execution and static UIs, per the user's request.
+No formal proof is claimed in this repository. The implementation intentionally focuses on small Rust APIs, tests, synthetic execution and static UIs.
 
 Start with `crates/core/src/lib.rs` and `docs/spec.md`. The default pool-core build has **zero dependencies**, no unsafe code, no NEAR imports, and no external I/O. Optional serde/borsh are serialization only. `cargo test -p pool-core --no-default-features` exercises the proof-facing configuration.
 
@@ -41,4 +41,4 @@ Account upgrades, oracle dishonesty, physical delivery, real broker fills, and d
 
 ## Existing evidence
 
-Unit tests cover scenario fixtures, accepted/rejected branches, stale requests, unauthorized identities, pending stock, earmarks, completed-unit prerequisites, duplicate settlement, recovery hedges and conservative pending exposure. Sandbox tests execute both Wasm binaries and compare full state/decisions with the pure core. HTTP smoke checks exercise the local Rust interface. Add mutation testing and proof canaries in the verification session; neither is currently a formal-verification result.
+Unit tests cover scenario fixtures, accepted/rejected branches, stale requests, unauthorized identities, pending stock, earmarks, completed-unit prerequisites, duplicate settlement, recovery hedges and conservative pending exposure. Sandbox tests execute both Wasm binaries and compare full state/decisions with the pure core. HTTP smoke checks exercise the local Rust interface. Add mutation testing and proof canaries in the verification work; neither is currently a formal-verification result.

@@ -1,6 +1,6 @@
 # Shared Pool Controls — revised implementation plan
 
-Updated November 11, 2026. This supersedes the earlier SwarmGuard plan. The user requested implementation in `difflabai/shared-pool-controls`, Rust throughout the decision/runtime layers, static HTML interfaces following trust-framework approval-contract patterns, a small API, and formal verification by another session.
+Updated November 11, 2026. This supersedes the earlier SwarmGuard plan. Goals: implementation in `difflabai/shared-pool-controls`, Rust throughout the decision/runtime layers, static HTML interfaces following trust-framework approval-contract patterns, a small API, and formal verification as separate follow-up work.
 
 ## Scope and order
 
@@ -27,7 +27,7 @@ Deliver a pure core, NEAR wrapper, enforced synthetic executor, deterministic sc
 - Static synthetic scheduling windows, not a production time/calendar engine.
 - Independent authenticated executor evidence replaces a generalized evidence/signature protocol.
 - No LLM dependency, frontend framework, JavaScript build chain, optimization solver, or database.
-- No Kani/Lean/Verus/TLA+ implementation in this session. Keep the spec and small dependency-free core ready for that work.
+- No Kani/Lean/Verus/TLA+ implementation in this iteration. Keep the spec and small dependency-free core ready for that work.
 
 These choices intentionally replace the earlier plan's dynamic policy epochs, generic ticket issuance API, multiple lifecycle stages, continuous scheduler, and proof milestones. They retain the important economic and asynchronous boundaries.
 
@@ -117,7 +117,7 @@ The live console uses NEAR RPC for final-state reads and a pinned wallet connect
 
 Repository must contain runnable source, scripts, locked dependencies, static pages, generated scenario files, API documentation, state-machine spec, security boundaries and formal-verification handoff. README must distinguish sandbox execution, local Rust simulation, static replay and real-chain wallet interaction.
 
-The next verification session should prove configuration soundness, arithmetic bounds, admission preservation, atomic rejection, dependency correctness, conservative pending envelopes, replay/idempotency, and recipe-specific conservation. SDK identity/promise behavior and external adapter truthfulness remain separate proof/trust boundaries. The earlier approval-contract proofs do not transfer automatically.
+The next verification effort should prove configuration soundness, arithmetic bounds, admission preservation, atomic rejection, dependency correctness, conservative pending envelopes, replay/idempotency, and recipe-specific conservation. SDK identity/promise behavior and external adapter truthfulness remain separate proof/trust boundaries. The earlier approval-contract proofs do not transfer automatically.
 
 No real-money transaction, public deployment or submission is required to complete this implementation. Commit and push the built project to the user-specified repository after checks. Any remaining failed check or omitted integration must be reported precisely.
 
