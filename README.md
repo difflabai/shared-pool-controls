@@ -12,6 +12,12 @@ Agents submit an owner-defined recipe and exact integer quantity. The core check
 
 **Status:** implemented prototype with Rust tests and NEAR sandbox integration tests. Not formally verified, independently audited, or deployed to a public network. Credits, GPU jobs, physical delivery, and financial positions are synthetic. The risk coefficients are illustrative, not a production portfolio model.
 
+## Hackathon review path
+
+Recommended primary track: **AI Security & Defense**. The product is a shared-state policy engine for agents; AI Swarms is a secondary thematic fit. See the [judge walkthrough](docs/judges-guide.md) for track analysis, a 90-second demo script, and a claim-to-test map.
+
+Start the lab below, then click **See a request blocked**. It resets GPU and runs three decisions: Data's four-block request is denied (energy 20 → 44), leaving six blocks booked. Click **Run next decision** to admit Data's explicit two-block revision (energy 20 → 8, eight blocks booked). The UI then links to NEAR execution evidence and implementation limits.
+
 ## Run the interactive lab
 
 Install Rust through rustup, Python 3, and optionally Node for JavaScript syntax checks. The repository selects Rust `1.98` and locks dependencies in `Cargo.lock`.

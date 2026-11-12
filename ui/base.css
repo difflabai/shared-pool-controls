@@ -1432,3 +1432,30 @@ body:not(.story-site) .row {
     transition:none!important
   }
 }
+
+/* Judge journey: the demo first, then concrete evidence. */
+.demo-guide, .evidence-grid, .review-status {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:28px;
+}
+.demo-guide {
+  margin:0 0 36px;
+  padding:24px 0;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.demo-guide p { margin:8px 0 0; font-size:.88rem; }
+.near-boundary { max-width:850px; margin:0 0 36px; }
+.evidence-section { padding-top:64px; padding-bottom:72px; }
+.evidence-grid article { border-top:2px solid var(--accent); padding-top:22px; }
+.evidence-grid h3, .review-status h3 { font-size:1.2rem; line-height:1.35; margin:14px 0; }
+.evidence-grid p, .review-status p { font-size:.92rem; }
+.evidence-grid a { display:inline-block; margin-top:12px; font-size:.85rem; }
+.review-status { grid-template-columns:repeat(2,minmax(0,1fr)); background:var(--soft); padding:28px; margin-top:36px; }
+#scenario-panel { scroll-margin-top:24px; }
+@media(max-width:760px) {
+  .demo-guide, .evidence-grid, .review-status { grid-template-columns:1fr; gap:20px; }
+  .evidence-section { padding-top:40px; padding-bottom:40px; }
+  .review-status { padding:20px; }
+}
