@@ -1,5 +1,13 @@
 {
   "initial": {
+    "completed_units": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
     "config": {
       "max_age_seconds": 0,
       "metrics": [
@@ -240,6 +248,7 @@
         }
       ]
     },
+    "first_id": 0,
     "observed_at": 1794441600,
     "paused": false,
     "records": [],
@@ -290,6 +299,14 @@
       },
       "id": 0,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -530,6 +547,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [
@@ -592,6 +610,14 @@
       },
       "id": 1,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          2,
+          0,
+          0,
+          0
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -832,6 +858,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [
@@ -901,6 +928,14 @@
       },
       "id": null,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          2,
+          0,
+          0,
+          0
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -1141,6 +1176,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [
@@ -1210,6 +1246,14 @@
       },
       "id": 2,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          2,
+          0,
+          2,
+          0
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -1450,6 +1494,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [
@@ -1526,6 +1571,14 @@
       },
       "id": 3,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          2,
+          0,
+          2,
+          2
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -1766,6 +1819,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [
@@ -1849,6 +1903,14 @@
       },
       "id": 4,
       "pool": {
+        "completed_units": [
+          4,
+          0,
+          2,
+          2,
+          2,
+          2
+        ],
         "config": {
           "max_age_seconds": 0,
           "metrics": [
@@ -2089,6 +2151,7 @@
             }
           ]
         },
+        "first_id": 0,
         "observed_at": 1794441600,
         "paused": false,
         "records": [

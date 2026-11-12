@@ -37,6 +37,23 @@ There is no `dampen` mutation: a caller previews an explicit reduced quantity an
 
 The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({id,completed})`, `confirm_not_executed({id,recipe,units})`, and `get_jobs({})`. Modes normal/reject/unknown/panic support fault injection. These are testing features, not a real asset gateway. It forgets a job once its id is 256 or more behind the newest id it has executed for the lock. `execute` of a forgotten id returns `"cancelled"` and starts nothing; `confirm_not_executed` of one fails `stale id`, and `finish` fails `unknown job`. It holds at most 512 jobs. The cap is reached only after at least 256 operator confirmations above the newest executed id; one `execute` of a higher id frees the space.
 
+## Gas
+
+Attach at least this much prepaid gas. The figures were measured on the v1.1 Wasm in near-sandbox 2.13.4, at a maximum-size state: 32 metrics, 64 terms, 32 recipes (one requires the other 31), and 256 retained records, all open. For `finish` the executor held 256 jobs. Each figure is the least whole Tgas that succeeded, plus at least 10 Tgas, rounded up.
+
+| Call | Gas it attaches to its promises | Least that succeeded | Attach |
+|---|---|---|---|
+| `dispatch` | `execute` 30 + `on_result` 30 | 70 Tgas | 100 Tgas |
+| `reconcile` | `status` 10 + `on_result` 30 | 46 Tgas | 60 Tgas |
+| executor `finish`, `confirm_not_executed` | the lock's `settle` 40 | 43 Tgas | 60 Tgas |
+| `submit`, `cancel`, `settle`, `observe`, `set_paused` | none | largest receipt 14.81 Tgas (a `submit` with 255 open records) | 30 Tgas |
+
+- Every smaller whole-Tgas amount from 40 Tgas up failed with "Exceeded the prepaid gas." and changed neither contract.
+- The gas attached to promises is fixed; extra prepaid gas is not passed on. At that state `on_result` burnt at most 10.92 of its 30 Tgas (a release), `execute` 2.45 of 30, `status` 1.75 of 10, and the lock's `settle` after `finish` 10.87 of 40.
+- A call with too little gas fails without changing either contract; retry with more gas. A lost executor notification is recovered with `reconcile`.
+- The contracts do not check prepaid gas. Smaller states need less. Another build or protocol version can change these figures.
+- The measuring test is adapted from the outside verification's RES-1 sandbox test. It is not part of this repository's suite.
+
 ## Deployment preparation
 
 1. Build with `scripts/build.sh`; retain Wasm and manifest. It sets `RUSTFLAGS="--cfg near"`, the flag `cargo near` sets, so a failed call reports its error name (for example `Smart contract panicked: Pending`). Without the flag near-sdk drops every panic message. The script fails if either Wasm does not import `env.panic_utf8`, or imports a host function for an action other than a function call (deploy, keys, transfer, stake, accounts, global contracts, any `promise_batch_*`). Any other build of the deployed Wasm must also set `--cfg near`.
