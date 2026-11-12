@@ -2434,7 +2434,7 @@ checksum = "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548"
 
 [[package]]
 name = "pool-contract"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "near-sdk",
  "pool-core",
@@ -2442,7 +2442,7 @@ dependencies = [
 
 [[package]]
 name = "pool-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "borsh",
  "serde",
@@ -2450,7 +2450,7 @@ dependencies = [
 
 [[package]]
 name = "pool-demo"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "pool-core",
  "serde_json",
@@ -2458,14 +2458,14 @@ dependencies = [
 
 [[package]]
 name = "pool-executor"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "near-sdk",
 ]
 
 [[package]]
 name = "pool-sandbox"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "near-workspaces",
  "pool-core",
