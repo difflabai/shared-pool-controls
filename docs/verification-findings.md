@@ -535,7 +535,9 @@ these imports, as expected.
 promise result. Anything but one JSON string of at most 64 bytes becomes
 Unknown, and a result for an id with no record is logged instead of
 panicking. Tests: `nt_f4_non_string_result_becomes_unknown`,
-`nt_f4_result_for_unknown_id_is_logged`.
+`nt_f4_result_for_unknown_id_is_logged`, and the sandbox test
+`non_string_executor_results_leave_the_record_unknown` (a hand-made Wasm
+executor returns `5` and a 70-byte string).
 
 **What happens.** `on_result` takes
 `#[callback_result] result: Result<String, PromiseError>`. If the executor

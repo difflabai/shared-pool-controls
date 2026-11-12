@@ -411,3 +411,159 @@ async fn window_of_300_records_through_the_executor() {
         ids.len()
     );
 }
+/// A Wasm executor whose `execute` returns the JSON number `5` and whose
+/// `status` returns a JSON string of 70 bytes. Neither is one JSON string of
+/// at most 64 bytes. Hand-assembled: one import (`env.value_return`), one page
+/// of memory, two exports, two data segments.
+fn non_string_executor() -> Vec<u8> {
+    fn uleb(mut n: usize, out: &mut Vec<u8>) {
+        loop {
+            let byte = (n & 0x7f) as u8;
+            n >>= 7;
+            if n == 0 {
+                out.push(byte);
+                return;
+            }
+            out.push(byte | 0x80);
+        }
+    }
+    fn bytes(b: &[u8], out: &mut Vec<u8>) {
+        uleb(b.len(), out);
+        out.extend_from_slice(b);
+    }
+    fn section(id: u8, items: &[Vec<u8>], out: &mut Vec<u8>) {
+        let mut body = vec![];
+        uleb(items.len(), &mut body);
+        items.iter().for_each(|i| body.extend_from_slice(i));
+        out.push(id);
+        bytes(&body, out);
+    }
+    let long = format!("\"{}\"", "a".repeat(68));
+    // (offset, data) of each value; offsets and lengths are below 64, so each
+    // i32.const and i64.const operand is one signed LEB128 byte.
+    let values: [(u8, &[u8]); 2] = [(0, b"5"), (8, long.as_bytes())];
+    assert!(values.iter().all(|(o, d)| *o < 64 && d.len() < 128));
+    let mut m = b"\0asm\x01\0\0\0".to_vec();
+    // Types: 0 = (i64, i64) -> (), 1 = () -> ().
+    section(1, &[vec![0x60, 2, 0x7e, 0x7e, 0], vec![0x60, 0, 0]], &mut m);
+    let mut import = vec![];
+    bytes(b"env", &mut import);
+    bytes(b"value_return", &mut import);
+    import.extend([0, 0]);
+    section(2, &[import], &mut m);
+    section(3, &[vec![1], vec![1]], &mut m);
+    section(5, &[vec![0, 1]], &mut m);
+    let export = |name: &[u8], func: u8| {
+        let mut e = vec![];
+        bytes(name, &mut e);
+        e.extend([0, func]);
+        e
+    };
+    section(7, &[export(b"execute", 1), export(b"status", 2)], &mut m);
+    // value_return(len, ptr) with each value, then end.
+    let body = |(offset, data): (u8, &[u8])| {
+        let len = data.len() as u8;
+        // A value of 64 or more needs a second byte as signed LEB128.
+        let mut code = vec![0, 0x42];
+        if len < 64 {
+            code.push(len);
+        } else {
+            code.extend([len, 0]);
+            code[2] |= 0x80;
+        }
+        code.extend([0x42, offset, 0x10, 0, 0x0b]);
+        let mut b = vec![];
+        bytes(&code, &mut b);
+        b
+    };
+    section(10, &[body(values[0]), body(values[1])], &mut m);
+    let data = |(offset, d): (u8, &[u8])| {
+        let mut s = vec![0, 0x41, offset, 0x0b];
+        bytes(d, &mut s);
+        s
+    };
+    section(11, &[data(values[0]), data(values[1])], &mut m);
+    m
+}
+/// NT-F4 on the real host: an executor result that is not one JSON string of
+/// at most 64 bytes leaves the record Unknown, and the callback does not fail.
+#[tokio::test]
+async fn non_string_executor_results_leave_the_record_unknown() {
+    let worker = near_workspaces::sandbox().await.unwrap();
+    let owner = worker.dev_create_account().await.unwrap();
+    let actor = worker.dev_create_account().await.unwrap();
+    let lock = worker.dev_deploy(&wasm("pool_contract")).await.unwrap();
+    let executor = worker.dev_deploy(&non_string_executor()).await.unwrap();
+    // The executor returns these exact bytes; it does not fail.
+    let long = format!("\"{}\"", "a".repeat(68));
+    for (method, value) in [("execute", "5"), ("status", long.as_str())] {
+        let r = executor.view(method).await.unwrap();
+        assert_eq!(r.result, value.as_bytes(), "{method}");
+    }
+    let mut cfg = fixtures::config("gpu").unwrap();
+    cfg.owner = owner.id().to_string();
+    for r in &mut cfg.recipes {
+        r.actor = actor.id().to_string();
+        r.executor = executor.id().to_string();
+    }
+    call(lock.as_account(), &lock, "new", json!({"config":cfg})).await;
+    let mut reference = state(&lock).await;
+    let req = Request {
+        recipe: 0,
+        units: 4,
+        version: 0,
+        expires_at: now() + 3600,
+    };
+    assert_eq!(
+        call(&actor, &lock, "submit", json!({"request":req})).await["id"],
+        0
+    );
+    reference.submit(actor.id().as_str(), req, now()).unwrap();
+    let reconciled = |r: &near_workspaces::result::ExecutionFinalResult| -> Vec<Value> {
+        r.logs()
+            .iter()
+            .filter_map(|l| l.strip_prefix("EVENT_JSON:"))
+            .map(|j| serde_json::from_str::<Value>(j).unwrap())
+            .filter(|e| e["event"] == "reconciled")
+            .map(|e| e["data"][0].clone())
+            .collect()
+    };
+    let expected = vec![json!({"id":0,"outcome":"unknown","error":null})];
+    // execute returns 5.
+    let r = actor
+        .call(lock.id(), "dispatch")
+        .args_json(json!({"id":0}))
+        .max_gas()
+        .transact()
+        .await
+        .unwrap();
+    assert!(r.is_success(), "dispatch: {:?}", r.failures());
+    assert_eq!(reconciled(&r), expected);
+    reference.dispatch(actor.id().as_str(), 0, now()).unwrap();
+    reference.acknowledge(0, false).unwrap();
+    assert_eq!(state(&lock).await, reference);
+    assert_eq!(reference.records[0].status, Status::Unknown);
+    // status returns a 70-byte string: still Unknown, no version change.
+    let r = actor
+        .call(lock.id(), "reconcile")
+        .args_json(json!({"id":0}))
+        .max_gas()
+        .transact()
+        .await
+        .unwrap();
+    assert!(r.is_success(), "reconcile: {:?}", r.failures());
+    assert_eq!(reconciled(&r), expected);
+    assert_eq!(state(&lock).await, reference);
+    // The reservation is held until the executor account reports.
+    call(
+        executor.as_account(),
+        &lock,
+        "settle",
+        json!({"id":0,"completed":false}),
+    )
+    .await;
+    reference.settle(executor.id().as_str(), 0, false).unwrap();
+    assert_eq!(state(&lock).await, reference);
+    assert_eq!(reference.records[0].status, Status::Cancelled);
+    println!("PASS non-string results: 5 and a 70-byte string leave the record Unknown");
+}
