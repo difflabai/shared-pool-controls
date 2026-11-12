@@ -72,7 +72,12 @@ unit tests, seeded random tests and the sandbox suite.
 - Executor retention. The synthetic executor forgets a job once its id is 256
   or more behind the newest id it has executed. `execute` of a forgotten id
   returns `"cancelled"`, `confirm_not_executed` of one fails `stale id`, and
-  the job cap is 512.
+  the job cap is 512 (v1.0.0: 256 jobs over the executor's life). The cap is
+  reached only after 256 or more operator confirmations of ids above the
+  newest executed id. At the cap `confirm_not_executed` fails `full`, even
+  for a record the lock still holds. If executes keep failing, the lock can
+  then stay at `Full` until the executor account itself signs a `settle`.
+  [docs/api.md](docs/api.md#executor-protocol) gives the details.
 - Wasm import surface (NT-F3). Both contracts create promises with
   `promise_create`, `promise_then` and `promise_return` instead of near-sdk's
   `Promise`. The 15 host imports for accounts, deploys, keys, transfers and
