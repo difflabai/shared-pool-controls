@@ -14,7 +14,7 @@ One immutable pool per deployment. All mutating methods are nonpayable; fund sto
 | `settle` | `{id,completed}` | Only that recipe's executor; false means definitive nonexecution, never unknown. |
 | `cancel` | `{id}` | Actor or owner; only undispatched Reserved records. |
 | `set_paused` | `{paused}` | Owner; blocks admission and dispatch. |
-| `observe` | `{values}` | Owner; no unresolved commitments. May raise energy. |
+| `observe` | `{values}` | Owner; new values only when every record is terminal. Restating the current values is allowed at any time and renews the snapshot timestamp. May raise energy. |
 | `on_result` | `{id}` plus runtime promise result | Private callback, not a public evidence submission endpoint. |
 
 Request example:

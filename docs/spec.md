@@ -51,7 +51,7 @@ The mock adapter keeps a bounded immutable association between ID and recipe/qua
 
 ## External observations and administration
 
-`set_paused` is owner-only and increments version. Pausing blocks new admissions and dispatch, not settlement or reconciliation. `observe` is owner-only and allowed only when every record is terminal. It replaces bounded measured values and refreshes the snapshot timestamp, without changing policy or deleting history. It can create a hard-limit violation. This is a trusted external fact assertion, not an energy-checked trade.
+`set_paused` is owner-only and increments version. Pausing blocks new admissions and dispatch, not settlement or reconciliation. `observe` is owner-only. It sets new values only when every record is terminal; restating the current values is allowed at any time and renews the snapshot timestamp. It replaces bounded measured values and refreshes the snapshot timestamp, without changing policy or deleting history. New values can create a hard-limit violation. This is a trusted external fact assertion, not an energy-checked trade.
 
 No policy upgrades, role mutation, arbitrary funds transfer, dynamic plugins, or reset entry point. Deployment-account full-access keys can still replace code; verify deployment upgrade authority separately. The owner is not thereby assumed powerless.
 

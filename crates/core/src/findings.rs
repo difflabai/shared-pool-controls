@@ -372,11 +372,13 @@ fn observed(g: &mut Rng, p: &Pool) -> Vec<i64> {
 /// each, including observes that put metrics out of bounds. After every
 /// call: a rejected call leaves the pool unchanged; preview agrees with
 /// submit; an admission leaves every metric's violation unchanged and no
-/// other call but observe raises one (HARD-STEP); INV-RES holds; and every
-/// open record can be resolved (assert_live).
+/// other call but observe raises one (HARD-STEP); an observe with a record
+/// open changes no value or record; INV-RES holds; and every open record
+/// can be resolved (assert_live).
 #[test]
 fn live_all_on_random_runs() {
     let (mut admitted, mut admitted_disturbed, mut exits, mut exits_disturbed) = (0, 0, 0, 0);
+    let mut refreshes = 0;
     for seed in 1..=300u64 {
         let mut g = Rng(seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1);
         let mut p = Pool::new(random_config(&mut g), 100).unwrap();
@@ -438,7 +440,13 @@ fn live_all_on_random_runs() {
             };
             if result.is_err() {
                 assert_eq!(p, before, "a rejected call changed the pool");
-            } else if !is_observe {
+            } else if is_observe {
+                // With a record open, only a restatement of the values passes.
+                if before.records.iter().any(|c| open(&c.status)) {
+                    assert_eq!((&p.values, &p.records), (&before.values, &before.records));
+                    refreshes += 1;
+                }
+            } else {
                 let (old, new) = (before.violations(&before.values), p.violations(&p.values));
                 if is_submit {
                     assert_eq!(new, old, "an admission changed a violation");
@@ -461,9 +469,10 @@ fn live_all_on_random_runs() {
     }
     // The run is not vacuous: it admits and resolves records, also in
     // states where some metric is out of bounds.
-    println!("admitted {admitted} ({admitted_disturbed} disturbed), exits {exits} ({exits_disturbed} disturbed)");
+    println!("admitted {admitted} ({admitted_disturbed} disturbed), exits {exits} ({exits_disturbed} disturbed), refreshes with records open {refreshes}");
     assert!(admitted > 500 && admitted_disturbed > 30);
     assert!(exits > 200 && exits_disturbed > 20);
+    assert!(refreshes > 20);
 }
 
 /// F-3 (low): one actor fills the 256 lifetime records with submit and
@@ -544,9 +553,11 @@ fn f5_version_max_freezes_settlement_and_every_transition() {
         Err(Error::Arithmetic)
     );
     assert_eq!(p.set_paused(OWNER, true), Err(Error::Arithmetic));
+    // v1.0.0 said Pending here; since the F-6 fix a restatement of the
+    // current values passes the open-record check and fails at the version.
     assert_eq!(
         p.observe(OWNER, frozen.values.clone(), 100),
-        Err(Error::Pending)
+        Err(Error::Arithmetic)
     );
     // Observation, not a finding: preview says allowed, submit fails.
     let q = req(&p, 4, 1);
@@ -568,28 +579,44 @@ fn f5_paused_pool_at_version_max_cannot_unpause() {
     assert_eq!(p, frozen);
 }
 
-/// F-6 (low): the risk fixture has max_age 300 and was observed at 100. At
-/// now = 401, with one record still Active, submit and dispatch fail
-/// SnapshotExpired and observe fails Pending until the executor settles it.
-/// formalver trace 211 (a smaller config).
+/// F-6 (low), fixed: the risk fixture has max_age 300 and was observed at
+/// 100. At now = 401, with one record Active and one Reserved, submit and
+/// dispatch fail SnapshotExpired. In v1.0.0 observe failed Pending until
+/// every record was terminal. v1.1 lets the owner restate the current
+/// values with records open: the values and records stay as they are, the
+/// snapshot timestamp is renewed and the version moves by one. New values
+/// still wait for every record to be terminal. formalver trace 211 (a
+/// smaller config).
 #[test]
-fn f6_open_record_blocks_the_snapshot_refresh() {
+fn f6_owner_refreshes_the_snapshot_with_records_open() {
     let mut p = pool("risk");
     let slow = submit(&mut p, 0, 1, 100).unwrap();
     dispatch_active(&mut p, slow, 100);
     let next = submit(&mut p, 3, 1, 100).unwrap();
-    let measured = vec![60, 40, 30, 40];
     assert_eq!(submit(&mut p, 1, 1, 401), Err(Error::SnapshotExpired));
     assert_eq!(
         p.dispatch("macro.test.near", next, 401),
         Err(Error::SnapshotExpired)
     );
-    assert_eq!(p.observe(OWNER, measured.clone(), 401), Err(Error::Pending));
-    p.cancel("macro.test.near", next, 401).unwrap();
-    assert_eq!(p.observe(OWNER, measured.clone(), 401), Err(Error::Pending));
-    p.settle(EXEC, slow, true).unwrap();
-    p.observe(OWNER, measured, 401).unwrap();
-    assert!(submit(&mut p, 1, 1, 401).is_ok());
+    let before = p.clone();
+    let fixture = vec![60, 40, 30, 40];
+    assert_eq!(p.observe(OWNER, fixture, 401), Err(Error::Pending));
+    let current = p.values.clone();
+    assert_eq!(
+        p.observe("credit.test.near", current.clone(), 401),
+        Err(Error::Unauthorized)
+    );
+    assert_eq!(p, before);
+    p.observe(OWNER, current.clone(), 401).unwrap();
+    assert_eq!(p.observed_at, 401);
+    assert_eq!(p.version, before.version + 1);
+    assert_eq!(p.values, current);
+    assert_eq!(p.records, before.records);
+    assert_eq!(p.records[slow as usize].status, Status::Active);
+    assert_live(&p);
+    p.dispatch("macro.test.near", next, 401).unwrap();
+    submit(&mut p, 3, 1, 401).unwrap();
+    assert_live(&p);
 }
 
 /// div-cancel-terminal-name: cancelling a Completed or Dispatched record

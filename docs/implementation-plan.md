@@ -55,7 +55,7 @@ Reserved -> Dispatched -> Active -> Completed. Missing/malformed/failed acknowle
 
 Reserve before dispatch. Bind dispatch ID to exact recipe and units. Synthetic executor accepts only the lock; an independent operator confirms completion/cancellation. Store terminal evidence before notification so reconciliation can recover a lost callback. Repeated evidence is idempotent; conflicting terminal evidence rejects.
 
-The administrator can pause admissions/dispatch and refresh observed values only with no unresolved records. Neither operation changes policy. Observations may raise energy. No production upgrade-lock claim is made.
+The administrator can pause admissions/dispatch and change observed values only with no unresolved records. Restating the current values, which renews the snapshot timestamp, is allowed at any time. Neither operation changes policy. Observations may raise energy. No production upgrade-lock claim is made.
 
 ## Scenario 1 — GPU cooperative
 

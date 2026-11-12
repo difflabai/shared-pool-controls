@@ -80,7 +80,7 @@ Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updat
 - Pending commitments count immediately. Pending negative-risk hedge effects do not provide headroom before fill.
 - No unexecuted position backs a hedge: a hedge must stay in bounds if the position is later reported unexecuted.
 - Cancellation after dispatch needs authenticated evidence of nonexecution. A timeout or failed receipt is insufficient.
-- The administrator and registered execution/evidence accounts are trusted. The owner can update observed facts only when there are no unresolved commitments; it cannot edit policy. That observation can raise energy or reveal a limit breach.
+- The administrator and registered execution/evidence accounts are trusted. The owner can update observed facts only when there are no unresolved commitments, and can restate the current values at any time to renew the snapshot; it cannot edit policy. That observation can raise energy or reveal a limit breach.
 - Only admitted reservation transitions promise nonincreasing energy. Settlement, cancellation, observations, fairness, economic correctness and eventual completion have separate assumptions.
 - The adapter boundary is real in the sandbox. Real brokers, cloud providers or warehouses would need enforceable integrations with no alternate credentials/path around the gate.
 - The prototype uses no real escrow token. Hiring credits are accounting fixtures, not NEAR balances.

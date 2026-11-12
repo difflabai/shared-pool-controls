@@ -477,12 +477,14 @@ impl Pool {
         Ok(())
     }
     /// New externally observed baseline, only when no obligations are unresolved.
-    /// Does not change immutable policy. May expose a hard-limit violation.
+    /// Restating the current values is allowed at any time: it changes no
+    /// value or record and renews the snapshot timestamp. Does not change
+    /// immutable policy. New values may expose a hard-limit violation.
     pub fn observe(&mut self, caller: &str, values: Vec<i64>, now: u64) -> Result<(), Error> {
         if caller != self.config.owner {
             return Err(Error::Unauthorized);
         }
-        if self.records.iter().any(|c| open(&c.status)) {
+        if values != self.values && self.records.iter().any(|c| open(&c.status)) {
             return Err(Error::Pending);
         }
         if values.len() != self.values.len() || values.iter().any(|v| !bounded(*v)) {
