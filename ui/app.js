@@ -232,6 +232,7 @@ $('alternative').onclick = () => guarded(async () => {
   } else say('No allowed smaller quantity. Try another approved action or wait for resources.', true);
 });
 $('shock').onclick = () => guarded(async () => {
+  if (scenario !== 'risk' || offline) return;
   const values = [...pool.values]; values[0] += 30;
   pool = (await api('observe', { values })).pool;
   history.push(scoreFromTerms(pool.values)); render();

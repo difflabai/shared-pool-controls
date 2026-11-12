@@ -1,3 +1,7 @@
+/* Preserve semantic visibility even when component styles set display. */
+[hidden] {
+  display:none !important;
+}
 :root {
   color-scheme:light;
   --bg:#f5f4ee;
