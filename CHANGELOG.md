@@ -74,7 +74,9 @@ unit tests, seeded random tests and the sandbox suite.
 - Wasm import surface (NT-F3). Both contracts create promises with
   `promise_create`, `promise_then` and `promise_return` instead of near-sdk's
   `Promise`. The 15 host imports for accounts, deploys, keys, transfers and
-  staking are gone, and `scripts/build.sh` fails if one comes back.
+  staking are gone, and `scripts/build.sh` fails if one comes back. It also
+  fails on any import that is not on its list of the current 18 contract and
+  13 executor imports.
   `dispatch`, `reconcile`, `finish` and `confirm_not_executed` return `()` in
   Rust; on chain the result is still the callback's.
 - Build: `scripts/build.sh` sets `RUSTFLAGS="--cfg near"`, and

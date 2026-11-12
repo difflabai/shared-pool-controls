@@ -41,7 +41,7 @@ Important nuances:
 
 The NEAR shell serializes the same core with borsh. Review `predecessor_account_id`, init authority, callback privacy, private callback's promise-result mapping, persistent state atomicity, and bounded gas/storage. The synthetic executor is independent code and must be included if claiming end-to-end gating. Unknown receipt failure cannot imply a refund.
 
-Both contracts create promises only with `promise_create`, `promise_then` and `promise_return`, and every promise is a function call with no deposit. Neither Wasm imports a host function for any other action: deploy, keys, transfer, stake, account creation or deletion, global contracts, or any `promise_batch_*` function. `scripts/build.sh` fails if one is imported. This was added after the v1.0.0 verification (finding NT-F3); it is checked by the build, not formally re-verified.
+Both contracts create promises only with `promise_create`, `promise_then` and `promise_return`, and every promise is a function call with no deposit. Neither Wasm imports a host function for any other action: deploy, keys, transfer, stake, account creation or deletion, global contracts, or any `promise_batch_*` function. `scripts/build.sh` fails if one is imported, and also on any import not on its reviewed list (18 for the contract, 13 for the executor). This was added after the v1.0.0 verification (finding NT-F3); it is checked by the build, not formally re-verified.
 
 Account upgrades, oracle dishonesty, physical delivery, real broker fills, and deployment locks are outside the current tests. There is no real token custody. Do not inherit formalver's labels or proofs: the design pattern is reused, not its implementation theorem.
 

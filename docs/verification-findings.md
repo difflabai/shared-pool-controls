@@ -510,7 +510,8 @@ outgoing calls carry 0, so the contract keeps the deposit.
 with `promise_create`, `promise_then` and `promise_return` instead of
 near-sdk's `Promise`. The 15 imports are gone: the contract imports 18 host
 functions and the executor 13. `scripts/build.sh` fails if a Wasm imports a
-host function for any action other than a function call.
+host function for any action other than a function call, or any import
+that is not on its list of those 18 and 13.
 
 **What happens.** Both contracts, in both builds, import 15 host functions
 that create or delete accounts, deploy code (including global contracts),

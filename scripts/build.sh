@@ -25,7 +25,8 @@ def limits(b,i):
     return i
 
 def imports(p):
-    """Sorted 'module.name' of every import in the wasm import section (id 2)."""
+    """Sorted 'module.name' of every import in the wasm import section (id 2).
+    A non-function import also carries its kind."""
     b=p.read_bytes()
     if b[:8]!=b'\0asm\x01\0\0\0': sys.exit(f'{p}: not a wasm 1 module')
     i=8
@@ -44,7 +45,7 @@ def imports(p):
                 elif kind==3: i+=2                    # global: valtype, mutability
                 elif kind==4: _,i=leb(b,i+1)          # tag: attribute, type index
                 else: sys.exit(f'{p}: unknown import kind {kind}')
-                out.append('.'.join(names))
+                out.append('.'.join(names)+('' if kind==0 else f' (import kind {kind})'))
             if i!=end: sys.exit(f'{p}: malformed import section')
             return sorted(out)
         i=end
@@ -58,14 +59,26 @@ def forbidden(imp):
     name=imp.split('.',1)[-1]
     return name.startswith('promise_batch_') or any(w in name for w in FORBIDDEN)
 
-paths=[pathlib.Path('target/wasm32-unknown-unknown/release')/(n+'.wasm') for n in ['pool_contract','pool_executor']]
+# Every import each Wasm may have; all are env functions. The list above names
+# known action imports; this one also fails on any import nobody has reviewed
+# (promise_yield_*, promise_set_refund_to, or one a later near-sdk adds).
+# Review a new import before adding it here.
+COMMON=['attached_deposit','current_account_id','input','panic_utf8','predecessor_account_id','promise_create','promise_return','read_register','register_len','storage_has_key','storage_read','storage_write','value_return']
+ALLOWED={
+    'pool_contract':COMMON+['block_timestamp','log_utf8','promise_result','promise_results_count','promise_then'],
+    'pool_executor':COMMON,
+}
+
 wasm={}
-for p in paths:
+for n,allowed in ALLOWED.items():
+    p=pathlib.Path('target/wasm32-unknown-unknown/release')/(n+'.wasm')
     found=imports(p)
     # NT-F1: without cfg(near) env::panic_str traps instead of calling panic_utf8.
     if 'env.panic_utf8' not in found: sys.exit(f'{p}: does not import env.panic_utf8; was it built without --cfg near?')
     bad=[i for i in found if forbidden(i)]
     if bad: sys.exit(f'{p}: imports host functions for actions other than function calls: {", ".join(bad)}')
+    new=[i for i in found if i not in {'env.'+a for a in allowed}]
+    if new: sys.exit(f'{p}: has imports that are not in the reviewed list in scripts/build.sh: {", ".join(new)}')
     wasm[str(p)]={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size,'imports':found}
 manifest={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'dirty':bool(subprocess.check_output(['git','status','--porcelain'],text=True).strip()),'rustc':subprocess.check_output(['rustc','--version'],text=True).strip(),'rustflags':os.environ['RUSTFLAGS'],'cargo_lock_sha256':hashlib.sha256(pathlib.Path('Cargo.lock').read_bytes()).hexdigest(),'wasm':wasm}
 pathlib.Path('artifacts/build.json').write_text(json.dumps(manifest,indent=2)+'\n')
