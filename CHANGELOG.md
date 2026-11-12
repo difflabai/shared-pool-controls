@@ -90,6 +90,10 @@ unit tests, seeded random tests and the sandbox suite.
   `artifacts/build.json` records the flags and each Wasm's imports.
 - `on_result` logs a result for an id with no record (`error: "NotFound"`)
   instead of panicking.
+- Stored state. The lock's pool gains `first_id` and `completed_units`, and
+  the executor gains `newest`. A v1.0.0 deployment cannot be upgraded in
+  place: its state would not load. Deploy v1.1.0 to fresh accounts; no
+  migration is provided.
 
 ### Docs
 
