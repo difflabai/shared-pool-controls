@@ -1,0 +1,1089 @@
+{
+  "initial": {
+    "config": {
+      "max_age_seconds": 300,
+      "metrics": [
+        {
+          "initial": 60,
+          "max": 100,
+          "min": 0,
+          "name": "Selloff stress loss",
+          "unit": "$100k"
+        },
+        {
+          "initial": 40,
+          "max": 80,
+          "min": 0,
+          "name": "Funding stress loss",
+          "unit": "$100k"
+        },
+        {
+          "initial": 30,
+          "max": 60,
+          "min": 0,
+          "name": "Volatility stress loss",
+          "unit": "$100k"
+        },
+        {
+          "initial": 40,
+          "max": 40,
+          "min": 0,
+          "name": "Free collateral above reserve",
+          "unit": "$100k"
+        }
+      ],
+      "name": "risk",
+      "owner": "owner.test.near",
+      "recipes": [
+        {
+          "actor": "credit.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Credit position: half-size lots",
+          "requires": [],
+          "reserve": [
+            20,
+            5,
+            0,
+            -5
+          ]
+        },
+        {
+          "actor": "equity.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Equity position",
+          "requires": [],
+          "reserve": [
+            10,
+            0,
+            5,
+            -5
+          ]
+        },
+        {
+          "actor": "macro.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Macro position",
+          "requires": [],
+          "reserve": [
+            0,
+            10,
+            5,
+            -5
+          ]
+        },
+        {
+          "actor": "macro.test.near",
+          "complete": [
+            -10,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Selloff hedge (credit only after fill)",
+          "requires": [],
+          "reserve": [
+            0,
+            0,
+            0,
+            -2
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "metric": 0,
+          "shape": "Excess",
+          "target": 80,
+          "weight": 1
+        },
+        {
+          "metric": 1,
+          "shape": "Excess",
+          "target": 60,
+          "weight": 1
+        },
+        {
+          "metric": 2,
+          "shape": "Excess",
+          "target": 40,
+          "weight": 1
+        }
+      ]
+    },
+    "observed_at": 1794441600,
+    "paused": false,
+    "records": [],
+    "values": [
+      60,
+      40,
+      30,
+      40
+    ],
+    "version": 0
+  },
+  "mode": "Rust core simulation; mocked execution",
+  "scenario": "risk",
+  "steps": [
+    {
+      "actor": "credit.test.near",
+      "decision": {
+        "after": "400",
+        "allowed": false,
+        "before": "0",
+        "candidate": [
+          100,
+          50,
+          30,
+          30
+        ],
+        "reason": "Energy",
+        "terms_after": [
+          "400",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": null,
+      "pool": {
+        "config": {
+          "max_age_seconds": 300,
+          "metrics": [
+            {
+              "initial": 60,
+              "max": 100,
+              "min": 0,
+              "name": "Selloff stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 80,
+              "min": 0,
+              "name": "Funding stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 30,
+              "max": 60,
+              "min": 0,
+              "name": "Volatility stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 40,
+              "min": 0,
+              "name": "Free collateral above reserve",
+              "unit": "$100k"
+            }
+          ],
+          "name": "risk",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "credit.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Credit position: half-size lots",
+              "requires": [],
+              "reserve": [
+                20,
+                5,
+                0,
+                -5
+              ]
+            },
+            {
+              "actor": "equity.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Equity position",
+              "requires": [],
+              "reserve": [
+                10,
+                0,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Macro position",
+              "requires": [],
+              "reserve": [
+                0,
+                10,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                -10,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Selloff hedge (credit only after fill)",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                0,
+                -2
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Excess",
+              "target": 80,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Excess",
+              "target": 60,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Excess",
+              "target": 40,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [],
+        "values": [
+          60,
+          40,
+          30,
+          40
+        ],
+        "version": 0
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 2,
+        "version": 0
+      }
+    },
+    {
+      "actor": "credit.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "0",
+        "candidate": [
+          80,
+          45,
+          30,
+          35
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": 0,
+      "pool": {
+        "config": {
+          "max_age_seconds": 300,
+          "metrics": [
+            {
+              "initial": 60,
+              "max": 100,
+              "min": 0,
+              "name": "Selloff stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 80,
+              "min": 0,
+              "name": "Funding stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 30,
+              "max": 60,
+              "min": 0,
+              "name": "Volatility stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 40,
+              "min": 0,
+              "name": "Free collateral above reserve",
+              "unit": "$100k"
+            }
+          ],
+          "name": "risk",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "credit.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Credit position: half-size lots",
+              "requires": [],
+              "reserve": [
+                20,
+                5,
+                0,
+                -5
+              ]
+            },
+            {
+              "actor": "equity.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Equity position",
+              "requires": [],
+              "reserve": [
+                10,
+                0,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Macro position",
+              "requires": [],
+              "reserve": [
+                0,
+                10,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                -10,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Selloff hedge (credit only after fill)",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                0,
+                -2
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Excess",
+              "target": 80,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Excess",
+              "target": 60,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Excess",
+              "target": 40,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 1
+          }
+        ],
+        "values": [
+          80,
+          45,
+          30,
+          35
+        ],
+        "version": 4
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 1,
+        "version": 0
+      }
+    },
+    {
+      "actor": "equity.test.near",
+      "decision": {
+        "after": "100",
+        "allowed": false,
+        "before": "0",
+        "candidate": [
+          90,
+          45,
+          35,
+          30
+        ],
+        "reason": "Energy",
+        "terms_after": [
+          "100",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": null,
+      "pool": {
+        "config": {
+          "max_age_seconds": 300,
+          "metrics": [
+            {
+              "initial": 60,
+              "max": 100,
+              "min": 0,
+              "name": "Selloff stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 80,
+              "min": 0,
+              "name": "Funding stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 30,
+              "max": 60,
+              "min": 0,
+              "name": "Volatility stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 40,
+              "min": 0,
+              "name": "Free collateral above reserve",
+              "unit": "$100k"
+            }
+          ],
+          "name": "risk",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "credit.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Credit position: half-size lots",
+              "requires": [],
+              "reserve": [
+                20,
+                5,
+                0,
+                -5
+              ]
+            },
+            {
+              "actor": "equity.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Equity position",
+              "requires": [],
+              "reserve": [
+                10,
+                0,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Macro position",
+              "requires": [],
+              "reserve": [
+                0,
+                10,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                -10,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Selloff hedge (credit only after fill)",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                0,
+                -2
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Excess",
+              "target": 80,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Excess",
+              "target": 60,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Excess",
+              "target": 40,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 1
+          }
+        ],
+        "values": [
+          80,
+          45,
+          30,
+          35
+        ],
+        "version": 4
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 1,
+        "units": 1,
+        "version": 4
+      }
+    },
+    {
+      "actor": "macro.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "0",
+        "candidate": [
+          80,
+          45,
+          30,
+          33
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": 1,
+      "pool": {
+        "config": {
+          "max_age_seconds": 300,
+          "metrics": [
+            {
+              "initial": 60,
+              "max": 100,
+              "min": 0,
+              "name": "Selloff stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 80,
+              "min": 0,
+              "name": "Funding stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 30,
+              "max": 60,
+              "min": 0,
+              "name": "Volatility stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 40,
+              "min": 0,
+              "name": "Free collateral above reserve",
+              "unit": "$100k"
+            }
+          ],
+          "name": "risk",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "credit.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Credit position: half-size lots",
+              "requires": [],
+              "reserve": [
+                20,
+                5,
+                0,
+                -5
+              ]
+            },
+            {
+              "actor": "equity.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Equity position",
+              "requires": [],
+              "reserve": [
+                10,
+                0,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Macro position",
+              "requires": [],
+              "reserve": [
+                0,
+                10,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                -10,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Selloff hedge (credit only after fill)",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                0,
+                -2
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Excess",
+              "target": 80,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Excess",
+              "target": 60,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Excess",
+              "target": 40,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 1
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 3,
+            "status": "Completed",
+            "units": 1
+          }
+        ],
+        "values": [
+          70,
+          45,
+          30,
+          33
+        ],
+        "version": 8
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 3,
+        "units": 1,
+        "version": 4
+      }
+    },
+    {
+      "actor": "equity.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "0",
+        "candidate": [
+          80,
+          45,
+          35,
+          28
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": 2,
+      "pool": {
+        "config": {
+          "max_age_seconds": 300,
+          "metrics": [
+            {
+              "initial": 60,
+              "max": 100,
+              "min": 0,
+              "name": "Selloff stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 80,
+              "min": 0,
+              "name": "Funding stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 30,
+              "max": 60,
+              "min": 0,
+              "name": "Volatility stress loss",
+              "unit": "$100k"
+            },
+            {
+              "initial": 40,
+              "max": 40,
+              "min": 0,
+              "name": "Free collateral above reserve",
+              "unit": "$100k"
+            }
+          ],
+          "name": "risk",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "credit.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Credit position: half-size lots",
+              "requires": [],
+              "reserve": [
+                20,
+                5,
+                0,
+                -5
+              ]
+            },
+            {
+              "actor": "equity.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Equity position",
+              "requires": [],
+              "reserve": [
+                10,
+                0,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Macro position",
+              "requires": [],
+              "reserve": [
+                0,
+                10,
+                5,
+                -5
+              ]
+            },
+            {
+              "actor": "macro.test.near",
+              "complete": [
+                -10,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Selloff hedge (credit only after fill)",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                0,
+                -2
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Excess",
+              "target": 80,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Excess",
+              "target": 60,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Excess",
+              "target": 40,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 1
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 3,
+            "status": "Completed",
+            "units": 1
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 2,
+            "recipe": 1,
+            "status": "Completed",
+            "units": 1
+          }
+        ],
+        "values": [
+          80,
+          45,
+          35,
+          28
+        ],
+        "version": 12
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 1,
+        "units": 1,
+        "version": 8
+      }
+    }
+  ]
+}

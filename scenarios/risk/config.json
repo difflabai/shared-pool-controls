@@ -1,0 +1,133 @@
+{
+  "name": "risk",
+  "owner": "owner.test.near",
+  "metrics": [
+    {
+      "name": "Selloff stress loss",
+      "unit": "$100k",
+      "initial": 60,
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "Funding stress loss",
+      "unit": "$100k",
+      "initial": 40,
+      "min": 0,
+      "max": 80
+    },
+    {
+      "name": "Volatility stress loss",
+      "unit": "$100k",
+      "initial": 30,
+      "min": 0,
+      "max": 60
+    },
+    {
+      "name": "Free collateral above reserve",
+      "unit": "$100k",
+      "initial": 40,
+      "min": 0,
+      "max": 40
+    }
+  ],
+  "terms": [
+    {
+      "metric": 0,
+      "target": 80,
+      "weight": 1,
+      "shape": "Excess"
+    },
+    {
+      "metric": 1,
+      "target": 60,
+      "weight": 1,
+      "shape": "Excess"
+    },
+    {
+      "metric": 2,
+      "target": 40,
+      "weight": 1,
+      "shape": "Excess"
+    }
+  ],
+  "recipes": [
+    {
+      "name": "Credit position: half-size lots",
+      "actor": "credit.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        20,
+        5,
+        0,
+        -5
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Equity position",
+      "actor": "equity.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        10,
+        0,
+        5,
+        -5
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Macro position",
+      "actor": "macro.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        10,
+        5,
+        -5
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Selloff hedge (credit only after fill)",
+      "actor": "macro.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        0,
+        -2
+      ],
+      "complete": [
+        -10,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    }
+  ],
+  "max_age_seconds": 300
+}

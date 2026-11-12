@@ -1,0 +1,17 @@
+[workspace]
+members = ["crates/core", "crates/contract", "crates/executor", "crates/demo", "crates/sandbox"]
+default-members = ["crates/core", "crates/contract", "crates/executor", "crates/demo"]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/difflabai/shared-pool-controls"
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+panic = "abort"
+overflow-checks = true

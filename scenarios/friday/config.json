@@ -1,0 +1,240 @@
+{
+  "name": "friday",
+  "owner": "owner.test.near",
+  "metrics": [
+    {
+      "name": "Research / customer A coverage",
+      "unit": "production lots",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Evaluation / customer B coverage",
+      "unit": "production lots",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Data / customer C coverage",
+      "unit": "production lots",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Friday machine bookings",
+      "unit": "production lots",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    },
+    {
+      "name": "Tuesday machine bookings",
+      "unit": "production lots",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    },
+    {
+      "name": "Friday dispatch slots",
+      "unit": "slots",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    },
+    {
+      "name": "Tuesday dispatch slots",
+      "unit": "slots",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    }
+  ],
+  "terms": [
+    {
+      "metric": 0,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 1,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 2,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 3,
+      "target": 8,
+      "weight": 10,
+      "shape": "Excess"
+    },
+    {
+      "metric": 4,
+      "target": 8,
+      "weight": 10,
+      "shape": "Excess"
+    }
+  ],
+  "recipes": [
+    {
+      "name": "research: Friday",
+      "actor": "research.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        1,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "research: Tuesday",
+      "actor": "research.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        1,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "evaluation: Friday",
+      "actor": "evaluation.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "evaluation: Tuesday",
+      "actor": "evaluation.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        1,
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "data: Friday",
+      "actor": "data.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        1,
+        1,
+        0,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "data: Tuesday",
+      "actor": "data.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    }
+  ],
+  "max_age_seconds": 0
+}

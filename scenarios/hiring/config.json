@@ -1,0 +1,175 @@
+{
+  "name": "hiring",
+  "owner": "owner.test.near",
+  "metrics": [
+    {
+      "name": "Research funded coverage",
+      "unit": "credits",
+      "initial": 0,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "Implementation funded coverage",
+      "unit": "credits",
+      "initial": 0,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "Review funded coverage",
+      "unit": "credits",
+      "initial": 0,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "Unencumbered discretionary funds",
+      "unit": "credits",
+      "initial": 5,
+      "min": 0,
+      "max": 10
+    },
+    {
+      "name": "Review earmark",
+      "unit": "credits",
+      "initial": 2,
+      "min": 0,
+      "max": 2
+    },
+    {
+      "name": "Active escrow",
+      "unit": "credits",
+      "initial": 0,
+      "min": 0,
+      "max": 7
+    },
+    {
+      "name": "Paid lifetime",
+      "unit": "credits",
+      "initial": 0,
+      "min": 0,
+      "max": 7
+    },
+    {
+      "name": "Protected reserve",
+      "unit": "credits",
+      "initial": 3,
+      "min": 3,
+      "max": 3
+    }
+  ],
+  "terms": [
+    {
+      "metric": 0,
+      "target": 2,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 1,
+      "target": 3,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 2,
+      "target": 2,
+      "weight": 1,
+      "shape": "Target"
+    }
+  ],
+  "recipes": [
+    {
+      "name": "Research worker units",
+      "actor": "research.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        1,
+        0,
+        0,
+        -1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        1,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Implementation worker units",
+      "actor": "implementation.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        1,
+        0,
+        -1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        1,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Independent review units",
+      "actor": "review.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        1,
+        0,
+        -1,
+        1,
+        0,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        1,
+        0
+      ],
+      "max_units": 20,
+      "requires": [
+        [
+          0,
+          2
+        ],
+        [
+          1,
+          3
+        ]
+      ]
+    }
+  ],
+  "max_age_seconds": 0
+}

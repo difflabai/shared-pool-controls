@@ -1,0 +1,12 @@
+[package]
+name = "pool-contract"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[lib]
+crate-type = ["cdylib", "rlib"]
+[dependencies]
+pool-core = { path = "../core", features = ["serde", "borsh"] }
+near-sdk = { version = "=5.29.1", default-features = false }
+[dev-dependencies]
+near-sdk = { version = "=5.29.1", default-features = false, features = ["unit-testing"] }

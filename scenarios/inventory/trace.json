@@ -1,0 +1,806 @@
+{
+  "initial": {
+    "config": {
+      "max_age_seconds": 0,
+      "metrics": [
+        {
+          "initial": 6,
+          "max": 20,
+          "min": 4,
+          "name": "Depot position",
+          "unit": "parts"
+        },
+        {
+          "initial": 6,
+          "max": 20,
+          "min": 0,
+          "name": "Branch A position",
+          "unit": "parts"
+        },
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Branch B position",
+          "unit": "parts"
+        },
+        {
+          "initial": 6,
+          "max": 20,
+          "min": 4,
+          "name": "Depot available",
+          "unit": "parts"
+        },
+        {
+          "initial": 6,
+          "max": 20,
+          "min": 0,
+          "name": "Branch A available",
+          "unit": "parts"
+        },
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Branch B available",
+          "unit": "parts"
+        },
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Reserved / in transit",
+          "unit": "parts"
+        }
+      ],
+      "name": "inventory",
+      "owner": "owner.test.near",
+      "recipes": [
+        {
+          "actor": "branch-a.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            -1
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Depot to A",
+          "requires": [],
+          "reserve": [
+            -1,
+            1,
+            0,
+            -1,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "actor": "branch-b.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            -1
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Depot to B",
+          "requires": [],
+          "reserve": [
+            -1,
+            0,
+            1,
+            -1,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "actor": "branch-a.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            1,
+            -1
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "A shares surplus with B",
+          "requires": [],
+          "reserve": [
+            0,
+            -1,
+            1,
+            0,
+            -1,
+            0,
+            1
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "metric": 0,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        },
+        {
+          "metric": 1,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        },
+        {
+          "metric": 2,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        }
+      ]
+    },
+    "observed_at": 1794441600,
+    "paused": false,
+    "records": [],
+    "values": [
+      6,
+      6,
+      0,
+      6,
+      6,
+      0,
+      0
+    ],
+    "version": 0
+  },
+  "mode": "Rust core simulation; mocked execution",
+  "scenario": "inventory",
+  "steps": [
+    {
+      "actor": "branch-a.test.near",
+      "decision": {
+        "after": "32",
+        "allowed": false,
+        "before": "24",
+        "candidate": [
+          4,
+          8,
+          0,
+          4,
+          6,
+          0,
+          2
+        ],
+        "reason": "Energy",
+        "terms_after": [
+          "0",
+          "16",
+          "16"
+        ],
+        "terms_before": [
+          "4",
+          "4",
+          "16"
+        ]
+      },
+      "id": null,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A position",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot available",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Reserved / in transit",
+              "unit": "parts"
+            }
+          ],
+          "name": "inventory",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to A",
+              "requires": [],
+              "reserve": [
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-b.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to B",
+              "requires": [],
+              "reserve": [
+                -1,
+                0,
+                1,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "A shares surplus with B",
+              "requires": [],
+              "reserve": [
+                0,
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [],
+        "values": [
+          6,
+          6,
+          0,
+          6,
+          6,
+          0,
+          0
+        ],
+        "version": 0
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 2,
+        "version": 0
+      }
+    },
+    {
+      "actor": "branch-b.test.near",
+      "decision": {
+        "after": "8",
+        "allowed": true,
+        "before": "24",
+        "candidate": [
+          4,
+          6,
+          2,
+          4,
+          6,
+          0,
+          2
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "4",
+          "4"
+        ],
+        "terms_before": [
+          "4",
+          "4",
+          "16"
+        ]
+      },
+      "id": 0,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A position",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot available",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Reserved / in transit",
+              "unit": "parts"
+            }
+          ],
+          "name": "inventory",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to A",
+              "requires": [],
+              "reserve": [
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-b.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to B",
+              "requires": [],
+              "reserve": [
+                -1,
+                0,
+                1,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "A shares surplus with B",
+              "requires": [],
+              "reserve": [
+                0,
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 1,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          4,
+          6,
+          2,
+          4,
+          6,
+          2,
+          0
+        ],
+        "version": 4
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 1,
+        "units": 2,
+        "version": 0
+      }
+    },
+    {
+      "actor": "branch-a.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "8",
+        "candidate": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          2,
+          2
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "4",
+          "4"
+        ]
+      },
+      "id": 1,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A position",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B position",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 4,
+              "name": "Depot available",
+              "unit": "parts"
+            },
+            {
+              "initial": 6,
+              "max": 20,
+              "min": 0,
+              "name": "Branch A available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Branch B available",
+              "unit": "parts"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Reserved / in transit",
+              "unit": "parts"
+            }
+          ],
+          "name": "inventory",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to A",
+              "requires": [],
+              "reserve": [
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-b.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Depot to B",
+              "requires": [],
+              "reserve": [
+                -1,
+                0,
+                1,
+                -1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "branch-a.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                -1
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "A shares surplus with B",
+              "requires": [],
+              "reserve": [
+                0,
+                -1,
+                1,
+                0,
+                -1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 1,
+            "status": "Completed",
+            "units": 2
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          4,
+          4,
+          4,
+          4,
+          4,
+          4,
+          0
+        ],
+        "version": 8
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 2,
+        "units": 2,
+        "version": 4
+      }
+    }
+  ]
+}
