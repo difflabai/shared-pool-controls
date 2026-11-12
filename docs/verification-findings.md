@@ -9,8 +9,9 @@ verification project.
 
 **Scope.** The verification ran on commit `a4bb5c3`, the head of PR #1.
 `crates/core/src/lib.rs`, `crates/contract` and `crates/executor` are
-byte-identical between `a4bb5c3` and v1.0.0 (`80fb89e`). Only package
-versions, the `station` fixture and its tests, the docs and the UI changed.
+byte-identical between `a4bb5c3` and v1.0.0 (`80fb89e`). The rest of the
+diff is package versions, the `station` scenario, fixture and tests, the
+demo, docs, UI, `scripts/smoke.py` and the Pages workflow.
 Every finding below applies to v1.0.0.
 
 **Line references.** `spec:N`, `api:N` and `handoff:N` are line N of
@@ -61,7 +62,7 @@ Severity rates the harm to a property the docs promise.
 
 | ID | Severity | Effect | Reproducer | Status |
 |---|---|---|---|---|
-| F-1 | high | After an `observe` breaks a bound, an admitted recovery hedge can never settle, and the pool can never be observed again. | `f1_disturbed_state_hedge_can_never_settle` | open |
+| F-1 | high | After an `observe` breaks a bound, an admitted recovery hedge can be left with no way to settle, and the pool cannot be observed again (shown for the trace-0 configuration). | `f1_disturbed_state_hedge_can_never_settle` | open |
 | F-2 | high | In the supplied `risk` fixture, with every metric in bounds, a position that a completed hedge relied on cannot be released by `settle(false)` or `cancel`. | `f2_risk_position_cannot_be_released_after_hedge_completes`, `f2_risk_reserved_position_is_stuck_after_hedge_completes` | open |
 | F-2b | high (part of F-2) | A release is not bounded by the envelope, so it can fail `Arithmetic`. | `f2b_release_outside_value_range_fails_arithmetic` | open |
 | F-3 | low | One actor can use all 256 lifetime records with free submit-and-cancel cycles. Every later `submit` fails `Full`. | `f3_submit_cancel_cycles_exhaust_lifetime_records` | open |
@@ -91,8 +92,10 @@ check compares with a violation of 0:
   was dispatched.
 - `observe` fails `Pending`, because a record is open (spec:54).
 
-The record never becomes terminal, and the pool can never be observed
-again. On a local chain the executor commits "completed", and its
+In this configuration no later call helps: the record never becomes
+terminal, and the pool can never be observed again. In other
+configurations a later admission that lowers metric 0 can let
+`settle(true)` pass, as in F-2. On a local chain the executor commits "completed", and its
 notification to the pool fails `Bounds`. The executor then refuses to change
 its answer, so the two contracts disagree permanently.
 
