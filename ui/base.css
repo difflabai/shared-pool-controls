@@ -1459,3 +1459,212 @@ body:not(.story-site) .row {
   .evidence-section { padding-top:40px; padding-bottom:40px; }
   .review-status { padding:20px; }
 }
+
+/* A luminous, architectural opening; warm editorial sections below. */
+.story-site { background:#f6f4ec; }
+.story-site .site-nav {
+  width:100%; padding-inline:max(32px,calc((100vw - 1240px)/2));
+  min-height:88px; background:#102d29; color:#f7f5df;
+  border-color:#ffffff18;
+}
+.story-site .site-nav .brand-light { color:#afc2b5; }
+.story-site .brand-mark i { background:#d8f793; }
+.story-site .brand-mark i:last-child { background:#e7ad87; }
+.story-site .hero {
+  width:100%; max-width:none; margin:0;
+  padding:64px max(32px,calc((100vw - 1240px)/2)) 76px;
+  background:radial-gradient(ellipse at 82% 42%,#335c453b,transparent 48%),#102d29;
+  color:#f7f5df; gap:68px; grid-template-columns:1.05fr 1fr;
+  position:relative; isolation:isolate; overflow:clip;
+}
+.hero:after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:5px;
+  background:linear-gradient(90deg,#d7f59c 0 32%,#819d78 32% 65%,#e7ad87 65%);
+}
+.hero h1 { font-size:clamp(3.3rem,5.2vw,5.25rem); letter-spacing:-.065em; line-height:1.03; margin:26px 0; }
+.hero h1 em { color:#d8f793; }
+.hero .eyebrow { color:#b9d7ba; font-size:.67rem; letter-spacing:.14em; }
+.hero .dot { background:#d8f793; box-shadow:0 0 18px #d8f79380; }
+.hero-thesis { font-size:1.2rem; color:#e0e8d4; line-height:1.5; margin-bottom:20px; }
+.hero .hero-intro { color:#b7c9bf; font-size:.88rem; line-height:1.8; max-width:490px; }
+.hero .hero-caption { color:#b7c9bf; font-size:.68rem; }
+.hero .primary { background:#d8f793; color:#132e26; border-color:#d8f793; padding:16px 22px; border-radius:8px; box-shadow:0 4px 28px #d8f79310; }
+.hero .primary:hover { background:#e6ffb5; box-shadow:0 6px 30px #d8f79330; }
+.hero .text-link { color:#e0e8d4; }
+.reveal-all { border:0; padding:10px 0; margin-top:8px; color:#c4d7ca; font-size:.7rem; background:transparent; gap:16px; }
+.reveal-all:hover { color:#e6ffb5; background:transparent; }
+.reveal-all:disabled { opacity:1; color:#a8bfae; }
+.hero-diagram {
+  padding:0; background:transparent; border:0; box-shadow:none;
+}
+.diagram-content {
+  position:relative; z-index:1; padding:28px; border-radius:22px;
+  background:linear-gradient(145deg,#24463d,#17372f);
+  border:1px solid #9cbe8838; box-shadow:0 35px 80px #061f2660, inset 0 1px #ffffff0b;
+}
+.diagram-orbit { position:absolute; width:115%; aspect-ratio:1; left:-7.5%; top:-8%; border:1px solid #badd9115; border-radius:50%; pointer-events:none; }
+.diagram-orbit:after { content:''; position:absolute; inset:25px; border:1px dashed #badd9118; border-radius:50%; }
+.hero .tiny-tag { color:#c1d0bf; border-color:#91ae8550; border-radius:20px; }
+.hero .request-chip { background:#ffffff08; border-color:#92b08744; color:#eff6e3; border-radius:9px; padding:15px 9px; }
+.hero .request-chip small { color:#b7c9bf; }
+.hero .agent-icon { background:#526d4344; color:#def3ba; }
+.hero .request-warm .agent-icon { background:#deaa7d24; color:#edbd98; }
+.hero .diagram-connectors path { stroke:#b5cf8c; stroke-width:1.4; }
+.hero .diagram-connectors span { background:#214136; color:#d0ddc6; }
+.hero .lock-card { padding:24px 20px; background:#d8f793; color:#18372c; border-radius:10px; box-shadow:0 0 40px #d8f79312; }
+.hero .lock-card strong { font-size:1rem; font-weight:650; }
+.hero .lock-card p { color:#3d5d36; font-size:.7rem; }
+.hero .lock-icon,.hero .lock-check { color:#325531; }
+.hero .pool-illustration { background:#ffffff07; border-color:#92b08744; color:#eff6e3; border-radius:10px; }
+.hero .healthy-label { color:#d8f793; }
+.hero .pool-blocks i { background:#d8f793; height:42px; box-shadow:0 0 15px #d8f79314; }
+.hero .pool-blocks .block-light { background:#9fbc8b; }
+.hero .pool-blocks .block-warm { background:#e7ad87; }
+.hero .diagram-key { color:#c8d7c2; }
+.hero .diagram-footnote { color:#aebeae; font-size:.68rem; margin:18px 0 0; }
+.premise { padding-top:34px; }
+.section-kicker { color:#546758; }
+.mechanism { gap:20px; }
+.mechanism article { padding:28px; border:1px solid #d8ddd3; border-radius:14px; background:#fffdf5; transition:border-color .25s,box-shadow .25s,transform .25s; }
+.step-number { font-size:2.5rem; color:#8f9f74; margin-bottom:30px; }
+.mechanism h3 { font-size:1.25rem; }
+.mechanism article:hover,.evidence-grid article:hover { border-color:#92a477; box-shadow:0 12px 36px #20372e09; }
+.energy-note { border:0; background:#e8ecdc; border-radius:12px; margin-top:28px; }
+.explorer-section { background:linear-gradient(145deg,#e8ecdf,#f0f1e8); }
+.scenario-shell { box-shadow:0 24px 60px #20372e0b; border-radius:18px; }
+.scenario-tabs button[aria-selected=true] { background:#183c30; color:#f5f5e2; border-radius:10px 10px 0 0; }
+.scenario-tabs button[aria-selected=true] small,.scenario-tabs button[aria-selected=true] .tab-index { color:#d8f793; }
+.evidence-grid { gap:20px; }
+.evidence-grid article { border:1px solid #d8ddd3; border-top:3px solid #91a575; padding:26px; border-radius:12px; background:#fffdf5; transition:border-color .25s,box-shadow .25s,transform .25s; }
+.evidence-section > .near-boundary { margin-top:40px; padding-left:24px; border-left:2px solid #99ae80; }
+.review-status { border-radius:14px; }
+.closing { padding-block:80px; }
+.closing > p:not(.eyebrow) { max-width:550px; margin:0 auto 30px; color:var(--muted); }
+.supporting-detail { transition:opacity .8s ease; }
+.reveal-group:not(.summary-visible) [data-detail="1"],
+.reveal-group:not(.details-visible) [data-detail="2"] { opacity:0; }
+.reveal-group:focus-within .supporting-detail { opacity:1; }
+@media(min-width:761px) and (max-width:1100px) {
+  .story-site .hero { gap:30px; padding-inline:32px; }
+  .hero h1 { font-size:3.8rem; }
+  .diagram-content { padding:18px; }
+}
+@media(max-width:760px) {
+  .story-site .site-nav { padding-inline:20px; min-height:80px; gap:12px; }
+  .story-site .hero { padding:54px 20px 64px; grid-template-columns:1fr; gap:50px; overflow:hidden; }
+  .hero h1 { font-size:clamp(2.8rem,10vw,4.4rem); }
+  .hero .eyebrow { font-size:.6rem; }
+  .hero-thesis { font-size:1.1rem; }
+  .hero .hero-intro { font-size:.9rem; }
+  .diagram-content { padding:20px 15px; }
+  .hero .request-chip { padding:12px 7px; }
+  .hero .lock-card { padding:22px 14px; }
+  .mechanism article,.evidence-grid article { padding:24px; }
+  .mechanism article:hover,.evidence-grid article:hover { transform:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .reveal-group:not(.summary-visible) [data-detail="1"], .reveal-group:not(.details-visible) [data-detail="2"] { opacity:1; }
+  *,*:before,*:after { animation:none!important; }
+}
+@media print {
+  .reveal-group:not(.summary-visible) [data-detail="1"], .reveal-group:not(.details-visible) [data-detail="2"] { opacity:1; }
+  .reveal-all { display:none; }
+}
+
+/* Orbital commons: a mission scene, driven by the Rust reservation ledger. */
+:root { --accent:#325795; --soft:#e9edf6; --text:#18233f; --muted:#626d83; --line:#d5dce8; --bg:#f4f5f9; }
+.story-site { background:#f4f5f9; }
+.story-site .site-nav { background:#080d20; color:#eff5ff; border-color:#91b9ee20; }
+.story-site .site-nav .brand-light { color:#a2b2d1; }
+.story-site .brand-mark i { background:#8ddfff; }
+.story-site .brand-mark i:last-child { background:#ffa967; }
+.story-site .orbital-hero {
+  background:radial-gradient(ellipse at 80% 38%,#23305270,transparent 55%),linear-gradient(155deg,#080d20,#0e1630 60%,#121b35);
+  color:#edf4ff; grid-template-columns:.85fr 1.35fr; gap:38px;
+  padding-top:52px; padding-bottom:64px; align-items:center;
+}
+.orbital-hero:after { background:linear-gradient(90deg,#8cddff,#5e79bb 65%,#ffa967); height:2px; }
+.orbit-stars { position:absolute; inset:0; z-index:-1; opacity:.5; pointer-events:none;
+  background-image:radial-gradient(circle at 15% 22%,#b6ddff 0 1px,transparent 1.5px),radial-gradient(circle at 70% 45%,#91a8d5 0 .8px,transparent 1.5px),radial-gradient(circle at 35% 80%,#fff 0 .8px,transparent 1.2px);
+  background-size:211px 193px,307px 283px,397px 331px;
+}
+.orbital-hero .eyebrow { color:#9ab3d9; font-size:.62rem; }
+.orbital-hero .dot { background:#88dfff; box-shadow:0 0 18px #88dfff66; }
+.scene-chapter { color:#7f94b6; font: .62rem ui-monospace,SFMono-Regular,monospace; letter-spacing:.17em; margin:38px 0 18px; }
+.orbital-hero h1 { font-size:clamp(3.1rem,4.8vw,4.8rem); }
+.orbital-hero h1 em { color:#ffa967; }
+.orbital-hero .hero-thesis { color:#d3e1f6; font-size:1.1rem; }
+.orbital-hero .hero-intro { color:#a6b6d1; max-width:390px; }
+.orbital-hero .hero-caption { color:#91a4c1; font-size:.64rem; }
+.orbital-hero .primary { background:#ffa967; border-color:#ffa967; color:#1b1c2a; box-shadow:0 0 40px #ff9b4518; }
+.orbital-hero .primary:hover { background:#ffc193; box-shadow:0 0 35px #ff9b4530; }
+.orbital-hero .text-link,.orbital-hero .reveal-all { color:#b7c9e4; }
+.orbital-hero .hero-actions { gap:18px; }
+.orbital-scene { min-width:0; position:relative; padding:22px 24px 16px; border:1px solid #88a7d128; border-radius:22px; background:linear-gradient(150deg,#15223b80,#080e20a0); box-shadow:0 30px 100px #0005,inset 0 1px #ffffff08; }
+.scene-topline { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px; font:.55rem ui-monospace,SFMono-Regular,monospace; letter-spacing:.1em; color:#9fb3d1; }
+.scene-topline i { display:inline-block; width:5px; height:5px; background:#78dfcb; border-radius:50%; margin-right:5px; }
+.station-map { display:block; width:100%; overflow:visible; margin:4px 0 -28px; }
+.ship text { fill:#c8def8; font:12px ui-monospace,SFMono-Regular,monospace; letter-spacing:1px; }
+.ship .ship-note { fill:#7589aa; font-size:9px; }
+.power-route { fill:#405875; stroke:#405875; stroke-width:2; }
+.power-route path { fill:none; stroke-dasharray:5 7; }
+.holding-marker { opacity:0; transition:opacity .5s; }
+.atlas-admitted .route-atlas,.lyra-admitted .route-lyra,.vega-admitted .route-vega { stroke:#81dfff; fill:#81dfff; filter:drop-shadow(0 0 5px #81dfff55); }
+.atlas-admitted .ship-atlas .ship-note,.lyra-admitted .ship-lyra .ship-note,.vega-admitted .ship-vega .ship-note { fill:#81dfff; }
+.atlas-admitted .route-atlas path,.lyra-admitted .route-lyra path,.vega-admitted .route-vega path { animation:power-flow 1.6s linear 3; }
+[data-phase=holding] .holding-marker { opacity:1; }
+[data-phase=holding][data-waiting=vega] .route-vega, [data-phase=holding][data-waiting=atlas] .route-atlas, [data-phase=holding][data-waiting=lyra] .route-lyra { stroke:#ffa967; fill:#ffa967; }
+[data-phase=holding][data-waiting=vega] .ship-vega .ship-note, [data-phase=holding][data-waiting=atlas] .ship-atlas .ship-note, [data-phase=holding][data-waiting=lyra] .ship-lyra .ship-note { fill:#ffc28c; }
+.flight-command { position:relative; text-align:center; margin:0 auto 22px; max-width:500px; }
+.flight-command .eyebrow { font:.6rem ui-monospace,SFMono-Regular,monospace; color:#8cabc8; letter-spacing:.14em; }
+.flight-command strong { display:block; margin:8px 0; font-size:clamp(1.3rem,2.1vw,2rem); font-weight:550; letter-spacing:.02em; color:#9ce8ff; transition:color .4s; }
+.flight-command p { font-size:.74rem; color:#a2b7d0; min-height:3.3em; line-height:1.6; margin:0 auto; max-width:400px; }
+[data-phase=holding] .flight-command strong { color:#ffb574; text-shadow:0 0 30px #ffa96730; }
+[data-phase=holding] .flight-command .eyebrow { color:#f1ae7b; }
+.power-ledger { border-top:1px solid #7798c12b; padding-top:16px; display:grid; grid-template-columns:auto 1fr; gap:12px 18px; align-items:center; }
+.power-ledger > div:first-child > span { display:block; font:.55rem ui-monospace,SFMono-Regular,monospace; color:#829bbc; letter-spacing:.1em; }
+.power-ledger strong { font-weight:450; font-size:1.15rem; color:#e1efff; }
+.power-ledger strong small { font-size:.6rem; color:#a5b7d0; }
+.power-ledger strong b { font-weight:600; }
+.power-cells { display:grid; grid-template-columns:repeat(12,1fr); gap:4px; }
+.power-cells i { height:24px; border:1px solid #58749a; background:#15243c; border-radius:2px; transition:background .6s,box-shadow .6s; }
+.power-cells i.booked { background:#85d9fb; border-color:#85d9fb; box-shadow:0 0 14px #85d9fb22; }
+.power-cells i.reserved { background:repeating-linear-gradient(135deg,#276657 0 3px,#193f3d 3px 6px); border-color:#64b9ab; }
+.reserve-key { grid-column:2; text-align:right; color:#8fcec1; font-size:.6rem; margin-top:-8px; }
+.station-continue { width:100%; margin-top:18px; border:1px solid #759ac15c; background:#1a2c46; color:#cee8ff; font-size:.78rem; padding:13px; border-radius:7px; }
+.station-continue:hover { background:#233b59; border-color:#9bdfff; }
+.station-continue:disabled { opacity:.4; }
+.scene-footnote { text-align:center; font-size:.59rem; color:#8b9bb4; line-height:1.6; margin:14px 0 0; }
+.scenario-tabs { grid-template-columns:repeat(6,minmax(0,1fr)); }
+.scenario-tabs button[aria-selected=true] { background:#182b49; color:#eff6ff; }
+.scenario-tabs button[aria-selected=true] small,.scenario-tabs button[aria-selected=true] .tab-index { color:#8edfff; }
+.explorer-section { background:linear-gradient(145deg,#e5ebf4,#f1f3f8); }
+.energy-note { background:#e4eaf4; }
+.step-number { color:#557bac; }
+.mechanism article,.evidence-grid article { background:#fcfdff; border-color:#d4ddea; }
+.evidence-grid article { border-top-color:#7c9dc6; }
+@keyframes power-flow { to { stroke-dashoffset:-48; } }
+@media(min-width:761px) and (max-width:1100px) {
+  .story-site .orbital-hero { grid-template-columns:1fr 1.2fr; gap:24px; }
+  .orbital-hero h1 { font-size:3.3rem; }
+  .orbital-scene { padding:18px; }
+  .power-ledger { grid-template-columns:1fr; gap:10px; }
+  .reserve-key { grid-column:1; }
+}
+@media(max-width:760px) {
+  .story-site .orbital-hero { grid-template-columns:1fr; gap:36px; padding-top:38px; }
+  .orbital-hero h1 { font-size:clamp(3rem,11vw,4.5rem); }
+  .orbital-hero .hero-intro { max-width:none; }
+  .scene-chapter { margin-top:24px; }
+  .orbital-scene { padding:18px 12px; border-radius:14px; }
+  .scene-topline { font-size:.48rem; }
+  .station-map { margin:15px 0 -8px; }
+  .flight-command strong { font-size:1.45rem; }
+  .flight-command p { font-size:.72rem; }
+  .power-ledger { grid-template-columns:1fr; }
+  .power-cells i { height:27px; }
+  .reserve-key { grid-column:1; }
+  .scene-footnote { font-size:.63rem; }
+}
+
+.orbital-scene { scroll-margin-top:16px; }

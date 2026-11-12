@@ -1,22 +1,23 @@
 # Shared Pool Controls
 
-**Independent agents. One shared limit.** A small Rust / NEAR gatekeeper for commitments against a shared pool. Five scenarios use the same core and contract:
+**Independent agents. One shared limit.** An MIT-licensed, open-source Rust / NEAR contract for commitments against a shared pool. Built for the **AI Security & Defense** track of NEAR Hackathon, it gives ecosystem developers a contract they can modify, configure, and deploy to address this class of shared-resource problems. Six scenarios use the same core and contract:
 
-1. **Every team needs the GPU now** — shared compute, protected inference capacity, smaller or later allocations.
-2. **Everyone promised Friday** — coupled machine and delivery reservations.
-3. **Every branch hoards the scarce part** — shared stock, protected depot reserve, receipt-gated availability.
-4. **Every agent hires more agents** — bounded worker funding, review earmarks, independent acceptance.
-5. **Everyone is diversified—until they need the same exit** — portfolio stress-loss budgets, collateral, fill-gated hedge credit.
+1. **Every ship wants to dock** — station power, a protected life-support allocation, and an explicit wait before requesting a later window.
+2. **Every team needs the GPU now** — shared compute, protected inference capacity, smaller or later allocations.
+3. **Everyone promised Friday** — coupled machine and delivery reservations.
+4. **Every branch hoards the scarce part** — shared stock, protected depot reserve, receipt-gated availability.
+5. **Every agent hires more agents** — bounded worker funding, review earmarks, independent acceptance.
+6. **Everyone is diversified—until they need the same exit** — portfolio stress-loss budgets, collateral, fill-gated hedge credit.
 
 Agents submit an owner-defined recipe and exact integer quantity. The core checks caller authority, freshness, prerequisites, resource bounds and `V(after) <= V(before)`, then atomically reserves the commitment. The execution adapter accepts calls only from the lock. Unknown outcomes retain reservations.
 
-**Status:** implemented prototype with Rust tests and NEAR sandbox integration tests. Not formally verified, independently audited, or deployed to a public network. Credits, GPU jobs, physical delivery, and financial positions are synthetic. The risk coefficients are illustrative, not a production portfolio model.
+**Status:** implemented prototype with Rust tests and NEAR sandbox integration tests. Not independently audited or deployed to a public network. [Formal verification](https://github.com/difflabai/formalver/pull/31) includes completed Lean model proofs and TLA+ checks; the overall effort is in progress, with Rust-core Kani verification pending and reported settlement/liveness findings unresolved in that PR. Credits, GPU jobs, physical delivery, and financial positions are synthetic. The risk coefficients are illustrative, not a production portfolio model.
 
 ## Hackathon review path
 
-Recommended primary track: **AI Security & Defense**. The product is a shared-state policy engine for agents; AI Swarms is a secondary thematic fit. See the [judge walkthrough](docs/judges-guide.md) for track analysis, a 90-second demo script, and a claim-to-test map.
+Track: **AI Security & Defense**. The deliverable is an open-source contract that ecosystem teams can adapt and deploy for shared compute, delivery capacity, inventory, worker funding, and risk budgets. The explorer demonstrates those applications. See the [judge walkthrough](docs/judges-guide.md) for a 90-second demo script and a claim-to-evidence map.
 
-Start the lab below, then click **See a request blocked**. It resets GPU and runs three decisions: Data's four-block request is denied (energy 20 → 44), leaving six blocks booked. Click **Run next decision** to admit Data's explicit two-block revision (energy 20 → 8, eight blocks booked). The UI then links to NEAR execution evidence and implementation limits.
+Start the lab below, then click **Begin docking sequence**. Atlas reserves 4 MW and Lyra 2 MW. Vega asks for 4 MW: **WAIT TO DOCK**. The station has 12 MW per window, but 4 MW is protected for life support; docking cannot exceed 8 MW. The denied request leaves 6 MW booked. Click **Request Vega docking in window 02** to submit a fresh request against the second window. The animation reflects Rust decisions, not a JavaScript policy implementation. The original GPU scenario remains available as a separate example of an energy-only denial.
 
 ## Run the interactive lab
 
@@ -27,11 +28,13 @@ cargo run -p pool-demo -- serve
 # Open http://127.0.0.1:8080
 ```
 
-The site introduces the shared-resource problem, guides visitors into the five-scenario explorer, then opens up the contract specification, lifecycle and source code. Custom requests and evidence controls are available under expandable sections.
+The site introduces the shared-resource problem, guides visitors into the six-scenario explorer, then opens up the contract specification, lifecycle and source code. Custom requests and evidence controls are available under expandable sections.
 
 The server binds only to loopback. It serves plain HTML/CSS/JavaScript and evaluates decisions in Rust. There is no frontend build, package manager, database, private key, LLM, or external service requirement. Selecting identities and confirming completion are explicit simulator controls, not production authentication.
 
 Use **Run next decision** to walk the trace; **Preview** and **Submit exact quantity** to explore; **Suggest a smaller quantity** to ask the bounded Rust planner for a suggestion. Unknown outcomes, confirmed nonexecution, duplicate completion, and a risk-market observation can be explored through the lifecycle controls.
+
+The `pages` workflow publishes the UI and recorded traces to GitHub Pages on every push to `main` (enable it once under Settings → Pages → Source: GitHub Actions). The hosted site is a replay with manual submissions disabled.
 
 For a completely static replay, serve the repository root with `python3 -m http.server 8081`, then open `/ui/`. The same page falls back to checked-in traces produced by Rust; manual submissions are disabled and the mode is clearly labeled. Generate them with:
 
@@ -61,7 +64,7 @@ python3 scripts/smoke.py     # local HTTP demo; start server first
 | [`crates/contract`](crates/contract) | NEAR identity, persisted state, events, promises and authenticated callbacks |
 | [`crates/executor`](crates/executor) | Enforced synthetic adapter, exact dispatch binding, independent operator, fault injection |
 | [`crates/demo`](crates/demo) | Rust local server, deterministic traces, bounded alternative search |
-| [`crates/sandbox`](crates/sandbox) | Wasm integration tests for all five configurations and uncertain outcomes |
+| [`crates/sandbox`](crates/sandbox) | Wasm integration tests for all six configurations and uncertain outcomes |
 | [`ui`](ui) | Static scenario lab and live NEAR console |
 | [`scenarios`](scenarios) | Generated configurations and reproducible decision traces |
 
@@ -79,4 +82,4 @@ Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updat
 - The adapter boundary is real in the sandbox. Real brokers, cloud providers or warehouses would need enforceable integrations with no alternate credentials/path around the gate.
 - The prototype uses no real escrow token. Hiring credits are accounting fixtures, not NEAR balances.
 
-The architecture follows [`difflabai/trust-framework`](https://github.com/difflabai/trust-framework/tree/249f932d84b91fbc6f82abd0668cac6c0503fc42/contracts/approval): a pure core and thin wrapper. Its proofs do **not** apply to this code. Formal verification is deliberately left to separate follow-up work.
+The architecture follows [`difflabai/trust-framework`](https://github.com/difflabai/trust-framework/tree/249f932d84b91fbc6f82abd0668cac6c0503fc42/contracts/approval): a pure core and thin wrapper. Its proofs do **not** apply to this code. Dedicated [shared-pool formal verification](https://github.com/difflabai/formalver/pull/31) targets the contract source pinned at `a4bb5c3`: Lean proofs cover the model transcription, TLA+ checks a bounded model, and conformance traces connect the models to the Rust core. Kani verification and refinement work remain pending. The PR reports high-severity settlement/liveness findings F-1 and F-2; consult its current status and findings before deploying. Changes to the contract or policy require review against the proof assumptions.

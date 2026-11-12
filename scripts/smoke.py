@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exercise the local Rust server, not a JavaScript policy reimplementation."""
-import json, time, urllib.request, urllib.error
-BASE='http://127.0.0.1:8080'
+import json, os, time, urllib.request, urllib.error
+BASE=os.environ.get('POOL_DEMO_URL', 'http://127.0.0.1:8080')
 def post(path, data):
     req=urllib.request.Request(BASE+'/api/'+path,json.dumps(data).encode(),{'Content-Type':'application/json'})
     with urllib.request.urlopen(req,timeout=5) as r: return json.load(r)
@@ -9,7 +9,7 @@ for attempt in range(40):
     try: post('scenarios',{}); break
     except (OSError,urllib.error.URLError): time.sleep(.25)
 else: raise SystemExit('Start cargo run -p pool-demo -- serve first')
-for name, expected in [('gpu',['32','20','44','8','4','0']),('friday',['32','20','44','8','4','0']),('inventory',['32','8','0']),('hiring',['22','13','4','0']),('risk',['400','0','100','0','0'])]:
+for name, expected in [('station',['32','20','44','4','0']),('gpu',['32','20','44','8','4','0']),('friday',['32','20','44','8','4','0']),('inventory',['32','8','0']),('hiring',['22','13','4','0']),('risk',['400','0','100','0','0'])]:
     p=post('reset',{'scenario':name})['pool']
     trace=post('trace',{'scenario':name})
     assert [s['decision']['after'] for s in trace['steps']]==expected

@@ -44,7 +44,7 @@ fn recipe(
         requires,
     }
 }
-pub const NAMES: [&str; 5] = ["gpu", "friday", "inventory", "hiring", "risk"];
+pub const NAMES: [&str; 6] = ["station", "gpu", "friday", "inventory", "hiring", "risk"];
 pub fn config(name: &str) -> Result<Config, Error> {
     let mut c = Config {
         name: name.into(),
@@ -55,6 +55,27 @@ pub fn config(name: &str) -> Result<Config, Error> {
         max_age_seconds: 0,
     };
     match name {
+        "station" => {
+            // Each window supplies 12 MW. Four MW are unavailable to docking:
+            // the 8 MW hard booking ceiling protects life support.
+            c = config("gpu")?;
+            c.name = name.into();
+            for (i, ship) in ["Atlas", "Lyra", "Vega"].iter().enumerate() {
+                c.metrics[i].name = format!("{ship} service allocation");
+                for window in 0..2 {
+                    let r = &mut c.recipes[i * 2 + window];
+                    r.name = format!("{ship}: docking window {}", window + 1);
+                    r.actor = format!("{}.test.near", ship.to_lowercase());
+                }
+            }
+            for m in &mut c.metrics {
+                m.unit = "MW".into();
+            }
+            for i in 3..5 {
+                c.metrics[i].name = format!("Window {} docking power", i - 2);
+                c.metrics[i].max = 8;
+            }
+        }
         "gpu" | "friday" => {
             let friday = name == "friday";
             let unit = if friday {
@@ -267,6 +288,7 @@ pub fn config(name: &str) -> Result<Config, Error> {
 /// (recipe index, requested units); each request is re-previewed at current version.
 pub fn trace(name: &str) -> Vec<(u32, u32)> {
     match name {
+        "station" => vec![(0, 4), (2, 2), (4, 4), (5, 4), (3, 2)],
         "gpu" | "friday" => vec![(0, 4), (2, 2), (4, 4), (4, 2), (5, 2), (3, 2)],
         "inventory" => vec![(0, 2), (1, 2), (2, 2)],
         "hiring" => vec![(0, 5), (0, 2), (1, 3), (2, 2)],

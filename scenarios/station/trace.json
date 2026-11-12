@@ -1,0 +1,1570 @@
+{
+  "initial": {
+    "config": {
+      "max_age_seconds": 0,
+      "metrics": [
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Atlas service allocation",
+          "unit": "MW"
+        },
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Lyra service allocation",
+          "unit": "MW"
+        },
+        {
+          "initial": 0,
+          "max": 20,
+          "min": 0,
+          "name": "Vega service allocation",
+          "unit": "MW"
+        },
+        {
+          "initial": 0,
+          "max": 8,
+          "min": 0,
+          "name": "Window 1 docking power",
+          "unit": "MW"
+        },
+        {
+          "initial": 0,
+          "max": 8,
+          "min": 0,
+          "name": "Window 2 docking power",
+          "unit": "MW"
+        }
+      ],
+      "name": "station",
+      "owner": "owner.test.near",
+      "recipes": [
+        {
+          "actor": "atlas.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Atlas: docking window 1",
+          "requires": [],
+          "reserve": [
+            1,
+            0,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "actor": "atlas.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Atlas: docking window 2",
+          "requires": [],
+          "reserve": [
+            1,
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "actor": "lyra.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Lyra: docking window 1",
+          "requires": [],
+          "reserve": [
+            0,
+            1,
+            0,
+            1,
+            0
+          ]
+        },
+        {
+          "actor": "lyra.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Lyra: docking window 2",
+          "requires": [],
+          "reserve": [
+            0,
+            1,
+            0,
+            0,
+            1
+          ]
+        },
+        {
+          "actor": "vega.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Vega: docking window 1",
+          "requires": [],
+          "reserve": [
+            0,
+            0,
+            1,
+            1,
+            0
+          ]
+        },
+        {
+          "actor": "vega.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Vega: docking window 2",
+          "requires": [],
+          "reserve": [
+            0,
+            0,
+            1,
+            0,
+            1
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "metric": 0,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        },
+        {
+          "metric": 1,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        },
+        {
+          "metric": 2,
+          "shape": "Target",
+          "target": 4,
+          "weight": 1
+        },
+        {
+          "metric": 3,
+          "shape": "Excess",
+          "target": 8,
+          "weight": 10
+        },
+        {
+          "metric": 4,
+          "shape": "Excess",
+          "target": 8,
+          "weight": 10
+        }
+      ]
+    },
+    "observed_at": 1794441600,
+    "paused": false,
+    "records": [],
+    "values": [
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "version": 0
+  },
+  "mode": "Rust core simulation; mocked execution",
+  "scenario": "station",
+  "steps": [
+    {
+      "actor": "atlas.test.near",
+      "decision": {
+        "after": "32",
+        "allowed": true,
+        "before": "48",
+        "candidate": [
+          4,
+          0,
+          0,
+          4,
+          0
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "16",
+          "16",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "16",
+          "16",
+          "16",
+          "0",
+          "0"
+        ]
+      },
+      "id": 0,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Atlas service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Lyra service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Vega service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 1 docking power",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 2 docking power",
+              "unit": "MW"
+            }
+          ],
+          "name": "station",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 1",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 2",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 3,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            },
+            {
+              "metric": 4,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 4
+          }
+        ],
+        "values": [
+          4,
+          0,
+          0,
+          4,
+          0
+        ],
+        "version": 4
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 4,
+        "version": 0
+      }
+    },
+    {
+      "actor": "lyra.test.near",
+      "decision": {
+        "after": "20",
+        "allowed": true,
+        "before": "32",
+        "candidate": [
+          4,
+          2,
+          0,
+          6,
+          0
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "4",
+          "16",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "16",
+          "16",
+          "0",
+          "0"
+        ]
+      },
+      "id": 1,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Atlas service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Lyra service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Vega service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 1 docking power",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 2 docking power",
+              "unit": "MW"
+            }
+          ],
+          "name": "station",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 1",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 2",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 3,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            },
+            {
+              "metric": 4,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 4
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          4,
+          2,
+          0,
+          6,
+          0
+        ],
+        "version": 8
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 2,
+        "units": 2,
+        "version": 4
+      }
+    },
+    {
+      "actor": "vega.test.near",
+      "decision": {
+        "after": "44",
+        "allowed": false,
+        "before": "20",
+        "candidate": [
+          4,
+          2,
+          4,
+          10,
+          0
+        ],
+        "reason": "Bounds",
+        "terms_after": [
+          "0",
+          "4",
+          "0",
+          "40",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "4",
+          "16",
+          "0",
+          "0"
+        ]
+      },
+      "id": null,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Atlas service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Lyra service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Vega service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 1 docking power",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 2 docking power",
+              "unit": "MW"
+            }
+          ],
+          "name": "station",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 1",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 2",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 3,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            },
+            {
+              "metric": 4,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 4
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          4,
+          2,
+          0,
+          6,
+          0
+        ],
+        "version": 8
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 4,
+        "units": 4,
+        "version": 8
+      }
+    },
+    {
+      "actor": "vega.test.near",
+      "decision": {
+        "after": "4",
+        "allowed": true,
+        "before": "20",
+        "candidate": [
+          4,
+          2,
+          4,
+          6,
+          4
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "4",
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "4",
+          "16",
+          "0",
+          "0"
+        ]
+      },
+      "id": 2,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Atlas service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Lyra service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Vega service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 1 docking power",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 2 docking power",
+              "unit": "MW"
+            }
+          ],
+          "name": "station",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 1",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 2",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 3,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            },
+            {
+              "metric": 4,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 4
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 2,
+            "recipe": 5,
+            "status": "Completed",
+            "units": 4
+          }
+        ],
+        "values": [
+          4,
+          2,
+          4,
+          6,
+          4
+        ],
+        "version": 12
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 5,
+        "units": 4,
+        "version": 8
+      }
+    },
+    {
+      "actor": "lyra.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "4",
+        "candidate": [
+          4,
+          4,
+          4,
+          6,
+          6
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "4",
+          "0",
+          "0",
+          "0"
+        ]
+      },
+      "id": 3,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Atlas service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Lyra service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 20,
+              "min": 0,
+              "name": "Vega service allocation",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 1 docking power",
+              "unit": "MW"
+            },
+            {
+              "initial": 0,
+              "max": 8,
+              "min": 0,
+              "name": "Window 2 docking power",
+              "unit": "MW"
+            }
+          ],
+          "name": "station",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 1",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "atlas.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Atlas: docking window 2",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "lyra.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Lyra: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 1",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                1,
+                0
+              ]
+            },
+            {
+              "actor": "vega.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Vega: docking window 2",
+              "requires": [],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                1
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 4,
+              "weight": 1
+            },
+            {
+              "metric": 3,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            },
+            {
+              "metric": 4,
+              "shape": "Excess",
+              "target": 8,
+              "weight": 10
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 4
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 2,
+            "recipe": 5,
+            "status": "Completed",
+            "units": 4
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 3,
+            "recipe": 3,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          4,
+          4,
+          4,
+          6,
+          6
+        ],
+        "version": 16
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 3,
+        "units": 2,
+        "version": 12
+      }
+    }
+  ]
+}
