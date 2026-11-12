@@ -2,7 +2,7 @@
 
 This page describes v1.1.0. Changes from v1.0.0 are listed in the [changelog](../CHANGELOG.md).
 
-One immutable pool per deployment. All mutating methods are nonpayable, including `reconcile`; fund storage by transferring NEAR to the deployment account separately. Local demonstration credits have no relationship to attached deposits.
+One immutable pool per deployment. All mutating methods are nonpayable, including `reconcile`; fund storage by transferring NEAR to the deployment account separately. The read methods (`get_pool`, `get_commitments`, `preview`, and the executor's `status` and `get_jobs`) are meant for view calls. They have no deposit check, so one sent as a transaction keeps any attached deposit; do not attach one. Local demonstration credits have no relationship to attached deposits.
 
 | Method | Arguments | Authority / result |
 |---|---|---|
@@ -30,6 +30,8 @@ A submit prunes the oldest retained record when 256 are retained and it is termi
 Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every effective state transition increments version by exactly 1. Calls that change nothing return Ok and leave the version alone: a repeated terminal settlement, a repeated cancel, an acknowledgment that does not change the status, a late acknowledgment. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
 
 Decision fields: `allowed`, `reason`, decimal-string `before` and optional `after`, decimal-string per-term scores, candidate metric vector. Reasons include Unauthorized, Paused, Stale, Expired, SnapshotExpired, InvalidRecipe, InvalidUnits, Prerequisite, Full, Arithmetic, Bounds, Energy. `after` can be present for a rejected request to explain its prospective score; it is not accepted state.
+
+Events are logged as `EVENT_JSON:{"standard":"shared_pool","version":"1.0.0","event":...,"data":[...]}`. The kinds are `decision` (every submit, admitted or not), `reconciled`, `settled`, `cancelled`, `paused` and `observed`. `version` is the event format version, not the package version. It stays `1.0.0` in v1.1.0 because no event shape changed; `reconciled` can now carry `error: "NotFound"`.
 
 There is no `dampen` mutation: a caller previews an explicit reduced quantity and signs a new exact request. Date changes and substitutions use separate recipes, never silent terms changes.
 

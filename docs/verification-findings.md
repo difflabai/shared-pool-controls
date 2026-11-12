@@ -7,7 +7,10 @@ v1.0.0 of the contract.
 **Status** line with the fixing commit and the tests that check the fix;
 [CHANGELOG.md](../CHANGELOG.md) lists the changes. The formal results cited
 here apply to v1.0.0. v1.1.0 has not been formally re-verified: its fixes
-are checked by tests in this repository only.
+are checked by tests in this repository only. The commit hashes on this
+page are commits of
+[PR #4](https://github.com/difflabai/shared-pool-controls/pull/4), which
+lists them.
 
 **Reproducers and regression tests.** In v1.0.0 each core finding had a
 reproducer test in `crates/core/src/findings.rs` (commit `94f27ff`) that
@@ -32,10 +35,12 @@ draft [PR #31](https://github.com/difflabai/formalver/pull/31), under
 [`projects/shared-pool/`](https://github.com/difflabai/formalver/tree/b9c495b8fa47e395d662a348f1cc7e352018aea5/projects/shared-pool)
 at commit `b9c495b`. Paths in this page are relative to that directory.
 Section 4 of its `strategy.md` is the full record. The **Evidence**
-paragraphs below cite results as that section reports them. Only the
-reproducer tests in `crates/core/src/findings.rs` run in this repository.
-The TLC, Lean, Prolog, shell and sandbox results were not re-run for this
-page.
+paragraphs below cite results as that section reports them. In this
+repository the findings are checked by the regression tests in
+`crates/core/src/findings.rs` (the v1.0.0 reproducers, rewritten for
+v1.1.0) and by the unit, build and sandbox tests that v1.1.0 added. The
+TLC, Lean, Prolog, shell and sandbox results of the verification project
+were not re-run for this page, and none of them covers v1.1.0.
 
 ## How the findings were found
 
