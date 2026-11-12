@@ -679,19 +679,39 @@ fn f6_owner_refreshes_the_snapshot_with_records_open() {
     assert_live(&p);
 }
 
-/// div-cancel-terminal-name: cancelling a Completed or Dispatched record
-/// fails with Pending, a name that suggests an open commitment.
+/// div-cancel-terminal-name, fixed: v1.0.0 answered a cancel of a
+/// Completed record with Pending, a name that suggests an open commitment.
+/// v1.1 says InvalidState, as settle does for conflicting terminal
+/// evidence. Dispatched, Active and Unknown records keep Pending: their
+/// executor's evidence is pending. A repeated cancel is an Ok no-op.
 #[test]
-fn div_cancel_of_completed_or_dispatched_record_says_pending() {
+fn cancel_names_conflicting_and_in_flight_states() {
     let mut p = pool("gpu");
     let done = submit(&mut p, 0, 1, 100).unwrap();
     dispatch_active(&mut p, done, 100);
     p.settle(EXEC, done, true).unwrap();
     let sent = submit(&mut p, 0, 1, 100).unwrap();
     p.dispatch("research.test.near", sent, 100).unwrap();
-    assert_eq!(
-        p.cancel("research.test.near", done, 100),
-        Err(Error::Pending)
-    );
-    assert_eq!(p.cancel(OWNER, sent, 100), Err(Error::Pending));
+    let active = submit(&mut p, 0, 1, 100).unwrap();
+    dispatch_active(&mut p, active, 100);
+    let unknown = submit(&mut p, 2, 1, 100).unwrap();
+    p.dispatch("evaluation.test.near", unknown, 100).unwrap();
+    p.acknowledge(unknown, false).unwrap();
+    let cancelled = submit(&mut p, 4, 1, 100).unwrap();
+    p.cancel("data.test.near", cancelled, 100).unwrap();
+    let before = p.clone();
+    let expected = [
+        (done, Err(Error::InvalidState)),
+        (sent, Err(Error::Pending)),
+        (active, Err(Error::Pending)),
+        (unknown, Err(Error::Pending)),
+        (cancelled, Ok(())),
+    ];
+    for (id, result) in expected {
+        let a = actor(&p, p.records[id as usize].recipe);
+        assert_eq!(p.cancel(&a, id, 100), result, "record {id} by its actor");
+        assert_eq!(p.cancel(OWNER, id, 100), result, "record {id} by the owner");
+        assert_eq!(p.cancel("attacker", id, 100), Err(Error::Unauthorized));
+    }
+    assert_eq!(p, before);
 }

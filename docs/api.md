@@ -12,7 +12,7 @@ One immutable pool per deployment. All mutating methods are nonpayable; fund sto
 | `dispatch` | `{id}` | Recipe actor; Reserved -> Dispatched and calls fixed executor. |
 | `reconcile` | `{id}` | Anyone may query the fixed executor; private callback applies authentic result. |
 | `settle` | `{id,completed}` | Only that recipe's executor; false means definitive nonexecution, never unknown. |
-| `cancel` | `{id}` | Actor or owner; only undispatched Reserved records. |
+| `cancel` | `{id}` | Actor or owner; only undispatched Reserved records. Dispatched, Active or Unknown: `Pending`. Completed: `InvalidState`. Already Cancelled: Ok, no change. |
 | `set_paused` | `{paused}` | Owner; blocks admission and dispatch. |
 | `observe` | `{values}` | Owner; new values only when every record is terminal. Restating the current values is allowed at any time and renews the snapshot timestamp. May raise energy. |
 | `on_result` | `{id}` plus runtime promise result | Private callback, not a public evidence submission endpoint. |
@@ -23,7 +23,7 @@ Request example:
 {"recipe":0,"units":4,"version":0,"expires_at":1794500000}
 ```
 
-Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every successful state transition changes version; terminal duplicate settlement is idempotent. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
+Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every effective state transition increments version by exactly 1. Calls that change nothing return Ok and leave the version alone: a repeated terminal settlement, a repeated cancel, an acknowledgment that does not change the status, a late acknowledgment. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
 
 Decision fields: `allowed`, `reason`, decimal-string `before` and optional `after`, decimal-string per-term scores, candidate metric vector. Reasons include Unauthorized, Paused, Stale, Expired, SnapshotExpired, InvalidRecipe, InvalidUnits, Prerequisite, Full, Arithmetic, Bounds, Energy. `after` can be present for a rejected request to explain its prospective score; it is not accepted state.
 

@@ -36,12 +36,12 @@ Hard constraints are axis-aligned metric bounds. Coupled constraints use additio
 
 - Reserved -> Dispatched: exact actor, unpaused, unexpired, fresh risk snapshot; wrapper creates the promise after state update.
 - Dispatched/Unknown -> Active: private acknowledgment says adapter accepted dispatch.
-- Dispatched/Unknown -> Unknown: missing, malformed or failed acknowledgment; retain values.
+- Dispatched/Unknown -> Unknown: missing, malformed or failed acknowledgment; retain values. Unknown -> Unknown is an Ok no-op without a version change (`reconcile` is permissionless).
 - Dispatched/Active/Unknown -> Completed: recipe executor attests completion; add completion delta, check the envelope of the remaining open records, increment version. No energy comparison is imposed on externally attested settlement.
-- Reserved -> Cancelled: actor or owner cancels before dispatch. Subtract reservation delta and check other pending effects.
+- Reserved -> Cancelled: actor or owner cancels before dispatch. Subtract reservation delta and check other pending effects. A cancel of a Dispatched, Active or Unknown record returns `Pending`: the executor's evidence is pending. A cancel of a Completed record returns `InvalidState`.
 - Dispatched/Active/Unknown -> Cancelled: executor attests definitive nonexecution; same checked inverse update.
-- Same completion/cancellation repeated: idempotent. Conflicting terminal evidence: reject.
-- Late acknowledgment after terminal settlement: ignored.
+- Same completion/cancellation repeated: idempotent, Ok without a version change. Conflicting terminal evidence: reject with `InvalidState`.
+- Late acknowledgment after terminal settlement: ignored, Ok without a version change.
 
 Admission refuses any commitment whose outcomes could make a metric worse than now, so the checked inverse cannot fail in a reachable state. There is still no forced administrative release.
 

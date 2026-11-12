@@ -15,7 +15,7 @@ Start with `crates/core/src/lib.rs` and `docs/spec.md`. The default pool-core bu
 | ATOM | All rejected core mutations preserve the full state | submit, dispatch, settle, cancel, observe |
 | STALE | Request computed at a prior accepted version cannot replay | candidate, submit |
 | ASYNC | Unknown outcomes retain reservation until authoritative terminal evidence | acknowledge, settle, cancel |
-| TERM | Terminal repeated evidence is idempotent; conflicting outcome cannot apply | settle |
+| TERM | Terminal repeated evidence is idempotent; conflicting outcome cannot apply | settle, cancel |
 | DEP | Prerequisite requires completed units, not acknowledgment or partial completion | candidate |
 | BIND | Each dispatch ID fixes actor recipe, units and executor | Commitment and wrapper dispatch |
 | STOCK | Inventory fixture conserves available + transit and never spends inbound pipeline | fixtures + lifecycle |

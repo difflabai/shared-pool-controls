@@ -437,6 +437,11 @@ impl Pool {
         if c.status == Status::Cancelled {
             return Ok(());
         }
+        // Completed is conflicting terminal evidence, as in settle. An
+        // in-flight record waits for its executor's evidence.
+        if c.status == Status::Completed {
+            return Err(Error::InvalidState);
+        }
         if c.status != Status::Reserved {
             return Err(Error::Pending);
         }
