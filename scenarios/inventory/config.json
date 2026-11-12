@@ -1,0 +1,153 @@
+{
+  "name": "inventory",
+  "owner": "owner.test.near",
+  "metrics": [
+    {
+      "name": "Depot position",
+      "unit": "parts",
+      "initial": 6,
+      "min": 4,
+      "max": 20
+    },
+    {
+      "name": "Branch A position",
+      "unit": "parts",
+      "initial": 6,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Branch B position",
+      "unit": "parts",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Depot available",
+      "unit": "parts",
+      "initial": 6,
+      "min": 4,
+      "max": 20
+    },
+    {
+      "name": "Branch A available",
+      "unit": "parts",
+      "initial": 6,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Branch B available",
+      "unit": "parts",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Reserved / in transit",
+      "unit": "parts",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    }
+  ],
+  "terms": [
+    {
+      "metric": 0,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 1,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 2,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    }
+  ],
+  "recipes": [
+    {
+      "name": "Depot to A",
+      "actor": "branch-a.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        -1,
+        1,
+        0,
+        -1,
+        0,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        -1
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "Depot to B",
+      "actor": "branch-b.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        -1,
+        0,
+        1,
+        -1,
+        0,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        -1
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "A shares surplus with B",
+      "actor": "branch-a.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        -1,
+        1,
+        0,
+        -1,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        -1
+      ],
+      "max_units": 20,
+      "requires": []
+    }
+  ],
+  "max_age_seconds": 0
+}

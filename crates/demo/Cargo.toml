@@ -1,0 +1,8 @@
+[package]
+name = "pool-demo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+pool-core = { path = "../core", features = ["serde"] }
+serde_json = "1"

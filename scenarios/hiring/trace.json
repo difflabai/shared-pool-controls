@@ -1,0 +1,1150 @@
+{
+  "initial": {
+    "config": {
+      "max_age_seconds": 0,
+      "metrics": [
+        {
+          "initial": 0,
+          "max": 10,
+          "min": 0,
+          "name": "Research funded coverage",
+          "unit": "credits"
+        },
+        {
+          "initial": 0,
+          "max": 10,
+          "min": 0,
+          "name": "Implementation funded coverage",
+          "unit": "credits"
+        },
+        {
+          "initial": 0,
+          "max": 10,
+          "min": 0,
+          "name": "Review funded coverage",
+          "unit": "credits"
+        },
+        {
+          "initial": 5,
+          "max": 10,
+          "min": 0,
+          "name": "Unencumbered discretionary funds",
+          "unit": "credits"
+        },
+        {
+          "initial": 2,
+          "max": 2,
+          "min": 0,
+          "name": "Review earmark",
+          "unit": "credits"
+        },
+        {
+          "initial": 0,
+          "max": 7,
+          "min": 0,
+          "name": "Active escrow",
+          "unit": "credits"
+        },
+        {
+          "initial": 0,
+          "max": 7,
+          "min": 0,
+          "name": "Paid lifetime",
+          "unit": "credits"
+        },
+        {
+          "initial": 3,
+          "max": 3,
+          "min": 3,
+          "name": "Protected reserve",
+          "unit": "credits"
+        }
+      ],
+      "name": "hiring",
+      "owner": "owner.test.near",
+      "recipes": [
+        {
+          "actor": "research.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1,
+            1,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Research worker units",
+          "requires": [],
+          "reserve": [
+            1,
+            0,
+            0,
+            -1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "actor": "implementation.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1,
+            1,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Implementation worker units",
+          "requires": [],
+          "reserve": [
+            0,
+            1,
+            0,
+            -1,
+            0,
+            1,
+            0,
+            0
+          ]
+        },
+        {
+          "actor": "review.test.near",
+          "complete": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            -1,
+            1,
+            0
+          ],
+          "executor": "executor.test.near",
+          "max_units": 20,
+          "name": "Independent review units",
+          "requires": [
+            [
+              0,
+              2
+            ],
+            [
+              1,
+              3
+            ]
+          ],
+          "reserve": [
+            0,
+            0,
+            1,
+            0,
+            -1,
+            1,
+            0,
+            0
+          ]
+        }
+      ],
+      "terms": [
+        {
+          "metric": 0,
+          "shape": "Target",
+          "target": 2,
+          "weight": 1
+        },
+        {
+          "metric": 1,
+          "shape": "Target",
+          "target": 3,
+          "weight": 1
+        },
+        {
+          "metric": 2,
+          "shape": "Target",
+          "target": 2,
+          "weight": 1
+        }
+      ]
+    },
+    "observed_at": 1794441600,
+    "paused": false,
+    "records": [],
+    "values": [
+      0,
+      0,
+      0,
+      5,
+      2,
+      0,
+      0,
+      3
+    ],
+    "version": 0
+  },
+  "mode": "Rust core simulation; mocked execution",
+  "scenario": "hiring",
+  "steps": [
+    {
+      "actor": "research.test.near",
+      "decision": {
+        "after": "22",
+        "allowed": false,
+        "before": "17",
+        "candidate": [
+          5,
+          0,
+          0,
+          0,
+          2,
+          5,
+          0,
+          3
+        ],
+        "reason": "Energy",
+        "terms_after": [
+          "9",
+          "9",
+          "4"
+        ],
+        "terms_before": [
+          "4",
+          "9",
+          "4"
+        ]
+      },
+      "id": null,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Research funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Implementation funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Review funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 5,
+              "max": 10,
+              "min": 0,
+              "name": "Unencumbered discretionary funds",
+              "unit": "credits"
+            },
+            {
+              "initial": 2,
+              "max": 2,
+              "min": 0,
+              "name": "Review earmark",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Active escrow",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Paid lifetime",
+              "unit": "credits"
+            },
+            {
+              "initial": 3,
+              "max": 3,
+              "min": 3,
+              "name": "Protected reserve",
+              "unit": "credits"
+            }
+          ],
+          "name": "hiring",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "research.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Research worker units",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "implementation.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Implementation worker units",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "review.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Independent review units",
+              "requires": [
+                [
+                  0,
+                  2
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                -1,
+                1,
+                0,
+                0
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 3,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [],
+        "values": [
+          0,
+          0,
+          0,
+          5,
+          2,
+          0,
+          0,
+          3
+        ],
+        "version": 0
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 5,
+        "version": 0
+      }
+    },
+    {
+      "actor": "research.test.near",
+      "decision": {
+        "after": "13",
+        "allowed": true,
+        "before": "17",
+        "candidate": [
+          2,
+          0,
+          0,
+          3,
+          2,
+          2,
+          0,
+          3
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "9",
+          "4"
+        ],
+        "terms_before": [
+          "4",
+          "9",
+          "4"
+        ]
+      },
+      "id": 0,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Research funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Implementation funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Review funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 5,
+              "max": 10,
+              "min": 0,
+              "name": "Unencumbered discretionary funds",
+              "unit": "credits"
+            },
+            {
+              "initial": 2,
+              "max": 2,
+              "min": 0,
+              "name": "Review earmark",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Active escrow",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Paid lifetime",
+              "unit": "credits"
+            },
+            {
+              "initial": 3,
+              "max": 3,
+              "min": 3,
+              "name": "Protected reserve",
+              "unit": "credits"
+            }
+          ],
+          "name": "hiring",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "research.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Research worker units",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "implementation.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Implementation worker units",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "review.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Independent review units",
+              "requires": [
+                [
+                  0,
+                  2
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                -1,
+                1,
+                0,
+                0
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 3,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          2,
+          0,
+          0,
+          3,
+          2,
+          0,
+          2,
+          3
+        ],
+        "version": 4
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 0,
+        "units": 2,
+        "version": 0
+      }
+    },
+    {
+      "actor": "implementation.test.near",
+      "decision": {
+        "after": "4",
+        "allowed": true,
+        "before": "13",
+        "candidate": [
+          2,
+          3,
+          0,
+          0,
+          2,
+          3,
+          2,
+          3
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "4"
+        ],
+        "terms_before": [
+          "0",
+          "9",
+          "4"
+        ]
+      },
+      "id": 1,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Research funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Implementation funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Review funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 5,
+              "max": 10,
+              "min": 0,
+              "name": "Unencumbered discretionary funds",
+              "unit": "credits"
+            },
+            {
+              "initial": 2,
+              "max": 2,
+              "min": 0,
+              "name": "Review earmark",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Active escrow",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Paid lifetime",
+              "unit": "credits"
+            },
+            {
+              "initial": 3,
+              "max": 3,
+              "min": 3,
+              "name": "Protected reserve",
+              "unit": "credits"
+            }
+          ],
+          "name": "hiring",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "research.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Research worker units",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "implementation.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Implementation worker units",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "review.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Independent review units",
+              "requires": [
+                [
+                  0,
+                  2
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                -1,
+                1,
+                0,
+                0
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 3,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 2
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 1,
+            "status": "Completed",
+            "units": 3
+          }
+        ],
+        "values": [
+          2,
+          3,
+          0,
+          0,
+          2,
+          0,
+          5,
+          3
+        ],
+        "version": 8
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 1,
+        "units": 3,
+        "version": 4
+      }
+    },
+    {
+      "actor": "review.test.near",
+      "decision": {
+        "after": "0",
+        "allowed": true,
+        "before": "4",
+        "candidate": [
+          2,
+          3,
+          2,
+          0,
+          0,
+          2,
+          5,
+          3
+        ],
+        "reason": "Allowed",
+        "terms_after": [
+          "0",
+          "0",
+          "0"
+        ],
+        "terms_before": [
+          "0",
+          "0",
+          "4"
+        ]
+      },
+      "id": 2,
+      "pool": {
+        "config": {
+          "max_age_seconds": 0,
+          "metrics": [
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Research funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Implementation funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 10,
+              "min": 0,
+              "name": "Review funded coverage",
+              "unit": "credits"
+            },
+            {
+              "initial": 5,
+              "max": 10,
+              "min": 0,
+              "name": "Unencumbered discretionary funds",
+              "unit": "credits"
+            },
+            {
+              "initial": 2,
+              "max": 2,
+              "min": 0,
+              "name": "Review earmark",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Active escrow",
+              "unit": "credits"
+            },
+            {
+              "initial": 0,
+              "max": 7,
+              "min": 0,
+              "name": "Paid lifetime",
+              "unit": "credits"
+            },
+            {
+              "initial": 3,
+              "max": 3,
+              "min": 3,
+              "name": "Protected reserve",
+              "unit": "credits"
+            }
+          ],
+          "name": "hiring",
+          "owner": "owner.test.near",
+          "recipes": [
+            {
+              "actor": "research.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Research worker units",
+              "requires": [],
+              "reserve": [
+                1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "implementation.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Implementation worker units",
+              "requires": [],
+              "reserve": [
+                0,
+                1,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            {
+              "actor": "review.test.near",
+              "complete": [
+                0,
+                0,
+                0,
+                0,
+                0,
+                -1,
+                1,
+                0
+              ],
+              "executor": "executor.test.near",
+              "max_units": 20,
+              "name": "Independent review units",
+              "requires": [
+                [
+                  0,
+                  2
+                ],
+                [
+                  1,
+                  3
+                ]
+              ],
+              "reserve": [
+                0,
+                0,
+                1,
+                0,
+                -1,
+                1,
+                0,
+                0
+              ]
+            }
+          ],
+          "terms": [
+            {
+              "metric": 0,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            },
+            {
+              "metric": 1,
+              "shape": "Target",
+              "target": 3,
+              "weight": 1
+            },
+            {
+              "metric": 2,
+              "shape": "Target",
+              "target": 2,
+              "weight": 1
+            }
+          ]
+        },
+        "observed_at": 1794441600,
+        "paused": false,
+        "records": [
+          {
+            "expires_at": 1794445200,
+            "id": 0,
+            "recipe": 0,
+            "status": "Completed",
+            "units": 2
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 1,
+            "recipe": 1,
+            "status": "Completed",
+            "units": 3
+          },
+          {
+            "expires_at": 1794445200,
+            "id": 2,
+            "recipe": 2,
+            "status": "Completed",
+            "units": 2
+          }
+        ],
+        "values": [
+          2,
+          3,
+          2,
+          0,
+          0,
+          0,
+          7,
+          3
+        ],
+        "version": 12
+      },
+      "request": {
+        "expires_at": 1794445200,
+        "recipe": 2,
+        "units": 2,
+        "version": 8
+      }
+    }
+  ]
+}

@@ -1,0 +1,202 @@
+{
+  "name": "gpu",
+  "owner": "owner.test.near",
+  "metrics": [
+    {
+      "name": "Research / customer A coverage",
+      "unit": "GPU blocks",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Evaluation / customer B coverage",
+      "unit": "GPU blocks",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Data / customer C coverage",
+      "unit": "GPU blocks",
+      "initial": 0,
+      "min": 0,
+      "max": 20
+    },
+    {
+      "name": "Window 1 bookings",
+      "unit": "GPU blocks",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    },
+    {
+      "name": "Window 2 bookings",
+      "unit": "GPU blocks",
+      "initial": 0,
+      "min": 0,
+      "max": 12
+    }
+  ],
+  "terms": [
+    {
+      "metric": 0,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 1,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 2,
+      "target": 4,
+      "weight": 1,
+      "shape": "Target"
+    },
+    {
+      "metric": 3,
+      "target": 8,
+      "weight": 10,
+      "shape": "Excess"
+    },
+    {
+      "metric": 4,
+      "target": 8,
+      "weight": 10,
+      "shape": "Excess"
+    }
+  ],
+  "recipes": [
+    {
+      "name": "research: now",
+      "actor": "research.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "research: next window",
+      "actor": "research.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "evaluation: now",
+      "actor": "evaluation.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "evaluation: next window",
+      "actor": "evaluation.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "data: now",
+      "actor": "data.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        1,
+        1,
+        0
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    },
+    {
+      "name": "data: next window",
+      "actor": "data.test.near",
+      "executor": "executor.test.near",
+      "reserve": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ],
+      "complete": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "max_units": 20,
+      "requires": []
+    }
+  ],
+  "max_age_seconds": 0
+}
