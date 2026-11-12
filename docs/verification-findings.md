@@ -606,9 +606,12 @@ in `sandbox/tests/resources.rs`; RES-1 in `sandbox/RESULTS.md`; OQ-9 in
 
 **Status.** v1.1.0 adds a gas table to [docs/api.md](api.md#gas)
 (`e47f1e5`). It was measured on the v1.1 Wasm with a test adapted from
-the RES-1 tests, at the same configuration with 256 retained records, all
-open. The test is now `crates/sandbox/tests/res1.rs` (ignored by default;
-it takes about eight minutes). The minimums for `dispatch` (70 Tgas), `reconcile` (46) and
+the RES-1 tests, with the same metrics, terms and recipes and 256
+retained records. The open records differ from the v1.0.0 sweep above
+(225 of 256): all 256 were open for `dispatch` and `reconcile`, and 251
+to 254 for the executor calls. The test is now
+`crates/sandbox/tests/res1.rs` (ignored by default; it takes about eight
+minutes). The minimums for `dispatch` (70 Tgas), `reconcile` (46) and
 executor `finish` (43) are the same as above; `confirm_not_executed` also
 needs 43. With the executor at its 512-job cap, `finish` needs 44. The
 largest single receipt is a `submit` with 255 open records, at 14.81 Tgas.

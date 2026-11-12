@@ -43,7 +43,7 @@ The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({i
 
 ## Gas
 
-Attach at least this much prepaid gas. The figures were measured on the v1.1 Wasm in near-sandbox 2.13.4, at a maximum-size state: 32 metrics, 64 terms, 32 recipes (one requires the other 31), and 256 retained records, all open. For `finish` the executor held 256 jobs, and then 512, its cap. Each figure is the least whole Tgas that succeeded, plus at least 10 Tgas, rounded up.
+Attach at least this much prepaid gas. The figures were measured on the v1.1 Wasm in near-sandbox 2.13.4, at a maximum-size state: 32 metrics, 64 terms, 32 recipes (one requires the other 31), and 256 retained records: all open for `dispatch` and `reconcile`, 251 to 254 open for the executor calls. For `finish` the executor held 256 jobs, and then 512, its cap. Each Attach figure is a round number at least 10 Tgas above the least that succeeded. The margins are 30 Tgas for `dispatch`, which attaches the most gas to its promises; 14 for `reconcile`; 16 or more for `finish` and `confirm_not_executed`; and 15 over the largest receipt for the other calls.
 
 | Call | Gas it attaches to its promises | Least that succeeded | Attach |
 |---|---|---|---|
