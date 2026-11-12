@@ -4,7 +4,7 @@ This is an unaudited, not-formally-verified prototype. Do not treat synthetic cr
 
 Trust assumptions: immutable configuration is honestly designed; registered executor/operator truthfully reports execution; the owner truthfully reports observed values; NEAR runtime/SDK behavior is correct; the deployment account's upgrade authority is controlled. The lock cannot stop external actions using bypass credentials.
 
-Attack surfaces intentionally limited: no agent-provided deltas, no arbitrary external method or account, no dynamic policy code, no unbounded logs in state, no frontend keys, no automatic timeout releases. Limits are fixed and terminal records retained to preserve ID replay protection.
+Attack surfaces intentionally limited: no agent-provided deltas, no arbitrary external method or account, no dynamic policy code, no unbounded logs in state, no frontend keys, no automatic timeout releases. Limits are fixed. The pool keeps its 256 most recent records and prunes the oldest only once it is completed or cancelled. Ids keep counting, so a pruned id is never reused. Replay protection comes from the request's version, not from retaining records.
 
 The local Rust server is a **simulator**: identities are selectable and independent-provider evidence is a button. It binds to 127.0.0.1, validates Host/Origin, requires JSON POST for API access, uses an allowlist for static files and caps requests. Do not reverse-proxy it publicly or use it as an authenticated production gateway.
 
