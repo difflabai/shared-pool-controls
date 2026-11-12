@@ -94,7 +94,8 @@ unit tests, seeded random tests and the sandbox suite.
   stays `1.0.0`: no event shape changed. It also says that the read methods
   keep a deposit sent with a transaction.
 - [docs/api.md](docs/api.md) has a gas table, measured on the v1.1.0 Wasm at
-  a maximum-size state.
+  a maximum-size state by `crates/sandbox/tests/res1.rs` (ignored by
+  default; run it with `--ignored`).
 - [docs/verification-findings.md](docs/verification-findings.md) gives each
   finding's status.
 

@@ -43,20 +43,20 @@ The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({i
 
 ## Gas
 
-Attach at least this much prepaid gas. The figures were measured on the v1.1 Wasm in near-sandbox 2.13.4, at a maximum-size state: 32 metrics, 64 terms, 32 recipes (one requires the other 31), and 256 retained records, all open. For `finish` the executor held 256 jobs. Each figure is the least whole Tgas that succeeded, plus at least 10 Tgas, rounded up.
+Attach at least this much prepaid gas. The figures were measured on the v1.1 Wasm in near-sandbox 2.13.4, at a maximum-size state: 32 metrics, 64 terms, 32 recipes (one requires the other 31), and 256 retained records, all open. For `finish` the executor held 256 jobs, and then 512, its cap. Each figure is the least whole Tgas that succeeded, plus at least 10 Tgas, rounded up.
 
 | Call | Gas it attaches to its promises | Least that succeeded | Attach |
 |---|---|---|---|
 | `dispatch` | `execute` 30 + `on_result` 30 | 70 Tgas | 100 Tgas |
 | `reconcile` | `status` 10 + `on_result` 30 | 46 Tgas | 60 Tgas |
-| executor `finish`, `confirm_not_executed` | the lock's `settle` 40 | 43 Tgas | 60 Tgas |
+| executor `finish`, `confirm_not_executed` | the lock's `settle` 40 | 43 Tgas; `finish` with 512 jobs 44 | 60 Tgas |
 | `submit`, `cancel`, `settle`, `observe`, `set_paused` | none | largest receipt 14.81 Tgas (a `submit` with 255 open records) | 30 Tgas |
 
 - Every smaller whole-Tgas amount from 40 Tgas up failed with "Exceeded the prepaid gas." and changed neither contract.
-- The gas attached to promises is fixed; extra prepaid gas is not passed on. At that state `on_result` burnt at most 10.92 of its 30 Tgas (a release), `execute` 2.45 of 30, `status` 1.75 of 10, and the lock's `settle` after `finish` 10.87 of 40.
+- The gas attached to promises is fixed; extra prepaid gas is not passed on. At that state `on_result` burnt at most 10.92 of its 30 Tgas (a release), `execute` 2.45 of 30, `status` 1.75 of 10, and the lock's `settle` after `finish` 10.87 of 40. With 512 jobs, `execute` burnt 3.64 of 30 and `status` 2.29 of 10.
 - A call with too little gas fails without changing either contract; retry with more gas. A lost executor notification is recovered with `reconcile`.
 - The contracts do not check prepaid gas. Smaller states need less. Another build or protocol version can change these figures.
-- The measuring test is adapted from the outside verification's RES-1 sandbox test. It is not part of this repository's suite.
+- The measuring test is `crates/sandbox/tests/res1.rs`, adapted from the outside verification's RES-1 sandbox test. It takes about eight minutes, so `scripts/sandbox.sh` skips it. Run it after `scripts/build.sh` with `cargo test -p pool-sandbox --locked --test res1 -- --ignored --nocapture`; it writes `artifacts/res1.json`. `confirm_not_executed` was swept with 254 jobs; with 512 jobs its executor receipt burnt 3.96 Tgas, the same as `finish` (3.95).
 
 ## Deployment preparation
 
