@@ -21,9 +21,11 @@ cargo run -p pool-demo -- serve
 # Open http://127.0.0.1:8080
 ```
 
+The site introduces the shared-resource problem, guides visitors into the five-scenario explorer, then opens up the contract specification, lifecycle and source code. Custom requests and evidence controls are available under expandable sections.
+
 The server binds only to loopback. It serves plain HTML/CSS/JavaScript and evaluates decisions in Rust. There is no frontend build, package manager, database, private key, LLM, or external service requirement. Selecting identities and confirming completion are explicit simulator controls, not production authentication.
 
-Use **Run next agent action** to walk the trace; **Preview** and **Submit exact quantity** to explore; **Find smaller alternative** to ask the bounded Rust planner for a suggestion. Unknown outcomes, confirmed nonexecution, duplicate completion, and a risk-market observation can be explored through the lifecycle controls.
+Use **Run next decision** to walk the trace; **Preview** and **Submit exact quantity** to explore; **Suggest a smaller quantity** to ask the bounded Rust planner for a suggestion. Unknown outcomes, confirmed nonexecution, duplicate completion, and a risk-market observation can be explored through the lifecycle controls.
 
 For a completely static replay, serve the repository root with `python3 -m http.server 8081`, then open `/ui/`. The same page falls back to checked-in traces produced by Rust; manual submissions are disabled and the mode is clearly labeled. Generate them with:
 

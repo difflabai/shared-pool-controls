@@ -1,12 +1,99 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Five shared-resource scenarios, one Rust decision kernel."><title>Shared Pool Controls</title><link rel="stylesheet" href="base.css"></head>
-<body><header><div class="row spread"><span class="eyebrow">Shared Pool Controls · Interactive lab</span><a href="live.html">Open NEAR contract console →</a></div><h1>Independent agents.<br>One shared limit.</h1><p class="lede">Let teams make their own decisions without spending the same capacity twice. A common Rust kernel checks the whole pool before a commitment is admitted.</p><div class="row"><span class="badge" id="mode">Connecting to Rust…</span><span class="hint">Synthetic resources · no funds or private keys · not formally verified</span></div><nav aria-label="Scenario" role="tablist" id="tabs"></nav></header>
-<main><section class="panel"><div class="row spread"><div><span class="eyebrow" id="category"></span><h2 id="title"></h2></div><button id="reset">Reset scenario</button></div><p id="story"></p><div class="row"><button id="next" class="primary">Run next agent action</button><button id="run">Run remaining trace</button><label><input id="auto" type="checkbox" checked> Simulate independent completion after admission</label></div><p class="hint" id="progress"></p></section>
-<div id="status" role="status" aria-live="polite"></div>
-<section class="panel"><div class="row spread"><h2>The shared pool</h2><span class="badge" id="version"></span></div><div id="metrics" class="metrics"></div></section>
-<div class="grid"><section class="panel"><h2>Propose a commitment</h2><label for="recipe">Owner-approved recipe</label><select id="recipe"></select><label for="units">Units</label><input id="units" type="number" min="1" max="100" value="4"><p id="actor" class="hint"></p><div class="row"><button id="preview">Preview</button><button id="submit" class="primary">Submit exact quantity</button><button id="alternative">Find smaller alternative</button></div><p class="hint">An alternative is only a suggestion. Review its quantity and submit it explicitly. The contract never silently changes your terms.</p><div id="decision"></div></section>
-<section class="panel"><h2>System energy</h2><p class="hint" id="formula"></p><div class="bars" id="energy" aria-label="Energy after accepted actions"></div><p class="hint">Energy is a configured policy score, not a prediction of business outcomes. Market observations and cancellations can raise it.</p><details><summary>Policy and integer arithmetic</summary><pre id="policy"></pre></details><button id="shock" hidden>Observe market shock (+$3m selloff loss)</button></section></div>
-<section class="panel"><h2>Commitments and execution</h2><p class="hint">Pending commitments already count. An unknown execution outcome keeps its reservation. Completion and confirmed nonexecution below are simulated independent-provider evidence.</p><div class="scroll"><table><thead><tr><th>ID</th><th>Recipe</th><th>Units</th><th>Status</th><th>Lifecycle</th></tr></thead><tbody id="commitments"></tbody></table></div></section>
-<section class="panel"><h2>Decision trail</h2><div id="log"><p class="muted">Run an action to see the common gatekeeper at work.</p></div><details><summary>Last Rust response</summary><pre id="raw"></pre></details></section>
-<section class="panel"><h2>What an uncoordinated baseline misses</h2><p id="baseline"></p><p class="hint">This comparison describes the same requested actions without the shared gate. It is not an unguarded execution endpoint.</p></section></main>
-<footer><a href="https://github.com/difflabai/shared-pool-controls">Source, tests, and verification handoff</a> · Rust core, NEAR wrapper, static HTML. Live integrations, real collateral and formal proofs are outside this prototype.</footer><script src="app.js"></script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ee">
+  <meta name="description" content="Independent agents share one world. Explore a NEAR smart contract that checks the combined effect of their decisions before committing shared resources.">
+  <title>Shared Pool Controls — Independent agents. Shared limits.</title>
+  <link rel="stylesheet" href="base.css">
+</head>
+<body class="story-site">
+<a class="skip-link" href="#explorer">Skip to scenario explorer</a>
+<header class="site-nav wrap">
+  <a class="brand" href="#"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Shared Pool<span class="brand-light">Controls</span></a>
+  <nav aria-label="Main navigation"><a href="#how-it-works">The idea</a><a href="#explorer">Scenarios</a><a href="#contract">The contract</a></nav>
+  <a class="source-link" href="https://github.com/difflabai/shared-pool-controls">GitHub <span aria-hidden="true">↗</span></a>
+</header>
+<main>
+<section class="hero wrap" aria-labelledby="hero-title">
+  <div class="hero-copy"><p class="eyebrow"><span class="dot"></span> Built for NEAR Hackathon</p>
+    <h1 id="hero-title">Let agents act.<br>Keep the whole<br>system <em>in balance.</em></h1>
+    <p class="hero-intro">One team’s good decision can become everyone’s problem. Give independent agents a shared set of limits—enforced before they commit the pool’s resources.</p>
+    <div class="hero-actions"><a class="button primary" href="#explorer">Explore the scenarios <span aria-hidden="true">↗</span></a><a class="text-link" href="#how-it-works">How does it work? <span aria-hidden="true">↓</span></a></div>
+    <p class="hero-caption">A small Rust core. A NEAR smart contract. Five ways to share.</p>
+  </div>
+  <div class="hero-diagram" aria-label="Illustration: three agents request 10 GPU blocks. A shared check admits 8 now and leaves 2 for later.">
+    <div class="diagram-heading"><span class="eyebrow">A shared GPU window</span><span class="tiny-tag">Illustration</span></div>
+    <div class="agent-requests"><div class="request-chip"><span class="agent-icon" aria-hidden="true">R</span><span>Research<small>4 blocks</small></span></div><div class="request-chip"><span class="agent-icon" aria-hidden="true">E</span><span>Evaluation<small>2 blocks</small></span></div><div class="request-chip request-warm"><span class="agent-icon" aria-hidden="true">D</span><span>Data<small>4 blocks</small></span></div></div>
+    <div class="diagram-connectors" aria-hidden="true"><svg viewBox="0 0 420 70" preserveAspectRatio="none"><path d="M70 0V25Q70 35 80 35H200Q210 35 210 45V70M210 0V70M350 0V25Q350 35 340 35H220Q210 35 210 45"/></svg><span>10 requested · 8 within the operating envelope</span></div>
+    <div class="lock-card"><div class="lock-icon" aria-hidden="true">◇</div><div><strong>Check the whole pool</strong><p>Hard limits hold. System energy does not rise.</p></div><span class="lock-check" aria-hidden="true">✓</span></div>
+    <div class="down-stem" aria-hidden="true"></div>
+    <div class="pool-illustration"><div class="row spread"><strong>8 blocks reserved now</strong><span class="healthy-label">Within policy</span></div><div class="pool-blocks" aria-hidden="true"><i></i><i></i><i></i><i></i><i class="block-light"></i><i class="block-light"></i><i class="block-warm"></i><i class="block-warm"></i></div><div class="row spread diagram-key"><span>Research 4 · Evaluation 2 · Data 2</span><span>2 for a later window ↗</span></div></div>
+    <p class="diagram-footnote">The smaller request is proposed, checked, and explicitly accepted. Nothing is silently resized.</p>
+  </div>
+</section>
+<section class="premise wrap" id="how-it-works" aria-labelledby="idea-title">
+  <div class="section-kicker"><span>01 / The idea</span><span>Local decisions. Shared consequences.</span></div>
+  <div class="premise-heading"><h2 id="idea-title">Everyone follows their own limits.<br><em>The pool still runs out.</em></h2><p>Compute, inventory, delivery capacity, money, risk: when agents share a resource, checking each agent alone misses the combined effect. Shared Pool Controls makes that combined effect part of every approval.</p></div>
+  <div class="mechanism">
+    <article><span class="step-number">01</span><h3>An agent proposes.</h3><p>It chooses an approved action and a quantity. The pool’s owner defines the rules; agents cannot rewrite them.</p></article>
+    <article><span class="step-number">02</span><h3>The lock checks.</h3><p>The contract evaluates the resulting shared state, including pending commitments. Hard limits must hold and the configured error score must not increase.</p></article>
+    <article><span class="step-number">03</span><h3>Resources are reserved.</h3><p>An allowed action reserves capacity before dispatch. A denied action can be revised and checked again. Unknown execution outcomes keep their reservations.</p></article>
+  </div>
+  <div class="energy-note"><span class="math-symbol" aria-hidden="true">V</span><p><strong>What is “system energy”?</strong> A policy-defined measure of imbalance: unmet work, excess bookings, uneven stock, or stress-loss exposure. The Lyapunov-style check asks whether an agent’s commitment makes that score worse. It does not predict every future event.</p><code>V(next) ≤ V(now)</code></div>
+</section>
+<section class="explorer-section" id="explorer" aria-labelledby="explorer-title">
+<div class="wrap">
+  <div class="section-kicker"><span>02 / Explore the scenarios</span><span>Five situations. One decision kernel.</span></div>
+  <div class="section-heading"><h2 id="explorer-title">See the shared<br><em>consequences.</em></h2><p>Step into a team of agents. Follow their requests, watch the pool change, and see why the lock allows or denies each commitment.</p></div>
+  <div class="scenario-tabs" aria-label="Scenario" role="tablist" id="tabs"></div>
+  <div id="scenario-panel" role="tabpanel" aria-labelledby="tab-gpu" class="scenario-shell">
+    <div class="scenario-intro"><div><p class="eyebrow" id="category"></p><h3 id="title"></h3><p id="story"></p></div><div class="scenario-counter"><span id="scenario-number">01</span><small>of 05 scenarios</small></div></div>
+    <div class="explorer-mode"><span class="badge" id="mode">Connecting to the explorer…</span><span>Synthetic resources. No real funds or jobs.</span></div>
+    <div class="playback"><div><span class="eyebrow">Up next</span><p id="next-action">Loading the first request…</p><span id="progress" class="hint"></span></div><div class="row"><button id="next" class="primary">Run next decision <span aria-hidden="true">→</span></button><button id="run">Run full trace</button><button id="reset" class="quiet">↺ Reset</button></div></div>
+    <div id="status" class="status-line" role="status" aria-live="polite"></div>
+    <div class="explorer-grid">
+      <div class="pool-column"><div class="row spread panel-heading"><h4>The shared pool</h4><span class="version-label" id="version"></span></div><div id="metrics" class="metrics"></div><div class="result-slot" id="decision" aria-live="polite"><p class="empty-state">Run the first decision to see what the lock checks.</p></div></div>
+      <div class="energy-column"><div class="row spread"><h4>System energy</h4><span id="current-energy" class="score">—</span></div><div class="bars" id="energy" aria-label="Energy across the scenario"></div><p class="hint" id="formula"></p><p class="chart-note">Lower means less imbalance under this policy. Denied requests do not change the pool.</p></div>
+    </div>
+    <div class="trail"><div class="row spread"><h4>Decision trail</h4><span class="hint">Most recent first</span></div><div id="log"><p class="empty-state">Each request leaves an explanation here.</p></div></div>
+    <div class="baseline-note"><span class="eyebrow">Why the shared check matters</span><p id="baseline"></p><small>This is the illustrative failure the scenario addresses, not an unguarded execution mode.</small></div>
+    <details class="experiment"><summary><span><span class="eyebrow">Go further</span> Try your own request</span><span class="summary-plus" aria-hidden="true">+</span></summary><div class="experiment-body"><div><label for="recipe">Approved action</label><select id="recipe"></select><label for="units">Quantity</label><input id="units" type="number" min="1" max="100" value="4"><p id="actor" class="hint"></p><div class="row"><button id="preview">Preview</button><button id="submit" class="primary">Submit exact quantity</button><button id="alternative">Suggest a smaller quantity</button></div><p class="hint" id="manual-note">A suggestion changes nothing until you explicitly submit it.</p></div><div><h4>Execution controls</h4><label class="check-label"><input id="auto" type="checkbox" checked> Simulate independent completion after each scripted admission</label><p class="hint">Turn this off to inspect pending commitments. Completion and confirmed nonexecution are simulated provider evidence.</p><button id="shock" hidden>Observe a market shock (+$3m selloff loss)</button></div></div></details>
+    <details class="execution-details"><summary>Inspect commitments &amp; execution <span class="summary-plus" aria-hidden="true">+</span></summary><p class="hint">Pending work already counts. An unknown outcome retains its reservation until the registered executor confirms what happened.</p><div class="scroll"><table><thead><tr><th>ID</th><th>Action</th><th>Units</th><th>Status</th><th>Simulate evidence</th></tr></thead><tbody id="commitments"></tbody></table></div></details>
+  </div>
+</div>
+</section>
+<section class="contract-section wrap" id="contract" aria-labelledby="contract-title">
+  <div class="section-kicker"><span>03 / Under the contract</span><span>Small enough to inspect.</span></div>
+  <div class="section-heading"><h2 id="contract-title">A simple gate.<br><em>An explicit boundary.</em></h2><p>The same Rust state machine powers every scenario. The NEAR wrapper adds caller identity, storage, and asynchronous execution. Agents submit intentions; the contract owns the state transition.</p></div>
+  <div class="contract-grid"><div class="code-panel"><div class="code-header"><span>Admission rule</span><span>Conceptual pseudocode</span></div><pre><code><span class="code-dim">// A proposed commitment</span>
+check_authority(caller, recipe);
+check_version_and_freshness(request);
+next = reserve(state, recipe, quantity);
+
+<span class="code-accent">require</span>(hard_constraints_hold(next));
+<span class="code-accent">require</span>(energy(next) &lt;= energy(state));
+
+<span class="code-dim">// Reserve first. Dispatch second.</span>
+commit(next);</code></pre><p>Recovery from an externally disturbed state has additional checks. See the full specification for exact semantics.</p></div>
+  <div class="technical-points"><article><span>01</span><div><h3>A pure Rust core</h3><p>Bounded data, checked integer arithmetic, fixed recipes. No NEAR dependency in the core’s default build.</p></div></article><article><span>02</span><div><h3>A NEAR execution boundary</h3><p>The synthetic adapter accepts execution only from the lock. Callback failure does not automatically release a commitment.</p></div></article><article><span>03</span><div><h3>A precise claim</h3><p>Accepted reservations do not increase the configured potential. External events can. Tests exist; formal verification is separate work.</p></div></article></div></div>
+  <div class="contract-details">
+    <details><summary>What exactly does an agent submit? <span aria-hidden="true">+</span></summary><div class="detail-body"><p>A recipe ID, an exact integer quantity, the state version it reviewed, and a short expiry. Recipes fix the actor, executor, effects, and prerequisites. The agent cannot supply its own risk estimate or ledger delta.</p><pre><code>{
+  "recipe": 0,
+  "units": 2,
+  "version": 4,
+  "expires_at": "current time + 10 minutes"
+}</code></pre><p class="hint">Illustrative request: the real expiry is an integer timestamp. A stale version is rejected and must be reviewed again.</p></div></details>
+    <details><summary>What happens after approval? <span aria-hidden="true">+</span></summary><div class="detail-body"><div class="lifecycle-flow"><span>Reserved</span><b>→</b><span>Dispatched</span><b>→</b><span>Active</span><b>→</b><span>Completed</span></div><p>Unknown execution outcomes keep their encumbrance. Before dispatch, the actor or owner can cancel. After dispatch, release requires definitive nonexecution evidence from the registered executor.</p></div></details>
+    <details><summary>What is—and isn’t—guaranteed? <span aria-hidden="true">+</span></summary><div class="detail-body"><p>The kernel checks the configured bounds and potential against a modeled state. It does not guarantee fairness, profitable trades, truthful external observations, or eventual completion. The immutable policy and registered evidence authorities are part of the trust boundary.</p><p>Compute jobs, deliveries, worker payments, and financial positions in this explorer are synthetic. Real-world enforcement requires an adapter without a route around the lock. This prototype is tested, not formally verified or audited.</p></div></details>
+    <details><summary>Inspect the selected scenario’s policy <span aria-hidden="true">+</span></summary><div class="detail-body"><pre id="policy"></pre></div></details>
+    <details><summary>Inspect the last Rust decision <span aria-hidden="true">+</span></summary><div class="detail-body"><pre id="raw">Run a scenario decision to inspect its response.</pre></div></details>
+  </div>
+  <div class="resource-links"><a href="https://github.com/difflabai/shared-pool-controls/blob/feat/shared-pool-controls/docs/spec.md"><span>Read the specification</span><span aria-hidden="true">↗</span></a><a href="https://github.com/difflabai/shared-pool-controls/tree/feat/shared-pool-controls/crates/core"><span>Explore the Rust core</span><span aria-hidden="true">↗</span></a><a href="live.html"><span>Open the NEAR console</span><span aria-hidden="true">↗</span></a></div>
+</section>
+<section class="closing wrap"><p class="eyebrow">Autonomy, with shared accountability.</p><h2>Many agents.<br><em>One world to share.</em></h2><a class="button primary" href="#explorer">Try another scenario <span aria-hidden="true">↑</span></a></section>
+</main>
+<footer class="site-footer wrap"><a class="brand" href="#">Shared Pool Controls</a><p>Built with Rust &amp; NEAR · Open-source prototype</p><a href="https://github.com/difflabai/shared-pool-controls">View on GitHub ↗</a></footer>
+<script src="app.js"></script>
+</body></html>
