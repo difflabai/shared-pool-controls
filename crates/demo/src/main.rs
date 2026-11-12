@@ -24,7 +24,7 @@ fn request(p: &Pool, r: u32, u: u32, time: u64) -> Request {
     }
 }
 fn finish_at(p: &mut Pool, id: u32, time: u64) -> Result<(), pool_core::Error> {
-    let c = p.records[id as usize].clone();
+    let c = p.record(id)?.clone();
     let r = p.config.recipes[c.recipe as usize].clone();
     if c.status == Status::Reserved {
         p.dispatch(&r.actor, id, time)?;
@@ -95,7 +95,7 @@ fn api(path: &str, body: &[u8], pools: &mut BTreeMap<String, Pool>) -> Result<Va
             .as_u64()
             .filter(|v| *v <= u32::MAX as u64)
             .ok_or("Missing id")? as u32;
-        let c = p.records.get(id as usize).ok_or("NotFound")?.clone();
+        let c = p.record(id).map_err(|e| e.to_string())?.clone();
         let r = p.config.recipes[c.recipe as usize].clone();
         match input["action"].as_str().unwrap_or("") {
             "complete" => finish_at(p, id, now()),

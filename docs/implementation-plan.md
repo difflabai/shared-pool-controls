@@ -23,7 +23,7 @@ Deliver a pure core, NEAR wrapper, enforced synthetic executor, deterministic sc
 - Per-metric hard bounds and three squared-potential primitives. Aggregate metrics encode coupled constraints.
 - Exact submission only. A Rust planner suggests a reduced quantity; the user/agent explicitly resubmits. Later dates are distinct recipes.
 - Version equality replaces a separate nonce system for accepted-request replay protection.
-- At most 256 lifetime commitments; no pruning or live migrations.
+- A window of the 256 most recent commitments; older terminal ones are pruned; replay protection is the version, not retention. No live migrations.
 - Static synthetic scheduling windows, not a production time/calendar engine.
 - Independent authenticated executor evidence replaces a generalized evidence/signature protocol.
 - No LLM dependency, frontend framework, JavaScript build chain, optimization solver, or database.

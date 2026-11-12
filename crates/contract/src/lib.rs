@@ -51,11 +51,14 @@ impl Contract {
     pub fn get_pool(&self) -> Pool {
         self.pool.clone()
     }
+    /// Up to `limit` (at most 50) retained records, from id `from` on. Ids
+    /// below `get_pool().first_id` were pruned; a page starting there begins
+    /// at the oldest retained record.
     pub fn get_commitments(&self, from: u32, limit: u32) -> Vec<Commitment> {
         self.pool
             .records
             .iter()
-            .skip(from as usize)
+            .skip(from.saturating_sub(self.pool.first_id) as usize)
             .take(limit.min(50) as usize)
             .cloned()
             .collect()
@@ -78,7 +81,7 @@ impl Contract {
     }
     pub fn dispatch(&mut self, id: u32) {
         must(self.pool.dispatch(&caller(), id, now()));
-        let c = &self.pool.records[id as usize];
+        let c = must(self.pool.record(id));
         let r = &self.pool.config.recipes[c.recipe as usize];
         let args = near_sdk::serde_json::to_vec(
             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),
@@ -93,7 +96,7 @@ impl Contract {
             env::attached_deposit().is_zero(),
             "Method reconcile doesn't accept deposit"
         );
-        let c = self.pool.records.get(id as usize).expect("NotFound");
+        let c = must(self.pool.record(id));
         assert!(
             matches!(
                 c.status,
@@ -379,6 +382,58 @@ mod tests {
             assert_eq!(e["data"][0]["outcome"], outcome, "{name}");
             assert!(e["data"][0]["error"].is_null(), "{name}");
         }
+    }
+    /// The gpu pool after 257 submit and cancel cycles: record 0 is pruned,
+    /// records 1-256 are retained and Cancelled.
+    fn pruned() -> Contract {
+        context("pool.test.near");
+        let mut c = Contract::new(pool_core::fixtures::config("gpu").unwrap());
+        for id in 0..=pool_core::MAX_RECORDS as u32 {
+            context("research.test.near");
+            let q = Request {
+                recipe: 0,
+                units: 1,
+                version: c.get_pool().version,
+                expires_at: 200,
+            };
+            assert_eq!(c.submit(q).id, Some(id));
+            c.cancel(id);
+        }
+        let p = c.get_pool();
+        assert_eq!((p.first_id, p.records.len()), (1, pool_core::MAX_RECORDS));
+        c
+    }
+    /// F-3: `get_commitments.from` is an id, and a result for a pruned id is
+    /// logged like any unknown id.
+    #[test]
+    fn f3_commitments_page_by_id_after_a_prune() {
+        let mut c = pruned();
+        let ids = |from: u32, limit: u32| -> Vec<u32> {
+            c.get_commitments(from, limit)
+                .iter()
+                .map(|r| r.id)
+                .collect()
+        };
+        assert_eq!(ids(0, 3), vec![1, 2, 3]);
+        assert_eq!(ids(1, 3), vec![1, 2, 3]);
+        assert_eq!(ids(255, 50), vec![255, 256]);
+        assert_eq!(ids(257, 5), Vec::<u32>::new());
+        assert_eq!(ids(100, 100), (100..150).collect::<Vec<u32>>());
+        let before = c.get_pool();
+        callback_context(vec![PromiseResult::Successful(b"\"completed\"".to_vec())]);
+        c.on_result(0);
+        assert_eq!(c.get_pool(), before);
+        assert_eq!(
+            last_event()["data"][0],
+            json!({"id":0,"outcome":"completed","error":"NotFound"})
+        );
+    }
+    #[test]
+    #[should_panic(expected = "NotFound")]
+    fn f3_reconcile_of_a_pruned_id_is_not_found() {
+        let c = pruned();
+        context("anyone.test.near");
+        c.reconcile(0);
     }
     #[test]
     fn nt_f4_result_for_unknown_id_is_logged() {

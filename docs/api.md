@@ -5,8 +5,8 @@ One immutable pool per deployment. All mutating methods are nonpayable, includin
 | Method | Arguments | Authority / result |
 |---|---|---|
 | `new` | `{config}` | Private initializer: only the deployment account itself. One-time init. |
-| `get_pool` | `{}` | Entire bounded state, including immutable policy and up to 256 records. |
-| `get_commitments` | `{from,limit}` | Read page, max 50. |
+| `get_pool` | `{}` | Entire bounded state: immutable policy, the 256 most recent records, `first_id` (id of the oldest retained record) and `completed_units` (per recipe, over the pool's life). |
+| `get_commitments` | `{from,limit}` | Read page, max 50, from id `from`. Ids below `first_id` were pruned; a page starting there begins at `first_id`. |
 | `preview` | `{actor,request}` | Advisory Decision; actor is only a hypothetical identity. |
 | `submit` | `{request}` | Predecessor must equal recipe actor. Returns `{decision,id}`; no id on rejection. |
 | `dispatch` | `{id}` | Recipe actor; Reserved -> Dispatched and calls fixed executor. |
@@ -23,6 +23,8 @@ Request example:
 {"recipe":0,"units":4,"version":0,"expires_at":1794500000}
 ```
 
+A submit prunes the oldest retained record when 256 are retained and it is terminal; while it is open, submit fails `Full`. Every call on a pruned id fails `NotFound`, including a repeated executor `settle` (v1.0.0 returned Ok). The event log keeps pruned records.
+
 Use the current version from `get_pool` and an expiry 10 minutes ahead; the example timestamp is illustrative. Maximum is 24 hours. `preview` and `submit` return the same decision structure. If version changed, reload and re-preview. Every effective state transition increments version by exactly 1. Calls that change nothing return Ok and leave the version alone: a repeated terminal settlement, a repeated cancel, an acknowledgment that does not change the status, a late acknowledgment. Submit, dispatch, pause and observe stop 768 versions below u32::MAX (`Arithmetic`); acknowledgment, settlement and cancellation always remain available.
 
 Decision fields: `allowed`, `reason`, decimal-string `before` and optional `after`, decimal-string per-term scores, candidate metric vector. Reasons include Unauthorized, Paused, Stale, Expired, SnapshotExpired, InvalidRecipe, InvalidUnits, Prerequisite, Full, Arithmetic, Bounds, Energy. `after` can be present for a rejected request to explain its prospective score; it is not accepted state.
@@ -33,7 +35,7 @@ There is no `dampen` mutation: a caller previews an explicit reduced quantity an
 
 `execute({id,recipe,units}) -> "active" | "cancelled" | "unknown"`. Only the lock may call. `status({id})` additionally returns `"completed"`. In the wrapper, any result that is not one JSON string of at most 64 bytes becomes Unknown: a runtime failure, a number, `null`, an object, invalid bytes, a longer result. So does an unexpected string. Fixed executor identity plus immutable recipe/quantity bind dispatch to the reservation. A production adapter must implement idempotency, authoritative cancellation and fill semantics.
 
-The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({id,completed})`, `confirm_not_executed({id,recipe,units})`, and `get_jobs({})`. Modes normal/reject/unknown/panic support fault injection. These are testing features, not a real asset gateway.
+The synthetic adapter has `new({lock,operator})`, `set_mode({mode})`, `finish({id,completed})`, `confirm_not_executed({id,recipe,units})`, and `get_jobs({})`. Modes normal/reject/unknown/panic support fault injection. These are testing features, not a real asset gateway. It forgets a job once its id is 256 or more behind the newest id it has executed for the lock. `execute` of a forgotten id returns `"cancelled"` and starts nothing; `confirm_not_executed` of one fails `stale id`, and `finish` fails `unknown job`. It holds at most 512 jobs. The cap is reached only after at least 256 operator confirmations above the newest executed id; one `execute` of a higher id frees the space.
 
 ## Deployment preparation
 

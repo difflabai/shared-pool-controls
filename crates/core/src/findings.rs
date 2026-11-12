@@ -30,7 +30,7 @@ fn submit(p: &mut Pool, recipe: u32, units: u32, now: u64) -> Result<u32, Error>
 }
 /// Reserved -> Dispatched -> Active, as the actor's dispatch and an "active" callback.
 fn dispatch_active(p: &mut Pool, id: u32, now: u64) {
-    let a = actor(p, p.records[id as usize].recipe);
+    let a = actor(p, p.record(id).unwrap().recipe);
     p.dispatch(&a, id, now).unwrap();
     p.acknowledge(id, true).unwrap();
 }
@@ -382,6 +382,7 @@ fn live_all_on_random_runs() {
     for seed in 1..=300u64 {
         let mut g = Rng(seed.wrapping_mul(0x9E37_79B9_7F4A_7C15) | 1);
         let mut p = Pool::new(random_config(&mut g), 100).unwrap();
+        let mut ghost = vec![];
         let mut now = 100u64;
         // Half of the runs start from an observed, often disturbed, state.
         if g.coin() {
@@ -394,9 +395,9 @@ fn live_all_on_random_runs() {
             }
             let before = p.clone();
             let violated = p.violations(&p.values).iter().any(|v| *v > 0);
-            let next = p.records.len() as i64;
+            let next = i64::from(p.first_id) + p.records.len() as i64;
             let id = g.range((next - 6).max(0), next) as u32;
-            let known = p.records.get(id as usize).map(|c| {
+            let known = p.record(id).ok().map(|c| {
                 let r = &p.config.recipes[c.recipe as usize];
                 (r.actor.clone(), r.executor.clone())
             });
@@ -463,6 +464,8 @@ fn live_all_on_random_runs() {
                     exits_disturbed += usize::from(closed && violated);
                 }
             }
+            record_history(&mut ghost, &p);
+            assert_window(&p, &ghost);
             assert_inv_res(&p);
             assert_live(&p);
         }
@@ -475,22 +478,324 @@ fn live_all_on_random_runs() {
     assert!(refreshes > 20);
 }
 
-/// F-3 (low): one actor fills the 256 lifetime records with submit and
-/// cancel. Every later submit, by any actor, fails Full, also after an
-/// observe. formalver trace 207 (a smaller config).
+/// WIN: `records` is a window of at most MAX_RECORDS records with
+/// consecutive ids from `first_id`, and `completed_units` is the per-recipe
+/// sum of Completed units in `ghost`, a full history of every record that
+/// was ever submitted (pruned ones included). Every id below `first_id` is
+/// NotFound, and its record in `ghost` was terminal.
+fn assert_window(p: &Pool, ghost: &[Commitment]) {
+    assert!(p.records.len() <= MAX_RECORDS);
+    for (k, c) in p.records.iter().enumerate() {
+        assert_eq!(c.id, p.first_id + k as u32, "ids are not affine in {p:?}");
+    }
+    assert_eq!(ghost.len(), p.first_id as usize + p.records.len());
+    assert_eq!(&ghost[p.first_id as usize..], &p.records[..]);
+    for c in &ghost[..p.first_id as usize] {
+        assert!(!open(&c.status), "record {} was pruned while open", c.id);
+        assert_eq!(p.record(c.id), Err(Error::NotFound));
+    }
+    let mut units = vec![0u32; p.config.recipes.len()];
+    for c in ghost.iter().filter(|c| c.status == Status::Completed) {
+        units[c.recipe as usize] += c.units;
+    }
+    assert_eq!(p.completed_units, units);
+}
+/// The ghost history after a call: the records of `p`, appended to or
+/// replacing the matching entries of `ghost`.
+fn record_history(ghost: &mut Vec<Commitment>, p: &Pool) {
+    for c in &p.records {
+        match ghost.get_mut(c.id as usize) {
+            Some(g) => *g = c.clone(),
+            None => {
+                assert_eq!(c.id as usize, ghost.len(), "an id was skipped");
+                ghost.push(c.clone());
+            }
+        }
+    }
+}
+
+/// F-3 (low), fixed: in v1.0.0 one actor could fill the 256 lifetime
+/// records with submit and cancel, and every later submit, by any actor,
+/// failed Full. v1.1 keeps a window of the 256 most recent records: a
+/// submit drops the oldest record when it is terminal, ids keep counting,
+/// and a pruned id is NotFound. Full remains only while the oldest retained
+/// record is open, and closing that record frees the window. formalver
+/// trace 207 (a smaller config).
 #[test]
-fn f3_submit_cancel_cycles_exhaust_lifetime_records() {
+fn f3_window_frees_terminal_records_and_keeps_ids() {
     let mut p = pool("gpu");
+    let mut ghost = vec![];
     for _ in 0..MAX_RECORDS {
         let id = submit(&mut p, 0, 1, 100).unwrap();
         p.cancel("research.test.near", id, 100).unwrap();
+        record_history(&mut ghost, &p);
     }
-    assert_eq!(p.records.len(), MAX_RECORDS);
-    assert_eq!(p.version, 2 * MAX_RECORDS as u32);
-    assert_eq!(submit(&mut p, 2, 1, 100), Err(Error::Full));
-    let values = p.values.clone();
-    p.observe(OWNER, values, 101).unwrap();
-    assert_eq!(submit(&mut p, 2, 1, 101), Err(Error::Full));
+    assert_eq!((p.records.len(), p.first_id), (MAX_RECORDS, 0));
+    // Another actor's submit prunes record 0 and gets the next id.
+    let front = submit(&mut p, 2, 1, 100).unwrap();
+    assert_eq!(front, 256);
+    record_history(&mut ghost, &p);
+    assert_eq!((p.records.len(), p.first_id), (MAX_RECORDS, 1));
+    assert_eq!((p.records[0].id, p.records[255].id), (1, 256));
+    assert_window(&p, &ghost);
+    let before = p.clone();
+    assert_eq!(p.record(0), Err(Error::NotFound));
+    assert_eq!(p.cancel(OWNER, 0, 100), Err(Error::NotFound));
+    assert_eq!(p.settle(EXEC, 0, false), Err(Error::NotFound));
+    assert_eq!(
+        p.dispatch("research.test.near", 0, 100),
+        Err(Error::NotFound)
+    );
+    assert_eq!(p.acknowledge(0, true), Err(Error::NotFound));
+    assert_eq!(p, before);
+
+    // Record 256 stays Reserved while 255 more cycles prune records 1-255.
+    for _ in 0..MAX_RECORDS - 1 {
+        let id = submit(&mut p, 0, 1, 100).unwrap();
+        p.cancel("research.test.near", id, 100).unwrap();
+        record_history(&mut ghost, &p);
+    }
+    assert_window(&p, &ghost);
+    assert_eq!(
+        (p.first_id, p.records[0].id, p.records[0].status.clone()),
+        (256, 256, Status::Reserved)
+    );
+    let full = p.clone();
+    let q = req(&p, 0, 1);
+    let d = p.preview("research.test.near", &q, 100);
+    assert_eq!((d.allowed, d.reason.as_str()), (false, "Full"));
+    assert_eq!(p.best_quantity("research.test.near", &q, 100), None);
+    assert_eq!(p.submit("research.test.near", q, 100), Err(Error::Full));
+    assert_eq!(p, full);
+    assert_live(&p);
+
+    // In flight, the front record still blocks until its executor settles.
+    let mut flight = p.clone();
+    flight.dispatch("evaluation.test.near", front, 100).unwrap();
+    assert_eq!(submit(&mut flight, 0, 1, 100), Err(Error::Full));
+    flight.settle(EXEC, front, true).unwrap();
+    assert_eq!(submit(&mut flight, 0, 1, 100), Ok(512));
+    assert_eq!(flight.completed_units, vec![0, 0, 1, 0, 0, 0]);
+
+    // The owner cancels the front record; the next submit prunes it.
+    p.cancel(OWNER, front, 100).unwrap();
+    record_history(&mut ghost, &p);
+    assert_eq!(submit(&mut p, 0, 1, 100), Ok(512));
+    record_history(&mut ghost, &p);
+    assert_eq!(p.first_id, 257);
+    assert_window(&p, &ghost);
+    assert_eq!(p.record(front), Err(Error::NotFound));
+}
+
+/// F-3: prerequisites read the lifetime `completed_units` counter, so
+/// pruning a Completed record does not undo them. In the hiring fixture
+/// the review needs 2 completed research units and 3 implementation units.
+/// Both Completed records are pruned and the review is still admitted.
+#[test]
+fn f3_prerequisites_survive_pruning() {
+    let mut p = pool("hiring");
+    let mut ghost = vec![];
+    for (recipe, units) in [(0, 2), (1, 3)] {
+        let id = submit(&mut p, recipe, units, 100).unwrap();
+        dispatch_active(&mut p, id, 100);
+        p.settle(EXEC, id, true).unwrap();
+    }
+    assert_eq!(p.completed_units, vec![2, 3, 0]);
+    // Submit and cancel reviews until both Completed records are pruned.
+    while p.first_id < 2 {
+        let id = submit(&mut p, 2, 1, 100).unwrap();
+        p.cancel(OWNER, id, 100).unwrap();
+        record_history(&mut ghost, &p);
+    }
+    assert_eq!(p.first_id, 2);
+    assert_window(&p, &ghost);
+    assert!(p.records.iter().all(|c| c.status == Status::Cancelled));
+    assert_eq!(p.completed_units, vec![2, 3, 0]);
+    let review = submit(&mut p, 2, 2, 100).unwrap();
+    dispatch_active(&mut p, review, 100);
+    p.settle(EXEC, review, true).unwrap();
+    assert_eq!(p.completed_units, vec![2, 3, 2]);
+}
+
+/// The window on random runs: 10 seeded configurations, 3,000 random calls
+/// each, enough for the window to fill and prune many times. Each has 1-3
+/// metrics with random recipe effects and bounds 60-150 either side of
+/// zero, plus one metric that no recipe touches and that carries the only
+/// potential term, so admission is limited by the hard bounds, not by
+/// energy. A call on a record picks the oldest one a quarter of the time
+/// and an open one half of the time; one record in 32 is never picked the
+/// second way, so the oldest record is sometimes open when the window is
+/// full. Every 1,500 calls every open record is resolved and the initial
+/// values are observed again, so completions do not push the values into a
+/// corner. After every call: a rejected call leaves the pool unchanged,
+/// preview agrees with submit, Full means 256 retained records with the
+/// oldest open, an admission into a full window prunes exactly one record,
+/// ids stay affine, only terminal records are pruned, `completed_units`
+/// equals the lifetime count, and INV-RES holds. Every 20 calls, every open
+/// record can be resolved (assert_live).
+#[test]
+fn window_on_random_runs() {
+    let (mut prunes, mut fulls, mut runs_pruning, mut runs_full) = (0, 0, 0, 0);
+    for seed in 1..=10u64 {
+        let mut g = Rng(seed.wrapping_mul(0xD1B5_4A32_D192_ED03) | 1);
+        let n = g.range(1, 3) as usize;
+        let mut metrics: Vec<Metric> = (0..n)
+            .map(|_| {
+                let (min, max) = (g.range(-150, -60), g.range(60, 150));
+                metric(min, max, g.range(-10, 10))
+            })
+            .collect();
+        metrics.push(metric(-10, 10, 0));
+        // Effects on the first n metrics; none on the last one.
+        let effects = |g: &mut Rng| -> Vec<i64> {
+            (0..=n).map(|k| if k < n { effect(g) } else { 0 }).collect()
+        };
+        let recipes = (0..g.range(1, 3))
+            .map(|i| Recipe {
+                name: "r".into(),
+                actor: ["a1.test.near", "a2.test.near"][g.range(0, 1) as usize].into(),
+                executor: ["x1.test.near", "x2.test.near"][g.range(0, 1) as usize].into(),
+                reserve: effects(&mut g),
+                complete: effects(&mut g),
+                max_units: g.range(1, 3) as u32,
+                requires: if i > 0 && g.coin() {
+                    vec![(0, 1)]
+                } else {
+                    vec![]
+                },
+            })
+            .collect();
+        let c = Config {
+            name: "window".into(),
+            owner: OWNER.into(),
+            terms: vec![Term {
+                metric: n as u32,
+                target: 0,
+                weight: 1,
+                shape: Shape::Target,
+            }],
+            metrics,
+            recipes,
+            max_age_seconds: 0,
+        };
+        let mut p = Pool::new(c, 100).unwrap();
+        let initial = p.values.clone();
+        let mut ghost = vec![];
+        let fulls_before = fulls;
+        for step in 0..3_000 {
+            let before = p.clone();
+            let next = i64::from(p.first_id) + p.records.len() as i64;
+            let tended: Vec<u32> = p
+                .records
+                .iter()
+                .filter(|c| open(&c.status) && c.id % 32 != 5)
+                .map(|c| c.id)
+                .collect();
+            let pick = g.range(0, 3);
+            let id = match pick {
+                0 => p.first_id,
+                1 => g.range(i64::from(p.first_id), next) as u32,
+                _ if !tended.is_empty() => tended[g.range(0, tended.len() as i64 - 1) as usize],
+                _ => g.range((next - 6).max(0), next) as u32,
+            };
+            let known = p.record(id).ok().map(|c| {
+                let r = &p.config.recipes[c.recipe as usize];
+                (r.actor.clone(), r.executor.clone(), c.status.clone())
+            });
+            let tending = pick >= 2 && !tended.is_empty() && g.coin();
+            // k: < 40 submit, < 55 dispatch, < 62 acknowledge, < 82 settle,
+            // < 97 cancel, else observe. Half of the calls on a tended record
+            // move it to its next state or to an exit.
+            let (k, actor, executor) = match known {
+                Some((a, x, Status::Reserved)) if tending => (if g.coin() { 40 } else { 82 }, a, x),
+                Some((a, x, _)) if tending => (if g.range(0, 3) == 0 { 55 } else { 62 }, a, x),
+                Some((a, x, _)) => (g.range(0, 99), a, x),
+                None => (g.range(0, 99), "a1.test.near".into(), "x1.test.near".into()),
+            };
+            let result = if k < 40 {
+                let recipe = g.range(0, p.config.recipes.len() as i64 - 1) as u32;
+                let r = &p.config.recipes[recipe as usize];
+                let a = r.actor.clone();
+                let q = Request {
+                    recipe,
+                    units: g.range(1, i64::from(r.max_units)) as u32,
+                    version: p.version,
+                    expires_at: 1_000,
+                };
+                let allowed = p.preview(&a, &q, 100).allowed;
+                let result = p.submit(&a, q, 100);
+                assert_eq!(allowed, result.is_ok(), "preview disagrees with submit");
+                let full = before.records.len() == MAX_RECORDS;
+                match result {
+                    Err(Error::Full) => {
+                        assert!(full && open(&before.records[0].status));
+                        fulls += 1;
+                    }
+                    Ok(new) => {
+                        assert_eq!(new, next as u32);
+                        assert_eq!(p.first_id, before.first_id + u32::from(full));
+                        prunes += usize::from(full);
+                    }
+                    Err(_) => {}
+                }
+                result.map(|_| ())
+            } else if k < 55 {
+                p.dispatch(&actor, id, 100)
+            } else if k < 62 {
+                p.acknowledge(id, g.coin())
+            } else if k < 82 {
+                p.settle(&executor, id, g.coin())
+            } else if k < 97 {
+                let who = if g.coin() { OWNER.to_string() } else { actor };
+                p.cancel(&who, id, 100)
+            } else {
+                // Restate the values, or reset them if every record is terminal.
+                let values = if g.coin() {
+                    initial.clone()
+                } else {
+                    p.values.clone()
+                };
+                p.observe(OWNER, values, 100)
+            };
+            if result.is_err() {
+                assert_eq!(p, before, "a rejected call changed the pool");
+            }
+            record_history(&mut ghost, &p);
+            assert_window(&p, &ghost);
+            assert_inv_res(&p);
+            if step % 20 == 0 {
+                assert_live(&p);
+            }
+            // Every 1,500 calls, resolve every open record and observe the
+            // initial values again, so completions do not drift the values
+            // into a corner where nothing is admitted.
+            if step % 1_500 == 1_499 {
+                let open_ids: Vec<u32> = p
+                    .records
+                    .iter()
+                    .filter(|c| open(&c.status))
+                    .map(|c| c.id)
+                    .collect();
+                for id in open_ids {
+                    let c = p.record(id).unwrap().clone();
+                    let r = p.config.recipes[c.recipe as usize].clone();
+                    if c.status == Status::Reserved {
+                        p.cancel(&r.actor, id, 100).unwrap();
+                    } else {
+                        p.settle(&r.executor, id, g.coin()).unwrap();
+                    }
+                    record_history(&mut ghost, &p);
+                }
+                p.observe(OWNER, initial.clone(), 100).unwrap();
+            }
+        }
+        runs_pruning += usize::from(p.first_id > 0);
+        runs_full += usize::from(fulls > fulls_before);
+    }
+    println!(
+        "prunes {prunes}, Full {fulls}; runs that pruned {runs_pruning}, that hit Full {runs_full}"
+    );
+    assert!(prunes > 1_000 && fulls > 20 && runs_pruning >= 6 && runs_full >= 3);
 }
 
 /// F-4 (low), fixed: v1.0.0 accepted a recipe whose actor is its executor,
@@ -708,7 +1013,7 @@ fn cancel_names_conflicting_and_in_flight_states() {
         (cancelled, Ok(())),
     ];
     for (id, result) in expected {
-        let a = actor(&p, p.records[id as usize].recipe);
+        let a = actor(&p, p.record(id).unwrap().recipe);
         assert_eq!(p.cancel(&a, id, 100), result, "record {id} by its actor");
         assert_eq!(p.cancel(OWNER, id, 100), result, "record {id} by the owner");
         assert_eq!(p.cancel("attacker", id, 100), Err(Error::Unauthorized));

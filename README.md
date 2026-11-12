@@ -70,7 +70,7 @@ python3 scripts/smoke.py     # local HTTP demo; start server first
 | [`ui`](ui) | Static scenario lab and live NEAR console |
 | [`scenarios`](scenarios) | Generated configurations and reproducible decision traces |
 
-One pool per deployment; immutable recipes, principals and policy. At most 32 metrics, 32 recipes, 64 potential terms and 256 lifetime commitments. Fixed limits bound computation and storage. The 257th commitment is rejected; rotate to a new deployment rather than pruning replay protection. The owner funds storage. This favors inspection and verification over indefinite production operation.
+One pool per deployment; immutable recipes, principals and policy. At most 32 metrics, 32 recipes and 64 potential terms. The pool keeps a window of the 256 most recent commitments. A new commitment prunes the oldest one if it is completed or cancelled; while the oldest is still open, submit fails `Full`. Ids keep counting, and a pruned id is `NotFound`; the event log keeps pruned records. Replay protection is the version, not retention. Prerequisites count completed units over the pool's whole life. Fixed limits bound computation and storage. The owner funds storage. The window replaces v1.0.0's 256 lifetime commitments (finding F-3); it is tested, not formally verified.
 
 Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updated implementation plan](docs/implementation-plan.md), [verification handoff](docs/verification-handoff.md), and [verification findings](docs/verification-findings.md).
 

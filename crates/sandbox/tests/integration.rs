@@ -1,6 +1,6 @@
 //! Real Wasm/receipt integration. Run scripts/sandbox.sh after building both Wasm files.
 use near_workspaces::{types::NearToken, Account, Contract};
-use pool_core::{fixtures, Pool, Request, Status};
+use pool_core::{fixtures, Config, Metric, Pool, Recipe, Request, Shape, Status, Term};
 use serde_json::{json, Value};
 use std::{
     collections::BTreeMap,
@@ -259,4 +259,155 @@ async fn unknown_outcomes_stale_requests_and_reconciliation() {
         "Unauthorized",
     )
     .await;
+}
+/// F-3: 300 records dispatched and settled end to end. The lock keeps the
+/// 256 most recent (first_id 44) and the executor at most 256 jobs. In v1.0.0
+/// the 257th record could not be admitted, and the executor would have
+/// panicked "full" at the 257th id. A pruned id is NotFound in the lock and
+/// forgotten by the executor. Most records run in reject mode, where the
+/// execute result settles them through on_result; ids 0-9 and 290-299 run
+/// in normal mode and the operator finishes them.
+#[tokio::test]
+async fn window_of_300_records_through_the_executor() {
+    let worker = near_workspaces::sandbox().await.unwrap();
+    let owner = worker.dev_create_account().await.unwrap();
+    let actor = worker.dev_create_account().await.unwrap();
+    let lock = worker.dev_deploy(&wasm("pool_contract")).await.unwrap();
+    let executor = worker.dev_deploy(&wasm("pool_executor")).await.unwrap();
+    // One record holds one unit of a 10-unit capacity until it ends either way.
+    let cfg = Config {
+        name: "window".into(),
+        owner: owner.id().to_string(),
+        metrics: vec![Metric {
+            name: "In flight".into(),
+            unit: "jobs".into(),
+            initial: 0,
+            min: 0,
+            max: 10,
+        }],
+        terms: vec![Term {
+            metric: 0,
+            target: 10,
+            weight: 1,
+            shape: Shape::Excess,
+        }],
+        recipes: vec![Recipe {
+            name: "job".into(),
+            actor: actor.id().to_string(),
+            executor: executor.id().to_string(),
+            reserve: vec![1],
+            complete: vec![-1],
+            max_units: 1,
+            requires: vec![],
+        }],
+        max_age_seconds: 0,
+    };
+    call(lock.as_account(), &lock, "new", json!({"config":cfg})).await;
+    call(
+        executor.as_account(),
+        &executor,
+        "new",
+        json!({"lock":lock.id(),"operator":owner.id()}),
+    )
+    .await;
+    let mut reference = state(&lock).await;
+    let x = executor.id().as_str();
+    let mut mode = "normal";
+    for id in 0..300u32 {
+        let normal = !(10..290).contains(&id);
+        let wanted = if normal { "normal" } else { "reject" };
+        if mode != wanted {
+            call(&owner, &executor, "set_mode", json!({"mode":wanted})).await;
+            mode = wanted;
+        }
+        let req = Request {
+            recipe: 0,
+            units: 1,
+            version: reference.version,
+            expires_at: now() + 3600,
+        };
+        let result = call(&actor, &lock, "submit", json!({"request":req})).await;
+        assert_eq!(result["id"], id, "{result}");
+        reference.submit(actor.id().as_str(), req, now()).unwrap();
+        call(&actor, &lock, "dispatch", json!({"id":id})).await;
+        reference.dispatch(actor.id().as_str(), id, now()).unwrap();
+        if normal {
+            reference.acknowledge(id, true).unwrap();
+            call(
+                &owner,
+                &executor,
+                "finish",
+                json!({"id":id,"completed":true}),
+            )
+            .await;
+            reference.settle(x, id, true).unwrap();
+        } else {
+            reference.settle(x, id, false).unwrap();
+        }
+        if id % 50 == 0 || id == 256 {
+            assert_eq!(state(&lock).await, reference, "record {id}");
+        }
+    }
+    let p = state(&lock).await;
+    assert_eq!(p, reference);
+    assert_eq!((p.first_id, p.records.len()), (44, 256));
+    assert_eq!(p.completed_units, vec![20]);
+    assert!(p
+        .records
+        .iter()
+        .all(|c| matches!(c.status, Status::Completed | Status::Cancelled)));
+    let jobs: Vec<Value> = executor.view("get_jobs").await.unwrap().json().unwrap();
+    let ids: Vec<u64> = jobs.iter().map(|j| j["id"].as_u64().unwrap()).collect();
+    assert_eq!(ids, (44..300).collect::<Vec<u64>>());
+    let page = |from: u32| {
+        let lock = &lock;
+        async move {
+            let v: Vec<Value> = lock
+                .view("get_commitments")
+                .args_json(json!({"from":from,"limit":50}))
+                .await
+                .unwrap()
+                .json()
+                .unwrap();
+            v.iter()
+                .map(|c| c["id"].as_u64().unwrap())
+                .collect::<Vec<u64>>()
+        }
+    };
+    assert_eq!(page(0).await, (44..94).collect::<Vec<u64>>());
+    assert_eq!(page(290).await, (290..300).collect::<Vec<u64>>());
+    // Pruned id 0: NotFound in the lock, forgotten by the executor.
+    fail(&actor, &lock, "reconcile", json!({"id":0}), "NotFound").await;
+    fail(&actor, &lock, "cancel", json!({"id":0}), "NotFound").await;
+    fail(
+        &owner,
+        &executor,
+        "finish",
+        json!({"id":0,"completed":true}),
+        "unknown job",
+    )
+    .await;
+    fail(
+        &owner,
+        &executor,
+        "confirm_not_executed",
+        json!({"id":0,"recipe":0,"units":1}),
+        "stale id",
+    )
+    .await;
+    let status: String = executor
+        .view("status")
+        .args_json(json!({"id":0}))
+        .await
+        .unwrap()
+        .json()
+        .unwrap();
+    assert_eq!(status, "unknown");
+    assert_eq!(state(&lock).await, reference);
+    println!(
+        "PASS window: first_id {}, {} records, {} executor jobs",
+        p.first_id,
+        p.records.len(),
+        ids.len()
+    );
 }

@@ -49,7 +49,7 @@ See the README for prerequisites. Sandbox setup downloads a binary on first use 
 
 Implemented: pure Rust core, NEAR wrapper, synthetic executor, deterministic scripted agents, static UI, local RPC/wallet console. The console signing path is implemented but has not been exercised with a public wallet/deployment by the automated suite.
 
-Not implemented: public-network deployment, live LLM agents, real escrow/payments, production resource adapters, NEAR Intents integration, TEE/privacy. The earlier approval-contract architecture inspired this structure; its proofs do not transfer. The fixed lifetime record bound and trusted observation/evidence roles are documented in the README and specification.
+Not implemented: public-network deployment, live LLM agents, real escrow/payments, production resource adapters, NEAR Intents integration, TEE/privacy. The earlier approval-contract architecture inspired this structure; its proofs do not transfer. The 256-record window and trusted observation/evidence roles are documented in the README and specification.
 
 ## Formal verification
 
