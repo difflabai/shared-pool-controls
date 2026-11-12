@@ -164,10 +164,10 @@ near contract deploy pool.you.near \
 #    is synthetic; use your own adapter for real resources. Without an
 #    initialized executor, the first dispatch ends in an "unknown" outcome
 #    and the reservation stays held.
-near contract deploy api-gateway.near \\
-  use-file target/wasm32-unknown-unknown/release/pool_executor.wasm \\
-  with-init-call new json-args '{"lock":"pool.you.near","operator":"you.near"}' \\
-  prepaid-gas '100 Tgas' attached-deposit '0 NEAR' \\
+near contract deploy api-gateway.near \
+  use-file target/wasm32-unknown-unknown/release/pool_executor.wasm \
+  with-init-call new json-args '{"lock":"pool.you.near","operator":"you.near"}' \
+  prepaid-gas '100 Tgas' attached-deposit '0 NEAR' \
   network-config testnet sign-with-keychain send
 
 # 4. Read the pool back and compare the code hash to your build manifest
