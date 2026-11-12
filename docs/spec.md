@@ -1,6 +1,6 @@
 # Core specification
 
-This document specifies the implemented prototype, not a claim of completed formal verification.
+This document describes v1.1.0 of the implemented prototype. It is not a claim of completed formal verification. An outside verification checked v1.0.0; v1.1.0 fixes its findings and has not been re-verified ([verification findings](verification-findings.md), [changelog](../CHANGELOG.md)).
 
 ## State and identity
 

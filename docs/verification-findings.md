@@ -1,10 +1,20 @@
 # Verification findings for v1.0.0
 
-This page lists the problems an outside verification effort found in the
-contract. Each core finding has a reproducer test in
-`crates/core/src/findings.rs`. Those tests pin v1.0.0 behaviour: they pass
-today and assert the faulty results. Each v1.1 fix flips the test that pins
-its finding. The shell findings point to the tests that show them in the
+This page lists the problems an outside verification effort found in
+v1.0.0 of the contract.
+
+**Status.** v1.1.0 fixes every finding below. Each finding has a
+**Status** line with the fixing commit and the tests that check the fix;
+[CHANGELOG.md](../CHANGELOG.md) lists the changes. The formal results cited
+here apply to v1.0.0. v1.1.0 has not been formally re-verified: its fixes
+are checked by tests in this repository only.
+
+**Reproducers and regression tests.** In v1.0.0 each core finding had a
+reproducer test in `crates/core/src/findings.rs` (commit `94f27ff`) that
+passed and asserted the faulty result. Each v1.1 fix rewrote its
+reproducer into a regression test of the fixed behaviour. The **Reproducer**
+paragraphs below name the v1.0.0 tests; the **Status** lines name the v1.1.0
+tests. The shell findings point to the tests that show them in the
 verification project.
 
 **Scope.** The verification ran on commit `a4bb5c3`, the head of PR #1.
@@ -60,23 +70,32 @@ on the real code.
 
 Severity rates the harm to a property the docs promise.
 
-| ID | Severity | Effect | Reproducer | Status |
+| ID | Severity | Effect | v1.0.0 reproducer | Status |
 |---|---|---|---|---|
-| F-1 | high | After an `observe` breaks a bound, an admitted recovery hedge can be left with no way to settle, and the pool cannot be observed again (shown for the trace-0 configuration). | `f1_disturbed_state_hedge_can_never_settle` | open |
-| F-2 | high | In the supplied `risk` fixture, with every metric in bounds, a position that a completed hedge relied on cannot be released by `settle(false)` or `cancel`. | `f2_risk_position_cannot_be_released_after_hedge_completes`, `f2_risk_reserved_position_is_stuck_after_hedge_completes` | open |
-| F-2b | high (part of F-2) | A release is not bounded by the envelope, so it can fail `Arithmetic`. | `f2b_release_outside_value_range_fails_arithmetic` | open |
-| F-3 | low | One actor can use all 256 lifetime records with free submit-and-cancel cycles. Every later `submit` fails `Full`. | `f3_submit_cancel_cycles_exhaust_lifetime_records` | open |
-| F-4 | low | `validate` accepts a recipe whose actor is its executor, or the owner. That account settles its own work. | `f4_validate_accepts_actor_or_owner_as_executor` | open |
-| F-5 | low | At version u32::MAX every transition fails `Arithmetic`, including settlement and unpausing. | `f5_version_max_freezes_settlement_and_every_transition`, `f5_paused_pool_at_version_max_cannot_unpause` | open |
-| F-6 | low | With `max_age_seconds > 0`, one long-open record blocks `observe`, so `submit` and `dispatch` fail `SnapshotExpired` until it settles. | `f6_open_record_blocks_the_snapshot_refresh` | open |
-| NT-F1 | medium (diagnostics, not safety) | The documented build omits `--cfg near`. Every on-chain failure is a bare trap with no message. | formalver `near-tests`, `sandbox` | open |
-| NT-F2 | low | `reconcile` accepts and keeps an attached deposit. | formalver `near-tests` | open |
-| NT-F3 | informational | The wasm imports 15 host functions for accounts, deploys, keys, transfers and staking. | formalver `near-tests` | open |
-| NT-F4 | low | A promise result that is not a JSON string makes the callback panic. The record does not become Unknown. | formalver `near-tests` | open |
+| F-1 | high | After an `observe` breaks a bound, an admitted recovery hedge can be left with no way to settle, and the pool cannot be observed again (shown for the trace-0 configuration). | `f1_disturbed_state_hedge_can_never_settle` | fixed in v1.1.0 (`59e404f`) |
+| F-2 | high | In the supplied `risk` fixture, with every metric in bounds, a position that a completed hedge relied on cannot be released by `settle(false)` or `cancel`. | `f2_risk_position_cannot_be_released_after_hedge_completes`, `f2_risk_reserved_position_is_stuck_after_hedge_completes` | fixed in v1.1.0 (`59e404f`) |
+| F-2b | high (part of F-2) | A release is not bounded by the envelope, so it can fail `Arithmetic`. | `f2b_release_outside_value_range_fails_arithmetic` | fixed in v1.1.0 (`59e404f`) |
+| F-3 | low | One actor can use all 256 lifetime records with free submit-and-cancel cycles. Every later `submit` fails `Full`. | `f3_submit_cancel_cycles_exhaust_lifetime_records` | fixed in v1.1.0 (`1f01d43`) |
+| F-4 | low | `validate` accepts a recipe whose actor is its executor, or the owner. That account settles its own work. | `f4_validate_accepts_actor_or_owner_as_executor` | fixed in v1.1.0 (`dc774f8`) |
+| F-5 | low | At version u32::MAX every transition fails `Arithmetic`, including settlement and unpausing. | `f5_version_max_freezes_settlement_and_every_transition`, `f5_paused_pool_at_version_max_cannot_unpause` | fixed in v1.1.0 (`da43188`) |
+| F-6 | low | With `max_age_seconds > 0`, one long-open record blocks `observe`, so `submit` and `dispatch` fail `SnapshotExpired` until it settles. | `f6_open_record_blocks_the_snapshot_refresh` | fixed in v1.1.0 (`3eaf1cb`) |
+| NT-F1 | medium (diagnostics, not safety) | The documented build omits `--cfg near`. Every on-chain failure is a bare trap with no message. | formalver `near-tests`, `sandbox` | fixed in v1.1.0 (`effd174`) |
+| NT-F2 | low | `reconcile` accepts and keeps an attached deposit. | formalver `near-tests` | fixed in v1.1.0 (`1d441c5`) |
+| NT-F3 | informational | The wasm imports 15 host functions for accounts, deploys, keys, transfers and staking. | formalver `near-tests` | fixed in v1.1.0 (`3598902`) |
+| NT-F4 | low | A promise result that is not a JSON string makes the callback panic. The record does not become Unknown. | formalver `near-tests` | fixed in v1.1.0 (`1d441c5`) |
 
 ## Core findings
 
 ### F-1 (high): disturbed-state hedge wedge
+
+**Status.** Fixed in v1.1.0 (`59e404f`). Admission now counts every
+outcome of every open record (stay open, complete, release), and compares
+each metric's interval violation with the smaller of its violation before
+the request and after the reservation. In this configuration the hedge is
+refused (`Bounds`), and every open record can always be resolved.
+Regression tests: `f1_hedge_that_cures_by_reservation_is_refused`,
+`f1_recovery_by_completion_is_admitted_and_live`, `live_all_on_random_runs`.
+Formal re-verification pending.
 
 **What happens.** An `observe` puts metric 0 at 12, above its max of 10.
 The recovery rule (spec:21, spec:23) admits a hedge that reserves −2 on
@@ -140,6 +159,14 @@ observe(owner, [5, 5], 103)                      Pending
   (RT-WEDGE in `sandbox/RESULTS.md`).
 
 ### F-2 (high): healthy-state release wedge in the `risk` fixture
+
+**Status.** Fixed in v1.1.0 (`59e404f`), by the same change as F-1. With
+the position open, 8- and 7-unit hedges are refused and 6 units are
+admitted. After the hedge completes, the position can still be released by
+`settle(false)` or `cancel`. Regression tests:
+`f2_hedge_cannot_rely_on_an_unexecuted_position`,
+`f2_reserved_position_can_always_be_cancelled`. Formal re-verification
+pending.
 
 **What happens.** There is no `observe`, and every metric is in bounds. A
 credit position (recipe 0, 1 unit) reserves +20 selloff loss: 60 becomes
@@ -212,6 +239,11 @@ settle(executor, 0, true)                     Ok
 
 ### F-2b: a release can leave the value range
 
+**Status.** Fixed in v1.1.0 (`59e404f`). The release is inside the
+admission interval, so b x 100 fails `Arithmetic` at admission and b x 66
+is admitted; after b completes, a can be cancelled. Regression test:
+`f2b_release_stays_in_the_value_range`. Formal re-verification pending.
+
 **What happens.** A release subtracts the reservation
 (`values - reserve * units`), and nothing bounds that result in advance. If
 a sibling's completion relied on a large reservation, the release can leave
@@ -244,6 +276,17 @@ shell.
 
 ### F-3 (low): lifetime record exhaustion
 
+**Status.** Fixed in v1.1.0 (`1f01d43`). The pool keeps a window of the
+256 most recent records. A submit prunes the oldest record when it is
+terminal and fails `Full` only while it is open; that record can always be
+closed (F-1's fix). Prerequisites count completed units over the pool's
+life. The executor forgets jobs 256 ids behind the newest it has executed.
+Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
+`f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract
+and executor `f3_*` tests, and the sandbox test
+`window_of_300_records_through_the_executor`. Formal re-verification
+pending.
+
 **What happens.** Records are never deleted (spec:54: `observe` does not
 delete history), and `submit` fails `Full` at 256 records. A submit followed
 by a cancel costs only gas, so one actor can use all 256 records. After
@@ -273,6 +316,12 @@ submit(evaluation, {recipe 2, units 1})       Full
   on chain.
 
 ### F-4 (low): a principal can attest its own work
+
+**Status.** Fixed in v1.1.0 (`dc774f8`). `validate` rejects a recipe whose
+actor is its executor (`InvalidConfig`), so both mutations below are
+refused. The owner may still be a recipe's actor, or its executor, when the
+other role is a different account. Regression test:
+`f4_actor_cannot_be_its_own_executor`. Formal re-verification pending.
 
 **What happens.** `Config::validate` does not compare a recipe's actor with
 its executor or with the owner. A recipe with actor = executor, or with
@@ -305,6 +354,16 @@ paid lifetime = 5, with no independent acceptance
   `prolog/extract.py` records that `validate` has no role checks.
 
 ### F-5 (low): version saturation freezes every transition
+
+**Status.** Fixed in v1.1.0 (`da43188`). Submit, dispatch, `set_paused`
+and `observe` fail `Arithmetic` from `VERSION_CAP` (u32::MAX - 768).
+Acknowledgment, settlement and cancellation still bump the version by 1 and
+always remain available: an open record needs at most three more bumps,
+and at most 256 records are open. At the cap a paused pool stays paused,
+and its open records still settle. Regression tests:
+`f5_open_records_resolve_above_the_version_cap`,
+`f5_paused_pool_at_the_cap_still_settles`, `f5_reserve_is_exactly_enough`.
+Formal re-verification pending.
 
 **What happens.** Every effective transition adds 1 to `version` with
 `checked_add`. At `version = u32::MAX` every transition fails `Arithmetic`:
@@ -353,6 +412,12 @@ observe(owner, [0, 0, 0, 0, 0])                         Arithmetic
 
 ### F-6 (low): an open record blocks the only snapshot refresh
 
+**Status.** Fixed in v1.1.0 (`3eaf1cb`). The owner can restate the current
+values at any time, which renews the snapshot timestamp. New values still
+need every record terminal. Regression test:
+`f6_owner_refreshes_the_snapshot_with_records_open`. Formal re-verification
+pending.
+
 **What happens.** With `max_age_seconds > 0`, `submit` and `dispatch` need
 a snapshot no older than `max_age_seconds` (spec:19, spec:37). Only
 `observe` refreshes it, and `observe` needs every record terminal (spec:54).
@@ -390,12 +455,18 @@ submit(equity, recipe 1 x 1)       Ok
 
 ## Shell, build and runtime findings
 
-This repository's tests do not reproduce these. The contract's unit tests
-call the `#[near]` methods as plain Rust functions, and near-sdk generates
-the deposit checks and the `#[callback_result]` decoding only for wasm32.
-The formalver tests named below run the wasm.
+v1.0.0's tests did not reproduce these. The contract's unit tests call the
+`#[near]` methods as plain Rust functions, and near-sdk generates the
+deposit checks and the `#[callback_result]` decoding only for wasm32. The
+formalver tests named below run the wasm. v1.1.0 adds build, unit and
+sandbox checks for each fix; the formalver tests were not re-run.
 
 ### NT-F1 (medium; diagnostics, not safety): the documented build drops every panic message
+
+**Status.** Fixed in v1.1.0 (`effd174`). `scripts/build.sh` sets
+`RUSTFLAGS="--cfg near"` and fails if a Wasm does not import
+`env.panic_utf8`. The sandbox helper `fail` asserts the error text, so a
+build without the flag fails the sandbox suite.
 
 **What happens.** api:40 says to build with `scripts/build.sh`, which runs
 plain `cargo build --target wasm32-unknown-unknown`. Without `--cfg near`,
@@ -419,6 +490,11 @@ it does not notice.
 
 ### NT-F2 (low): `reconcile` keeps an attached deposit
 
+**Status.** Fixed in v1.1.0 (`1d441c5`). `reconcile` rejects any deposit
+("Method reconcile doesn't accept deposit"). Tests:
+`nt_f2_reconcile_rejects_deposit`, and a 1 yoctoNEAR `reconcile` in the
+sandbox suite.
+
 **What happens.** `reconcile` takes `&self`, so near-sdk generates no
 nonpayable check for it. A call with an attached deposit succeeds. Its two
 outgoing calls carry 0, so the contract keeps the deposit.
@@ -429,6 +505,12 @@ outgoing calls carry 0, so the contract keeps the deposit.
 `near-tests/tests/shell.rs` (both wasm builds, 1 NEAR attached).
 
 ### NT-F3 (informational): host imports the contracts never use
+
+**Status.** Fixed in v1.1.0 (`3598902`). Both contracts create promises
+with `promise_create`, `promise_then` and `promise_return` instead of
+near-sdk's `Promise`. The 15 imports are gone: the contract imports 18 host
+functions and the executor 13. `scripts/build.sh` fails if a Wasm imports a
+host function for any action other than a function call.
 
 **What happens.** Both contracts, in both builds, import 15 host functions
 that create or delete accounts, deploy code (including global contracts),
@@ -447,6 +529,12 @@ authority to a separate check).
 these imports, as expected.
 
 ### NT-F4 (low): a non-string promise result does not become Unknown
+
+**Status.** Fixed in v1.1.0 (`1d441c5`). `on_result` reads the raw
+promise result. Anything but one JSON string of at most 64 bytes becomes
+Unknown, and a result for an id with no record is logged instead of
+panicking. Tests: `nt_f4_non_string_result_becomes_unknown`,
+`nt_f4_result_for_unknown_id_is_logged`.
 
 **What happens.** `on_result` takes
 `#[callback_result] result: Result<String, PromiseError>`. If the executor
@@ -468,6 +556,13 @@ Unknown in the wrapper." Strings do. Other JSON values do not.
 |---|---|---|---|
 | `div-ack-noop-version` | spec:39 lists "Dispatched/Unknown -> Unknown". api:26: "Every successful state transition changes version". | `acknowledge` returns `Ok` without a version bump when the status would not change. The code comment says why: `reconcile` is permissionless, so a bump on a no-op would let anyone invalidate every in-flight request. The existing test `repeated_unknown_reconciliation_does_not_change_version` pins it. | The code is right. Change the docs. |
 | `div-cancel-terminal-name` | spec:41-43 and api:15: cancel applies only to undispatched Reserved records. | Cancelling a Completed or dispatched record fails `Pending`, a name that suggests an open commitment. `div_cancel_of_completed_or_dispatched_record_says_pending` pins it. | Return `InvalidState`, as `dispatch` and `settle` do for a record in the wrong status, or document `Pending`. |
+
+**Status.** Both resolved in v1.1.0 (`138ef98`). `div-ack-noop-version`:
+spec and api now say that a call that changes nothing, such as an
+acknowledgment that does not change the status, returns `Ok` without a
+version change. `div-cancel-terminal-name`: `cancel` of a Completed record
+fails `InvalidState`; Dispatched, Active and Unknown records still fail
+`Pending`. Test: `cancel_names_conflicting_and_in_flight_states`.
 
 ## Measured minimum prepaid gas
 
@@ -496,6 +591,14 @@ Evidence: `res_1_gas_at_max_state` and `res_1_min_prepaid_gas_and_executor_cap`
 in `sandbox/tests/resources.rs`; RES-1 in `sandbox/RESULTS.md`; OQ-9 in
 `strategy.md`.
 
+**Status.** v1.1.0 adds a gas table to [docs/api.md](api.md#gas)
+(`e47f1e5`). It was measured on the v1.1 Wasm with a scratch test adapted
+from the RES-1 tests, at the same configuration with 256 retained records,
+all open. The minimums for `dispatch` (70 Tgas), `reconcile` (46) and
+executor `finish` (43) are the same as above; `confirm_not_executed` also
+needs 43. The largest single receipt is a `submit` with 255 open records,
+at 14.81 Tgas.
+
 ## Observation (not a finding)
 
 At `version = u32::MAX`, `preview` returns `allowed: true` for a request
@@ -503,4 +606,9 @@ that `submit` then rejects with `Arithmetic`. `submit` checks the version
 bump after the checker that `preview` shares. The contract's `submit` runs
 `preview` first and then `must(submit)`, so on chain the call panics
 instead of returning a rejected decision.
-`f5_version_max_freezes_settlement_and_every_transition` pins it.
+`f5_version_max_freezes_settlement_and_every_transition` pinned it.
+
+**Status.** Closed in v1.1.0 (`da43188`). The version check is now part of
+the admission that `preview` shares, so `preview` reports `Arithmetic` from
+`VERSION_CAP` on. `f5_open_records_resolve_above_the_version_cap` checks
+it.

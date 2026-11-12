@@ -1,5 +1,7 @@
 # NEAR API
 
+This page describes v1.1.0. Changes from v1.0.0 are listed in the [changelog](../CHANGELOG.md).
+
 One immutable pool per deployment. All mutating methods are nonpayable, including `reconcile`; fund storage by transferring NEAR to the deployment account separately. Local demonstration credits have no relationship to attached deposits.
 
 | Method | Arguments | Authority / result |

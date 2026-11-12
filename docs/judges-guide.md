@@ -53,11 +53,11 @@ Not implemented: public-network deployment, live LLM agents, real escrow/payment
 
 ## Formal verification
 
-[Formal verification PR #31](https://github.com/difflabai/formalver/pull/31) targets contract source pinned at `a4bb5c3`. It reports completed Lean model proofs, bounded TLA+ safety checks, Prolog requirements checks, and conformance traces against the Rust core and NEAR shell. These are substantive verification results, with distinct scopes; they are not a completed proof of every deployed Rust/Wasm behavior.
+[Formal verification PR #31](https://github.com/difflabai/formalver/pull/31) targets v1.0.0, with contract source pinned at `a4bb5c3`. It reports completed Lean model proofs, bounded TLA+ safety checks, Prolog requirements checks, and conformance traces against the Rust core and NEAR shell. These are substantive verification results, with distinct scopes; they are not a completed proof of every deployed Rust/Wasm behavior.
 
-The new station fixture is not part of that pinned verification revision; it has a dedicated Rust regression test. The core admission algorithm is unchanged.
+The new station fixture is not part of that pinned verification revision; it has a dedicated Rust regression test.
 
-The PR is a draft labeled **In-Progress**. Kani verification of the real Rust core and refinement obligations remain pending. It reports high-severity settlement/liveness findings F-1 and F-2. Present those findings alongside the proofs, and inspect the PR's current status before making a deployment claim. Modifying the contract or its policy requires reviewing the proof assumptions and rerunning applicable checks.
+The PR is a draft labeled **In-Progress**. Kani verification of the real Rust core and refinement obligations remain pending. It reported high-severity settlement/liveness findings F-1 and F-2 and several lower-severity findings. v1.1.0 fixes all of them, which changes admission, record retention and the version limit ([findings](verification-findings.md), [changelog](../CHANGELOG.md)). The fixes are tested but not formally re-verified. Present the findings and fixes alongside the proofs, and inspect the PR's current status before making a deployment claim. Modifying the contract or its policy requires reviewing the proof assumptions and rerunning applicable checks.
 
 ## Presentation rationale and official sources
 
