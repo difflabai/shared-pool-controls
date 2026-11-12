@@ -33,7 +33,9 @@ async fn call(a: &Account, c: &Contract, method: &str, args: Value) -> Value {
     assert!(result.is_success(), "{method}: {result:?}");
     result.json().unwrap_or(Value::Null)
 }
-async fn fail(a: &Account, c: &Contract, method: &str, args: Value) {
+/// The call must fail with a panic message that contains `expected`. A Wasm
+/// built without `--cfg near` traps with no message, so this also checks the build.
+async fn fail(a: &Account, c: &Contract, method: &str, args: Value, expected: &str) {
     let r = a
         .call(c.id(), method)
         .args_json(args)
@@ -42,6 +44,11 @@ async fn fail(a: &Account, c: &Contract, method: &str, args: Value) {
         .await
         .unwrap();
     assert!(r.is_failure(), "expected {method} to fail");
+    let text = r.into_result().unwrap_err().to_string();
+    assert!(
+        text.contains("Smart contract panicked: ") && text.contains(expected),
+        "{method}: expected a panic with {expected:?}, got {text}"
+    );
 }
 #[tokio::test]
 async fn five_scenarios_execute_through_the_actual_gate() {
@@ -99,9 +106,17 @@ async fn five_scenarios_execute_through_the_actual_gate() {
                     &executor,
                     "execute",
                     json!({"id":id,"recipe":r,"units":u}),
+                    "only lock may execute",
                 )
                 .await;
-                fail(actor, &lock, "settle", json!({"id":id,"completed":true})).await;
+                fail(
+                    actor,
+                    &lock,
+                    "settle",
+                    json!({"id":id,"completed":true}),
+                    "Unauthorized",
+                )
+                .await;
                 call(actor, &lock, "dispatch", json!({"id":id})).await;
                 reference.dispatch(actor.id().as_str(), id, now()).unwrap();
                 reference.acknowledge(id, true).unwrap();
@@ -130,7 +145,14 @@ async fn five_scenarios_execute_through_the_actual_gate() {
             reference.energy(&reference.values).unwrap(),
             reference.records.len()
         );
-        fail(&owner, &lock, "on_result", json!({"id":0})).await;
+        fail(
+            &owner,
+            &lock,
+            "on_result",
+            json!({"id":0}),
+            "Method on_result is private",
+        )
+        .await;
     }
 }
 #[tokio::test]
@@ -166,7 +188,7 @@ async fn unknown_outcomes_stale_requests_and_reconciliation() {
     call(&owner, &executor, "set_mode", json!({"mode":"unknown"})).await;
     call(&actor, &lock, "dispatch", json!({"id":0})).await;
     assert_eq!(state(&lock).await.records[0].status, Status::Unknown);
-    fail(&actor, &lock, "cancel", json!({"id":0})).await;
+    fail(&actor, &lock, "cancel", json!({"id":0}), "Pending").await;
     assert_eq!(state(&lock).await.values[3], 4);
     call(&actor, &lock, "reconcile", json!({"id":0})).await;
     assert_eq!(state(&lock).await.records[0].status, Status::Active);
@@ -206,5 +228,12 @@ async fn unknown_outcomes_stale_requests_and_reconciliation() {
     )
     .await;
     assert_eq!(state(&lock).await.values[3], 0);
-    fail(&actor, &lock, "observe", json!({"values":[0,0,0,0,0]})).await;
+    fail(
+        &actor,
+        &lock,
+        "observe",
+        json!({"values":[0,0,0,0,0]}),
+        "Unauthorized",
+    )
+    .await;
 }
