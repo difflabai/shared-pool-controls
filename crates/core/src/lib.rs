@@ -2,6 +2,8 @@
 //! See docs/spec.md for the transition system and explicit trust assumptions.
 #![forbid(unsafe_code)]
 
+#[cfg(test)]
+mod findings;
 pub mod fixtures;
 #[cfg(test)]
 mod tests;
