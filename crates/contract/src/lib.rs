@@ -1,5 +1,5 @@
 //! Thin NEAR shell: identity, storage, receipts, and asynchronous execution.
-use near_sdk::{env, near, require, AccountId, Gas, PanicOnDefault, Promise};
+use near_sdk::{env, near, require, AccountId, Gas, NearToken, PanicOnDefault};
 use pool_core::{Commitment, Config, Decision, Pool, Request};
 
 #[near(contract_state)]
@@ -76,7 +76,7 @@ impl Contract {
         );
         Submission { decision, id }
     }
-    pub fn dispatch(&mut self, id: u32) -> Promise {
+    pub fn dispatch(&mut self, id: u32) {
         must(self.pool.dispatch(&caller(), id, now()));
         let c = &self.pool.records[id as usize];
         let r = &self.pool.config.recipes[c.recipe as usize];
@@ -84,17 +84,10 @@ impl Contract {
             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),
         )
         .unwrap();
-        Promise::new(r.executor.parse().unwrap())
-            .function_call(
-                "execute",
-                args,
-                near_sdk::NearToken::from_yoctonear(0),
-                Gas::from_tgas(30),
-            )
-            .then(self.callback(id))
+        call_then_callback(&r.executor, "execute", &args, Gas::from_tgas(30), id);
     }
     /// Any observer may request reconciliation; no authority is granted by this call.
-    pub fn reconcile(&self, id: u32) -> Promise {
+    pub fn reconcile(&self, id: u32) {
         // NT-F2: near-sdk generates the nonpayable check only for &mut self methods.
         require!(
             env::attached_deposit().is_zero(),
@@ -111,14 +104,8 @@ impl Contract {
             "InvalidState"
         );
         let r = &self.pool.config.recipes[c.recipe as usize];
-        Promise::new(r.executor.parse().unwrap())
-            .function_call(
-                "status",
-                near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
-                near_sdk::NearToken::from_yoctonear(0),
-                Gas::from_tgas(10),
-            )
-            .then(self.callback(id))
+        let args = near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap();
+        call_then_callback(&r.executor, "status", &args, Gas::from_tgas(10), id);
     }
     #[private]
     pub fn on_result(&mut self, id: u32) {
@@ -176,20 +163,30 @@ impl Contract {
         );
     }
 }
-impl Contract {
-    fn callback(&self, id: u32) -> Promise {
-        Promise::new(env::current_account_id()).function_call(
-            "on_result",
-            near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
-            near_sdk::NearToken::from_yoctonear(0),
-            Gas::from_tgas(30),
-        )
-    }
+/// Calls `method` on the executor with no deposit, then this contract's
+/// `on_result({id})` with 30 Tgas, and makes the callback's result the result
+/// of the current call. NT-F3: this uses near-sdk's low-level promise functions.
+/// Its `Promise` type links the host functions for every action (deploy, keys,
+/// transfer, stake, accounts); build.sh fails if any of them is imported.
+fn call_then_callback(executor: &str, method: &str, args: &[u8], gas: Gas, id: u32) {
+    let zero = NearToken::from_yoctonear(0);
+    let call = env::promise_create(executor.parse().unwrap(), method, args, zero, gas);
+    let callback = env::promise_then(
+        call,
+        env::current_account_id(),
+        "on_result",
+        near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
+        zero,
+        Gas::from_tgas(30),
+    );
+    env::promise_return(callback);
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use near_sdk::test_utils::{get_logs, VMContextBuilder};
+    use near_sdk::mock::MockAction;
+    use near_sdk::serde_json::{json, Value};
+    use near_sdk::test_utils::{get_created_receipts, get_logs, VMContextBuilder};
     use near_sdk::{testing_env, NearToken, PromiseResult};
     use pool_core::Status;
     fn context(actor: &str) {
@@ -243,7 +240,7 @@ mod tests {
             expires_at: 200,
         };
         assert_eq!(c.submit(q).id, Some(0));
-        let _ = c.dispatch(0);
+        c.dispatch(0);
         assert_eq!(c.get_pool().records[0].status, Status::Dispatched);
         c
     }
@@ -252,6 +249,66 @@ mod tests {
         let logs = get_logs();
         assert_eq!(logs.len(), 1, "{logs:?}");
         near_sdk::serde_json::from_str(logs[0].strip_prefix("EVENT_JSON:").unwrap()).unwrap()
+    }
+    /// A function call: (method, JSON args, deposit in yocto, gas in Tgas, unused-gas weight).
+    type Call = (String, Value, u128, u64, u64);
+    /// Every receipt created by the last call: (receiver, receipts it waits for, calls).
+    fn receipts() -> Vec<(String, Vec<u64>, Vec<Call>)> {
+        get_created_receipts()
+            .into_iter()
+            .map(|r| {
+                let calls = r.actions.into_iter().map(|a| match a {
+                    MockAction::FunctionCallWeight {
+                        method_name,
+                        args,
+                        attached_deposit,
+                        prepaid_gas,
+                        gas_weight,
+                        ..
+                    } => (
+                        String::from_utf8(method_name).unwrap(),
+                        near_sdk::serde_json::from_slice(&args).unwrap(),
+                        attached_deposit.as_yoctonear(),
+                        prepaid_gas.as_tgas(),
+                        gas_weight.0,
+                    ),
+                    other => panic!("not a function call: {other:?}"),
+                });
+                (
+                    r.receiver_id.to_string(),
+                    r.receipt_indices,
+                    calls.collect(),
+                )
+            })
+            .collect()
+    }
+    #[test]
+    fn dispatch_and_reconcile_call_the_executor_then_on_result() {
+        let call = |method: &str, args: Value, tgas: u64| (method.to_string(), args, 0, tgas, 0);
+        let on_result = (
+            "pool.test.near".to_string(),
+            vec![0],
+            vec![call("on_result", json!({"id":0}), 30)],
+        );
+        let c = dispatched();
+        let execute = call("execute", json!({"id":0,"recipe":0,"units":4}), 30);
+        assert_eq!(
+            receipts(),
+            vec![
+                ("executor.test.near".into(), vec![], vec![execute]),
+                on_result.clone()
+            ]
+        );
+        context("anyone.test.near");
+        c.reconcile(0);
+        let status = call("status", json!({"id":0}), 10);
+        assert_eq!(
+            receipts(),
+            vec![
+                ("executor.test.near".into(), vec![], vec![status]),
+                on_result
+            ]
+        );
     }
     #[test]
     #[should_panic(expected = "Method reconcile doesn't accept deposit")]
@@ -262,13 +319,13 @@ mod tests {
             .predecessor_account_id("anyone.test.near".parse().unwrap())
             .attached_deposit(NearToken::from_yoctonear(1));
         testing_env!(b.build());
-        let _ = c.reconcile(0);
+        c.reconcile(0);
     }
     #[test]
     fn reconcile_without_deposit_is_open_to_anyone() {
         let c = dispatched();
         context("anyone.test.near");
-        let _ = c.reconcile(0);
+        c.reconcile(0);
     }
     #[test]
     fn nt_f4_non_string_result_becomes_unknown() {

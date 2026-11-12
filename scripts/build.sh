@@ -50,12 +50,22 @@ def imports(p):
         i=end
     return []
 
+# NT-F3: both contracts make only function calls, through promise_create and
+# promise_then. near-sdk's Promise type links the host functions for every
+# other action. Fail if any of them, or any promise_batch_* function, is imported.
+FORBIDDEN=['deploy','delete_account','add_key','delete_key','gas_key','transfer','stake','create_account','global_contract']
+def forbidden(imp):
+    name=imp.split('.',1)[-1]
+    return name.startswith('promise_batch_') or any(w in name for w in FORBIDDEN)
+
 paths=[pathlib.Path('target/wasm32-unknown-unknown/release')/(n+'.wasm') for n in ['pool_contract','pool_executor']]
 wasm={}
 for p in paths:
     found=imports(p)
     # NT-F1: without cfg(near) env::panic_str traps instead of calling panic_utf8.
     if 'env.panic_utf8' not in found: sys.exit(f'{p}: does not import env.panic_utf8; was it built without --cfg near?')
+    bad=[i for i in found if forbidden(i)]
+    if bad: sys.exit(f'{p}: imports host functions for actions other than function calls: {", ".join(bad)}')
     wasm[str(p)]={'sha256':hashlib.sha256(p.read_bytes()).hexdigest(),'bytes':p.stat().st_size,'imports':found}
 manifest={'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'dirty':bool(subprocess.check_output(['git','status','--porcelain'],text=True).strip()),'rustc':subprocess.check_output(['rustc','--version'],text=True).strip(),'rustflags':os.environ['RUSTFLAGS'],'cargo_lock_sha256':hashlib.sha256(pathlib.Path('Cargo.lock').read_bytes()).hexdigest(),'wasm':wasm}
 pathlib.Path('artifacts/build.json').write_text(json.dumps(manifest,indent=2)+'\n')

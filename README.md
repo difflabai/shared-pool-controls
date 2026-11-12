@@ -56,7 +56,7 @@ The separate [`ui/live.html`](ui/live.html) is a static NEAR console: read any c
 python3 scripts/smoke.py     # local HTTP demo; start server first
 ```
 
-`near-workspaces` downloads its sandbox binary on first use. Network access and a supported host are required. `build.sh` builds with `RUSTFLAGS="--cfg near"` and fails if a Wasm does not import `env.panic_utf8` (without the flag, failed calls carry no error name). `artifacts/build.json` records source revision, dirty status, Rust version, Rust flags, Cargo.lock hash, and each Wasm's hash and imports. This is a local build manifest, not an independent reproducibility or deployment attestation.
+`near-workspaces` downloads its sandbox binary on first use. Network access and a supported host are required. `build.sh` builds with `RUSTFLAGS="--cfg near"` and fails if a Wasm does not import `env.panic_utf8` (without the flag, failed calls carry no error name). It also fails if a Wasm imports a host function for an action other than a function call (deploy, keys, transfer, stake, accounts). `artifacts/build.json` records source revision, dirty status, Rust version, Rust flags, Cargo.lock hash, and each Wasm's hash and imports. This is a local build manifest, not an independent reproducibility or deployment attestation.
 
 ## Small architecture
 
