@@ -18,9 +18,9 @@ Input: `(caller, recipe, units, expected_version, expires_at, now)`.
 
 Check paused, version equality, expiry strictly after now and at most one day ahead, observation freshness if configured, record bound, recipe validity, exact caller, quantity range, and completed-unit prerequisites. Compute candidate values by adding the recipe's reservation delta times units, with checked arithmetic.
 
-For each metric compute a conservative interval containing every subset of outstanding completion effects, plus the proposed completion effect. Independent positive effects contribute to the high endpoint and negative effects to the low endpoint. Check this interval against the configured hard bound. In a healthy state, all intervals must fit. In a disturbed state, no metric's violation amount may exceed its current violation.
+For each metric compute a conservative interval that contains every outcome of every open record, plus the proposed one. Each record may stay open, complete (add its completion effect) or be released (subtract its reservation effect), independently of the others. Positive effects contribute to the high endpoint and negative effects to the low endpoint. Check this interval against the configured hard bound. No metric's interval violation may exceed its violation before the request or its violation after the reservation. In a healthy state, all intervals must fit.
 
-Then require V(candidate) <= V(current). In a state already violating hard bounds also require V(candidate + proposed_completion) < V(current). This allows a recovery hedge to reserve collateral while its beneficial stress effect waits for fill. This is only a recovery admission rule; it is not a guarantee that execution arrives or recovery completes.
+Then require V(candidate) <= V(current). In a state already violating hard bounds also require V(candidate + proposed_completion) < V(current). This allows a recovery hedge to reserve collateral while its beneficial stress effect waits for fill. A reservation never changes a metric's violation amount; recovery comes from completion. This is only a recovery admission rule; it is not a guarantee that execution arrives or recovery completes.
 
 On success append a Reserved record, replace values, increment version. On rejection return an error with no state change. The wrapper may emit a rejection event but does not consume a nonce or persist an audit record. Accepted requests cannot replay at the original version. A new version constitutes a new deliberate request; there is no separate client nonce mechanism.
 
@@ -37,13 +37,13 @@ Hard constraints are axis-aligned metric bounds. Coupled constraints use additio
 - Reserved -> Dispatched: exact actor, unpaused, unexpired, fresh risk snapshot; wrapper creates the promise after state update.
 - Dispatched/Unknown -> Active: private acknowledgment says adapter accepted dispatch.
 - Dispatched/Unknown -> Unknown: missing, malformed or failed acknowledgment; retain values.
-- Dispatched/Active/Unknown -> Completed: recipe executor attests completion; add completion delta, check remaining completion envelope, increment version. No energy comparison is imposed on externally attested settlement.
+- Dispatched/Active/Unknown -> Completed: recipe executor attests completion; add completion delta, check the envelope of the remaining open records, increment version. No energy comparison is imposed on externally attested settlement.
 - Reserved -> Cancelled: actor or owner cancels before dispatch. Subtract reservation delta and check other pending effects.
 - Dispatched/Active/Unknown -> Cancelled: executor attests definitive nonexecution; same checked inverse update.
 - Same completion/cancellation repeated: idempotent. Conflicting terminal evidence: reject.
 - Late acknowledgment after terminal settlement: ignored.
 
-A checked inverse can fail if another commitment depends on its contribution. The original commitment remains encumbered; resolve dependent work first. There is no forced administrative release that bypasses these checks. In the supplied fixtures, physical availability and risk-credit timing prevent ordinary unsafe reliance on unexecuted work.
+Admission refuses any commitment whose outcomes could make a metric worse than now, so the checked inverse cannot fail its bounds or range check in a reachable state. There is still no forced administrative release.
 
 No automatic expiry of a dispatched request. A deadline does not prove nonexecution. Reconciliation queries the fixed executor by immutable ID. Unknown is distinct from cancelled. An executed but unacknowledged job remains a liability.
 
@@ -63,7 +63,7 @@ Inventory: planning positions move at reservation. Physical source availability 
 
 Hiring: reservation consumes discretionary funds or a review earmark and increases coverage plus escrow. Independent acceptance moves escrow to lifetime spending. Coverage remains after payment. `free + earmark + escrow + paid + protected = 10`. Review needs completed research units >=2 and implementation units >=3. No worker can authorize its own acceptance through the wrapper.
 
-Risk: values are conservative scenario losses in $100k units. Positive loss contributions reserve immediately; hedge benefit occurs only on completion. Collateral encumbrance remains until an explicit later measured baseline. There is no automatic sale/close model or partial fill support. Each mock trade is an atomic synthetic position. No pending hedge offsets are netted into new trade capacity.
+Risk: values are conservative scenario losses in $100k units. Positive loss contributions reserve immediately; hedge benefit occurs only on completion. Collateral encumbrance remains until an explicit later measured baseline. There is no automatic sale/close model or partial fill support. Each mock trade is an atomic synthetic position. No pending hedge offsets are netted into new trade capacity. No unexecuted position backs a hedge: a hedge must stay in bounds if the position is later reported unexecuted.
 
 ## Intended proof boundary
 

@@ -78,6 +78,7 @@ Read the [API](docs/api.md), [state-machine specification](docs/spec.md), [updat
 
 - Hard bounds and the potential are different checks. A lower score cannot buy permission to breach a protected limit.
 - Pending commitments count immediately. Pending negative-risk hedge effects do not provide headroom before fill.
+- No unexecuted position backs a hedge: a hedge must stay in bounds if the position is later reported unexecuted.
 - Cancellation after dispatch needs authenticated evidence of nonexecution. A timeout or failed receipt is insufficient.
 - The administrator and registered execution/evidence accounts are trusted. The owner can update observed facts only when there are no unresolved commitments; it cannot edit policy. That observation can raise energy or reveal a limit breach.
 - Only admitted reservation transitions promise nonincreasing energy. Settlement, cancellation, observations, fairness, economic correctness and eventual completion have separate assumptions.

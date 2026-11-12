@@ -182,8 +182,11 @@ impl Pool {
             .map(|(v, m)| (m.min - v).max(0) as u64 + (v - m.max).max(0) as u64)
             .collect()
     }
-    /// Check all pending completion subsets conservatively per metric. A pending
-    /// hedge cannot provide hard-limit headroom before the hedge executes.
+    /// Per metric, an interval that contains every outcome of every open record
+    /// (it stays open, completes, or releases its reservation) and of `extra`,
+    /// with record `skip` left out. A pending hedge gives no hard-limit headroom
+    /// before it executes, and no admission can rely on another record's
+    /// reservation staying in place.
     fn envelope(
         &self,
         values: &[i64],
@@ -194,11 +197,19 @@ impl Pool {
         let mut high = values.to_vec();
         let mut apply = |r: &Recipe, units: u32| -> Result<(), Error> {
             for i in 0..values.len() {
+                // d: completion delta; x: release delta (cancel or settle(false)).
                 let d = r.complete[i]
                     .checked_mul(i64::from(units))
                     .ok_or(Error::Arithmetic)?;
-                low[i] = low[i].checked_add(d.min(0)).ok_or(Error::Arithmetic)?;
-                high[i] = high[i].checked_add(d.max(0)).ok_or(Error::Arithmetic)?;
+                let x = r.reserve[i]
+                    .checked_mul(-i64::from(units))
+                    .ok_or(Error::Arithmetic)?;
+                low[i] = low[i]
+                    .checked_add(d.min(x).min(0))
+                    .ok_or(Error::Arithmetic)?;
+                high[i] = high[i]
+                    .checked_add(d.max(x).max(0))
+                    .ok_or(Error::Arithmetic)?;
                 if !bounded(low[i]) || !bounded(high[i]) {
                     return Err(Error::Arithmetic);
                 }
@@ -215,6 +226,11 @@ impl Pool {
         }
         Ok((low, high))
     }
+    /// No metric's interval violation may exceed its violation now or at
+    /// `candidate`. Since every admission passes this check, in every reachable
+    /// state each metric's interval violation equals its current violation, and
+    /// every completion or release of an open record passes this check too
+    /// (LIVE, docs/verification-handoff.md).
     fn check_bounds(
         &self,
         candidate: &[i64],
@@ -223,9 +239,10 @@ impl Pool {
     ) -> Result<(), Error> {
         let (low, high) = self.envelope(candidate, extra, skip)?;
         let old = self.violations(&self.values);
+        let new = self.violations(candidate);
         for (i, m) in self.config.metrics.iter().enumerate() {
             let v = (m.min - low[i]).max(0) as u64 + (high[i] - m.max).max(0) as u64;
-            if v > old[i] {
+            if v > old[i].min(new[i]) {
                 return Err(Error::Bounds);
             }
         }
@@ -412,8 +429,8 @@ impl Pool {
         let r = &self.config.recipes[c.recipe as usize];
         let undo: Vec<i64> = r.reserve.iter().map(|d| -d).collect();
         let next = add(&self.values, &undo, c.units)?;
-        // A dependent commitment can prevent release. Retain encumbrance until
-        // dependencies are resolved; do not corrupt a downstream reservation.
+        // The release is still checked. Admission counted it in the envelope,
+        // so in a reachable state this check passes; no release is forced.
         self.check_bounds(&next, None, Some(id))?;
         self.bump()?;
         self.values = next;
