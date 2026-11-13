@@ -28,10 +28,10 @@ pub struct Executor {
     operator: AccountId,
     jobs: Vec<Job>,
     mode: String,
-    /// The largest id the lock has vouched for: one it sent to `execute`, or
-    /// one whose `settle` from this executor it accepted. Either way the lock
-    /// retained that record then, so every id WINDOW or more below it was
-    /// already pruned.
+    /// The largest id the lock has vouched for: one whose `execute` created a
+    /// job (an `execute` of an id that has a job moves nothing), or one whose
+    /// `settle` from this executor it accepted. Either way the lock retained
+    /// that record then, so every id WINDOW or more below it was pruned.
     newest: u32,
 }
 #[near]
@@ -55,10 +55,10 @@ impl Executor {
         );
         self.mode = mode;
     }
-    /// Starts job `id` once; a repeated call returns the stored status. A job
-    /// is forgotten once `newest` is WINDOW or more past its id. Such an id
-    /// returns "cancelled" without starting anything: the lock has pruned its
-    /// record, so it is terminal and never dispatched again.
+    /// Starts job `id` once and raises `newest` to it; an id that has a job (a
+    /// repeat, or a confirmation's) returns its status and moves nothing. An id
+    /// WINDOW or more behind `newest` returns "cancelled" and starts nothing:
+    /// the lock pruned its record, so it is terminal and never dispatched again.
     pub fn execute(&mut self, id: u32, recipe: u32, units: u32) -> String {
         assert_eq!(
             env::predecessor_account_id(),
@@ -124,10 +124,10 @@ impl Executor {
     /// a job. A forgotten id fails "stale id". The job is stored first and kept
     /// whatever the lock answers. If the lock accepts the settle, `on_settled`
     /// raises `newest` to `id`. If it refuses (an unassigned or pruned id, a
-    /// record still Reserved, another outcome already recorded), the job stays
-    /// until `newest` is WINDOW or more past its id, for good if the lock never
-    /// reaches that id. MAX_JOBS is reached only with at least WINDOW jobs
-    /// above `newest`, refused or still waiting for `on_settled`.
+    /// record still Reserved, another outcome recorded, another executor's
+    /// recipe), the job stays until `newest` is WINDOW or more past its id, for
+    /// good if the lock never reaches that id. MAX_JOBS is reached only with at
+    /// least WINDOW jobs above `newest`, refused or waiting for `on_settled`.
     pub fn confirm_not_executed(&mut self, id: u32, recipe: u32, units: u32) {
         self.operator();
         assert!(!self.jobs.iter().any(|j| j.id == id), "job exists");
@@ -153,7 +153,7 @@ impl Executor {
     #[private]
     pub fn on_settled(&mut self, id: u32) {
         assert_eq!(env::promise_results_count(), 1, "not a settle callback");
-        // The lock's settle returns no value; any success counts.
+        // Settle returns no value, but any success counts (even `Err(TooLong)`).
         if env::promise_result_checked(0, 0) != Err(PromiseError::Failed) {
             self.advance(id);
         }
@@ -268,14 +268,18 @@ mod tests {
     /// The executor's own `on_settled(id)` after the lock accepted (`ok`) or
     /// refused its settle.
     fn settled(e: &mut Executor, id: u32, ok: bool) {
-        let mut b = VMContextBuilder::new();
-        b.current_account_id("executor.test.near".parse().unwrap())
-            .predecessor_account_id("executor.test.near".parse().unwrap());
         let result = if ok {
             PromiseResult::Successful(vec![])
         } else {
             PromiseResult::Failed
         };
+        settled_with(e, id, result);
+    }
+    /// The executor's own `on_settled(id)` with the given settle result.
+    fn settled_with(e: &mut Executor, id: u32, result: PromiseResult) {
+        let mut b = VMContextBuilder::new();
+        b.current_account_id("executor.test.near".parse().unwrap())
+            .predecessor_account_id("executor.test.near".parse().unwrap());
         testing_env!(
             b.build(),
             near_sdk::test_vm_config(),
@@ -300,6 +304,10 @@ mod tests {
     fn stored(e: &Executor) -> Vec<u8> {
         near_sdk::borsh::to_vec(e).unwrap()
     }
+    /// The mock runtime cannot see which promise `notify` returns. The
+    /// sandbox test `confirmed_failed_executes_keep_the_executor_at_256_jobs`
+    /// checks it: a refused confirmation's transaction fails with the lock's
+    /// error (`NotFound`), while its `on_settled` receipt succeeds.
     #[test]
     fn finish_and_confirm_call_settle_on_the_lock() {
         caller("executor.test.near");
@@ -438,6 +446,19 @@ mod tests {
         assert_eq!(e.newest, 10);
         assert_eq!(ids(&e).len(), 12);
     }
+    /// D-1: the shipped lock's `settle` returns nothing, but a success with a
+    /// value counts as accepted too (`promise_result_checked` with a bound
+    /// of 0 bytes reports it as `TooLong`, not `Failed`).
+    #[test]
+    fn d1_a_settle_success_with_a_value_counts_as_accepted() {
+        let mut e = executor();
+        execute(&mut e, 0..=255);
+        confirm(&mut e, 300);
+        settled_with(&mut e, 300, PromiseResult::Successful(vec![1]));
+        let mut expected: Vec<u32> = (45..=255).collect();
+        expected.push(300);
+        assert_eq!((e.newest, ids(&e)), (300, expected));
+    }
     /// D-1: `on_settled` needs the one promise result `notify` gives it. The
     /// executor account calling it directly has none. (`#[private]` exists
     /// only in the Wasm entry point; the sandbox tests it.)
@@ -449,14 +470,19 @@ mod tests {
         e.on_settled(5);
     }
     /// D-1, decision (a): `finish` also calls `on_settled`. A refused
-    /// confirmation (as for a record still Reserved) moves nothing; the
-    /// operator's retry `finish(id, false)`, once accepted, moves `newest`.
+    /// confirmation (as for a record still Reserved) moves nothing, and nor
+    /// does the lock's later `execute` of that id, which answers from the
+    /// stored job. The operator's retry `finish(id, false)`, once accepted,
+    /// moves `newest`.
     #[test]
     fn d1_finish_moves_newest_too() {
         let mut e = executor();
         execute(&mut e, 0..=255);
         confirm(&mut e, 300);
         settled(&mut e, 300, false);
+        assert_eq!((e.newest, e.jobs.len()), (255, 257));
+        caller("pool.test.near");
+        assert_eq!(e.execute(300, 0, 1), "cancelled");
         assert_eq!((e.newest, e.jobs.len()), (255, 257));
         caller("operator.test.near");
         e.finish(300, false);

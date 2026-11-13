@@ -621,7 +621,8 @@ async fn confirmed_failed_executes_keep_the_executor_at_256_jobs() {
     held.push(300);
     assert_eq!(job_ids(&executor).await, held, "job 300 pushed, 44 held");
     // Dispatch: execute answers "cancelled" from job 300, so the lock
-    // cancels the record.
+    // cancels the record. An execute that finds a stored job moves no newest
+    // id, so job 44 stays.
     call(&actor, &lock, "dispatch", json!({"id":300})).await;
     reference.dispatch(a, 300, now()).unwrap();
     reference.settle(x, 300, false).unwrap();
