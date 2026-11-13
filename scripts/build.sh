@@ -52,8 +52,9 @@ def imports(p):
     return []
 
 # NT-F3: both contracts make only function calls, through promise_create and
-# promise_then. near-sdk's Promise type links the host functions for every
-# other action. Fail if any of them, or any promise_batch_* function, is imported.
+# promise_then; the executor's on_settled reads the lock's settle result.
+# near-sdk's Promise type links the host functions for every other action.
+# Fail if any of them, or any promise_batch_* function, is imported.
 FORBIDDEN=['deploy','delete_account','add_key','delete_key','gas_key','transfer','stake','create_account','global_contract']
 def forbidden(imp):
     name=imp.split('.',1)[-1]
@@ -66,7 +67,7 @@ def forbidden(imp):
 COMMON=['attached_deposit','current_account_id','input','panic_utf8','predecessor_account_id','promise_create','promise_return','read_register','register_len','storage_has_key','storage_read','storage_write','value_return']
 ALLOWED={
     'pool_contract':COMMON+['block_timestamp','log_utf8','promise_result','promise_results_count','promise_then'],
-    'pool_executor':COMMON,
+    'pool_executor':COMMON+['promise_result','promise_results_count','promise_then'],
 }
 
 wasm={}
