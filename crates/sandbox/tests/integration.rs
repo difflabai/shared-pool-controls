@@ -411,6 +411,274 @@ async fn window_of_300_records_through_the_executor() {
         ids.len()
     );
 }
+/// The executor's job ids, in the order it holds them.
+async fn job_ids(executor: &Contract) -> Vec<u64> {
+    let jobs: Vec<Value> = executor.view("get_jobs").await.unwrap().json().unwrap();
+    jobs.iter().map(|j| j["id"].as_u64().unwrap()).collect()
+}
+/// D-1 (owner decision Q4): 300 records whose `execute` fails, each confirmed
+/// not executed by the operator. The lock accepts each confirmation's settle,
+/// and the executor's private callback `on_settled` then moves its newest id,
+/// so it holds at most 256 jobs. Before this change it forgot nothing without
+/// a successful `execute`: 257 jobs after the confirmation of id 256, and the
+/// 512-job cap after 512. Then, on the real host: a refused confirmation
+/// keeps its job and the transaction reports the lock's error; `on_settled`
+/// is private; a Reserved record confirmed too early is cancelled when it is
+/// dispatched, after which `finish(id, false)` moves the newest id; the pool
+/// is not wedged.
+#[tokio::test]
+async fn confirmed_failed_executes_keep_the_executor_at_256_jobs() {
+    let worker = near_workspaces::sandbox().await.unwrap();
+    let owner = worker.dev_create_account().await.unwrap();
+    let actor = worker.dev_create_account().await.unwrap();
+    let lock = worker.dev_deploy(&wasm("pool_contract")).await.unwrap();
+    let executor = worker.dev_deploy(&wasm("pool_executor")).await.unwrap();
+    // One record holds one unit of a 10-unit capacity until it ends either way.
+    let cfg = Config {
+        name: "confirmations".into(),
+        owner: owner.id().to_string(),
+        metrics: vec![Metric {
+            name: "In flight".into(),
+            unit: "jobs".into(),
+            initial: 0,
+            min: 0,
+            max: 10,
+        }],
+        terms: vec![Term {
+            metric: 0,
+            target: 10,
+            weight: 1,
+            shape: Shape::Excess,
+        }],
+        recipes: vec![Recipe {
+            name: "job".into(),
+            actor: actor.id().to_string(),
+            executor: executor.id().to_string(),
+            reserve: vec![1],
+            complete: vec![-1],
+            max_units: 1,
+            requires: vec![],
+        }],
+        max_age_seconds: 0,
+    };
+    call(lock.as_account(), &lock, "new", json!({"config":cfg})).await;
+    call(
+        executor.as_account(),
+        &executor,
+        "new",
+        json!({"lock":lock.id(),"operator":owner.id()}),
+    )
+    .await;
+    call(&owner, &executor, "set_mode", json!({"mode":"panic"})).await;
+    let mut reference = state(&lock).await;
+    let (a, x) = (actor.id().as_str(), executor.id().as_str());
+    let mut last = None;
+    for id in 0..300u32 {
+        let req = Request {
+            recipe: 0,
+            units: 1,
+            version: reference.version,
+            expires_at: now() + 3600,
+        };
+        let result = call(&actor, &lock, "submit", json!({"request":req})).await;
+        assert_eq!(result["id"], id, "{result}");
+        reference.submit(a, req, now()).unwrap();
+        // execute fails (panic mode), so on_result marks the record Unknown.
+        call(&actor, &lock, "dispatch", json!({"id":id})).await;
+        reference.dispatch(a, id, now()).unwrap();
+        reference.acknowledge(id, false).unwrap();
+        let r = owner
+            .call(executor.id(), "confirm_not_executed")
+            .args_json(json!({"id":id,"recipe":0,"units":1}))
+            .max_gas()
+            .transact()
+            .await
+            .unwrap();
+        assert!(r.is_success(), "confirm {id}: {:?}", r.failures());
+        reference.settle(x, id, false).unwrap();
+        if [0, 50, 100, 150, 200, 250, 255, 256, 257, 299].contains(&id) {
+            // The bound: the newest id is `id`, so at most 256 jobs remain.
+            let held = job_ids(&executor).await;
+            assert_eq!(
+                held,
+                (u64::from(id.saturating_sub(255))..=u64::from(id)).collect::<Vec<u64>>(),
+                "executor jobs after the confirmation of {id}: {} jobs",
+                held.len()
+            );
+            assert_eq!(state(&lock).await, reference, "record {id}");
+        }
+        last = Some(r);
+    }
+    let p = state(&lock).await;
+    assert_eq!(p, reference);
+    assert_eq!((p.first_id, p.records.len()), (44, 256));
+    assert!(p.records.iter().all(|c| c.status == Status::Cancelled));
+    let jobs: Vec<Value> = executor.view("get_jobs").await.unwrap().json().unwrap();
+    assert!(jobs.iter().all(|j| j["status"] == "cancelled"));
+    let window: Vec<u64> = (44..300).collect();
+    assert_eq!(job_ids(&executor).await, window);
+    // The confirmation of 299: the executor's call and its on_settled, and
+    // the lock's settle, all succeed.
+    let r = last.unwrap();
+    let on = |account: &near_workspaces::AccountId| {
+        r.receipt_outcomes()
+            .iter()
+            .filter(|o| &o.executor_id == account)
+            .map(|o| o.is_success())
+            .collect::<Vec<bool>>()
+    };
+    assert_eq!(
+        (on(executor.id()), on(lock.id())),
+        (vec![true, true], vec![true])
+    );
+    // Forgotten id 43: stale for a confirmation, unknown for finish.
+    fail(
+        &owner,
+        &executor,
+        "confirm_not_executed",
+        json!({"id":43,"recipe":0,"units":1}),
+        "stale id",
+    )
+    .await;
+    fail(
+        &owner,
+        &executor,
+        "finish",
+        json!({"id":43,"completed":false}),
+        "unknown job",
+    )
+    .await;
+    // A refused confirmation (an unassigned id): the transaction fails with
+    // the lock's error; on_settled still runs, changes nothing, and the job
+    // stays (no rollback).
+    let r = owner
+        .call(executor.id(), "confirm_not_executed")
+        .args_json(json!({"id":10_000,"recipe":0,"units":1}))
+        .max_gas()
+        .transact()
+        .await
+        .unwrap();
+    let on = |account: &near_workspaces::AccountId| {
+        r.receipt_outcomes()
+            .iter()
+            .filter(|o| &o.executor_id == account)
+            .map(|o| o.is_success())
+            .collect::<Vec<bool>>()
+    };
+    assert_eq!(
+        (on(executor.id()), on(lock.id())),
+        (vec![true, true], vec![false])
+    );
+    let text = r.into_result().unwrap_err().to_string();
+    assert!(
+        text.contains("Smart contract panicked: NotFound"),
+        "refused confirmation: {text}"
+    );
+    let mut held = window.clone();
+    held.push(10_000);
+    assert_eq!(job_ids(&executor).await, held);
+    assert_eq!(state(&lock).await, reference);
+    // on_settled is private, and needs the settle's result. An id of 600
+    // would forget every job below 345 if either call went through.
+    fail(
+        &owner,
+        &executor,
+        "on_settled",
+        json!({"id":600}),
+        "Method on_settled is private",
+    )
+    .await;
+    fail(
+        executor.as_account(),
+        &executor,
+        "on_settled",
+        json!({"id":600}),
+        "not a settle callback",
+    )
+    .await;
+    assert_eq!(job_ids(&executor).await, held);
+    // A Reserved record confirmed too early: the lock refuses (InvalidState),
+    // the job stays and pre-cancels the id.
+    call(&owner, &executor, "set_mode", json!({"mode":"normal"})).await;
+    let req = Request {
+        recipe: 0,
+        units: 1,
+        version: reference.version,
+        expires_at: now() + 3600,
+    };
+    let result = call(&actor, &lock, "submit", json!({"request":req})).await;
+    assert_eq!(result["id"], 300, "{result}");
+    reference.submit(a, req, now()).unwrap();
+    fail(
+        &owner,
+        &executor,
+        "confirm_not_executed",
+        json!({"id":300,"recipe":0,"units":1}),
+        "InvalidState",
+    )
+    .await;
+    assert_eq!(state(&lock).await, reference);
+    held.push(300);
+    assert_eq!(job_ids(&executor).await, held, "job 300 pushed, 44 held");
+    // Dispatch: execute answers "cancelled" from job 300, so the lock
+    // cancels the record.
+    call(&actor, &lock, "dispatch", json!({"id":300})).await;
+    reference.dispatch(a, 300, now()).unwrap();
+    reference.settle(x, 300, false).unwrap();
+    let p = state(&lock).await;
+    assert_eq!(p, reference);
+    assert_eq!(p.record(300).unwrap().status, Status::Cancelled);
+    assert_eq!(job_ids(&executor).await, held);
+    // finish(300, false) is now accepted (a same-outcome no-op at the lock);
+    // its on_settled raises the newest id to 300 and forgets job 44.
+    call(
+        &owner,
+        &executor,
+        "finish",
+        json!({"id":300,"completed":false}),
+    )
+    .await;
+    reference.settle(x, 300, false).unwrap();
+    assert_eq!(state(&lock).await, reference);
+    let mut held: Vec<u64> = (45..300).collect();
+    held.extend([10_000, 300]);
+    assert_eq!(job_ids(&executor).await, held, "finish moved the newest id");
+    // Not wedged: the next record runs end to end.
+    let req = Request {
+        recipe: 0,
+        units: 1,
+        version: reference.version,
+        expires_at: now() + 3600,
+    };
+    let result = call(&actor, &lock, "submit", json!({"request":req})).await;
+    assert_eq!(result["id"], 301, "{result}");
+    reference.submit(a, req, now()).unwrap();
+    call(&actor, &lock, "dispatch", json!({"id":301})).await;
+    reference.dispatch(a, 301, now()).unwrap();
+    reference.acknowledge(301, true).unwrap();
+    assert_eq!(state(&lock).await, reference);
+    let mut held: Vec<u64> = (46..300).collect();
+    held.extend([10_000, 300, 301]);
+    assert_eq!(job_ids(&executor).await, held, "execute forgot job 45");
+    call(
+        &owner,
+        &executor,
+        "finish",
+        json!({"id":301,"completed":true}),
+    )
+    .await;
+    reference.settle(x, 301, true).unwrap();
+    let p = state(&lock).await;
+    assert_eq!(p, reference);
+    assert_eq!(p.record(301).unwrap().status, Status::Completed);
+    assert_eq!((p.first_id, p.completed_units.clone()), (46, vec![1]));
+    println!(
+        "PASS confirmed failed executes: first_id {}, {} records, at most 256 executor jobs from confirmations, {} jobs at the end",
+        p.first_id,
+        p.records.len(),
+        held.len()
+    );
+}
 /// A Wasm executor whose `execute` returns the JSON number `5` and whose
 /// `status` returns a JSON string of 70 bytes. Neither is one JSON string of
 /// at most 64 bytes. Hand-assembled: one import (`env.value_return`), one page
