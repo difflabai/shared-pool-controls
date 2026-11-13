@@ -31,7 +31,7 @@ unit tests, seeded random tests and the sandbox suite.
   records. [F-3](docs/verification-findings.md#f-3-low-lifetime-record-exhaustion)
 - F-4 (low): a recipe's actor could be its own executor. `new` now rejects
   such a config (`InvalidConfig`). The owner may still be a recipe's
-  executor.
+  executor; the repository owner decided to allow it.
   [F-4](docs/verification-findings.md#f-4-low-a-principal-can-attest-its-own-work)
 - F-5 (low): at version u32::MAX every transition failed, including
   settlement. Submit, dispatch, pause and observe now stop 768 versions
@@ -59,6 +59,7 @@ unit tests, seeded random tests and the sandbox suite.
   from completion), and a request that is in bounds only while another open
   record's reservation stays in place. In the `risk` fixture, with one credit
   position open, the largest admitted selloff hedge is 6 units, not 8.
+  Confirmed by the repository owner.
 - Record window. The pool keeps the 256 most recent commitments. A submit
   prunes the oldest one when it is completed or cancelled, and fails `Full`
   while it is open. A dispatched oldest record closes only when its executor
@@ -66,7 +67,8 @@ unit tests, seeded random tests and the sandbox suite.
   counting, and a pruned id is `NotFound` (including a repeated executor
   `settle`, which v1.0.0 accepted). `get_pool` gains `first_id` and
   `completed_units`; prerequisites count completed units over the pool's
-  life. `get_commitments` takes `from` as an id.
+  life. `get_commitments` takes `from` as an id. Confirmed by the
+  repository owner.
 - `cancel` of a Completed record fails `InvalidState` (was `Pending`).
   Dispatched, Active and Unknown records still fail `Pending`.
 - Version reserve: submit, dispatch, `set_paused` and `observe` fail
