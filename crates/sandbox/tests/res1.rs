@@ -19,9 +19,13 @@
 //! must fail with "Exceeded the prepaid gas." in its first receipt, run
 //! nothing on the other contract, log nothing, and leave both contracts' raw
 //! storage byte-identical and the pool equal to the host-side core.
+//! `finish` and `confirm_not_executed` call the lock's `settle` (40 Tgas) and
+//! then the executor's private callback `on_settled` (10 Tgas); every
+//! measured `on_settled` must burn less than 6 Tgas.
 //!
-//! Then it fills the executor to its 512-job cap and measures `status`,
-//! `finish` and `execute` there.
+//! Then it fills the executor to its 512-job cap through confirmations the
+//! lock refuses (unassigned ids), and measures `status`, `finish` (with its
+//! `on_settled`) and `execute` there.
 #![allow(clippy::too_many_arguments)]
 
 use near_workspaces::network::Sandbox;
@@ -39,6 +43,10 @@ const TX_GAS_LIMIT: u64 = 300 * TGAS;
 const OUT_OF_GAS: &str = "Exceeded the prepaid gas.";
 const N_METRICS: usize = 32;
 const N_RECIPES: usize = 32;
+/// Gas the executor attaches to its `on_settled`, and the most any measured
+/// `on_settled` may burn (so at least 4 Tgas of it remain).
+const ON_SETTLED_TGAS: u64 = 10;
+const ON_SETTLED_LIMIT: u64 = 6 * TGAS;
 
 fn root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..")
@@ -137,6 +145,36 @@ fn receipts_on<'a>(r: &'a ExecutionFinalResult, account: &AccountId) -> Vec<&'a 
         .collect()
 }
 
+/// A `finish` or `confirm_not_executed`: the executor's call and its
+/// `on_settled` both succeed, and the lock's `settle` succeeds iff
+/// `accepted`. Returns the gas `on_settled` burnt, which must be under
+/// ON_SETTLED_LIMIT.
+fn on_settled(
+    what: &str,
+    r: &ExecutionFinalResult,
+    exec: &AccountId,
+    lock: &AccountId,
+    accepted: bool,
+) -> u64 {
+    let (on_exec, on_lock) = (receipts_on(r, exec), receipts_on(r, lock));
+    assert!(
+        on_exec.len() == 2 && on_exec.iter().all(|o| o.is_success()),
+        "{what}: executor receipts {:?}",
+        r.failures()
+    );
+    assert!(
+        on_lock.len() == 1 && on_lock[0].is_success() == accepted,
+        "{what}: the lock's settle should {}",
+        if accepted { "succeed" } else { "fail" }
+    );
+    let g = on_exec[1].gas_burnt.as_gas();
+    assert!(
+        g < ON_SETTLED_LIMIT,
+        "{what}: on_settled burnt {g} gas, the limit is {ON_SETTLED_LIMIT}"
+    );
+    g
+}
+
 /// The `reconciled` events logged on `account`.
 fn reconciled(r: &ExecutionFinalResult, account: &AccountId) -> Vec<Value> {
     let logs: Vec<String> = receipts_on(r, account)
@@ -213,14 +251,15 @@ struct Gas {
 
 impl Gas {
     /// Records the gas burnt by each receipt of `r` on `on` and the
-    /// transaction total; returns the largest receipt. `budget`: receipt
-    /// index i (in the order of `on`) must burn less than the static gas b.
+    /// transaction total; returns the largest receipt. `budgets`: for each
+    /// (i, b), receipt index i (in the order of `on`) must burn less than
+    /// the static gas b.
     fn add(
         &mut self,
         what: &str,
         r: &ExecutionFinalResult,
         on: &[(&AccountId, &str)],
-        budget: Option<(usize, u64)>,
+        budgets: &[(usize, u64)],
     ) -> u64 {
         let mut receipts = vec![];
         for (account, label) in on {
@@ -235,11 +274,14 @@ impl Gas {
             .unwrap_or(0);
         let total = r.total_gas_burnt.as_gas();
         let mut row = json!({ "call": what, "tx_total_tgas": tgas(total), "receipts": receipts, "margin_to_300_tgas": tgas(TX_GAS_LIMIT - total) });
-        if let Some((i, b)) = budget {
+        let mut checked = vec![];
+        for &(i, b) in budgets {
             let g = row["receipts"][i]["gas"].as_u64().unwrap();
-            row["attached_budget_tgas"] = json!(b / TGAS);
-            row["margin_to_budget_tgas"] = json!(tgas(b.saturating_sub(g)));
+            checked.push(json!({ "receipt": i, "on": row["receipts"][i]["on"], "attached_budget_tgas": b / TGAS, "margin_to_budget_tgas": tgas(b.saturating_sub(g)) }));
             assert!(g < b, "{what}: receipt {i} burnt {g} of its {b} budget");
+        }
+        if !checked.is_empty() {
+            row["budgets"] = json!(checked);
         }
         assert!(total < TX_GAS_LIMIT, "{what}: {total} gas");
         eprintln!("RES-1 {row}");
@@ -470,7 +512,7 @@ async fn res_1_gas_at_max_state() {
     let mut curve: Vec<(usize, u32, u64)> = vec![];
     let mut below = vec![];
     let mut minimum = vec![];
-    gas.add("new (max config)", &r_new, &pool_on, None);
+    gas.add("new (max config)", &r_new, &pool_on, &[]);
 
     // ---- A. 31 Completed prerequisites (recipe i x 1), then open
     // recipe-31 reservations of 100 units up to 255 records.
@@ -530,7 +572,7 @@ async fn res_1_gas_at_max_state() {
         "preview at 255 records, 224 open (as a transaction)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     // #256: 224 open records in the envelope, no prune (v1.0.0's worst case).
     let (id, r) = submit_open(&actor, &lock, &mut reference, expires_at, now, &mut curve).await;
@@ -539,7 +581,7 @@ async fn res_1_gas_at_max_state() {
         "submit #256 (224 open records, no prune)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     // #257: the oldest record (id 0) is Completed, so this submit prunes it.
     let (id, r) = submit_open(&actor, &lock, &mut reference, expires_at, now, &mut curve).await;
@@ -551,7 +593,7 @@ async fn res_1_gas_at_max_state() {
         "submit #257 (225 open records, prunes id 0)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     assert_eq!(pool(&lock).await, reference, "after the first prune");
     while reference.first_id < 30 {
@@ -563,7 +605,7 @@ async fn res_1_gas_at_max_state() {
         "submit #287 (255 open records, prunes the last Completed record)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     assert_eq!(open_count(&reference), 256);
     assert_eq!(pool(&lock).await, reference, "256 open records");
@@ -585,14 +627,14 @@ async fn res_1_gas_at_max_state() {
         "submit #288 (rejected Full: the oldest record is open)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     assert_eq!(pool(&lock).await, reference, "after Full");
 
     // Reads.
     let r = ok(&actor, lock.id(), "get_pool", json!({})).await;
     let json_len = r.clone().into_result().unwrap().raw_bytes().unwrap().len();
-    let get_pool_tx = gas.add("get_pool (as a transaction)", &r, &pool_on, None);
+    let get_pool_tx = gas.add("get_pool (as a transaction)", &r, &pool_on, &[]);
     let r = ok(
         &actor,
         lock.id(),
@@ -609,7 +651,7 @@ async fn res_1_gas_at_max_state() {
         "get_commitments(0, 1000) -> ids 31..80 (as a transaction)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     let state_bytes = raw_state(&worker, lock.id())
         .await
@@ -626,7 +668,7 @@ async fn res_1_gas_at_max_state() {
             &format!("set_paused({paused}), 256 open records"),
             &r,
             &pool_on,
-            None,
+            &[],
         );
     }
     let r = ok(
@@ -645,7 +687,7 @@ async fn res_1_gas_at_max_state() {
         "observe (restates the values), 256 open records",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     // cancel the oldest record: its release is checked against 255 other open records.
     let r = ok(&actor, lock.id(), "cancel", json!({ "id": 31 })).await;
@@ -654,7 +696,7 @@ async fn res_1_gas_at_max_state() {
         "cancel (release; 255 other open records)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     let (id, r) = submit_open(&actor, &lock, &mut reference, expires_at, now, &mut curve).await;
     assert_eq!(
@@ -665,7 +707,7 @@ async fn res_1_gas_at_max_state() {
         "submit #288 after the cancel (255 open records, prunes id 31)",
         &r,
         &pool_on,
-        None,
+        &[],
     );
     assert_eq!(pool(&lock).await, reference, "256 open records again");
 
@@ -703,7 +745,7 @@ async fn res_1_gas_at_max_state() {
         &format!("dispatch #{ra} with {min_dispatch} Tgas prepaid (the minimum)"),
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     minimum.push(json!({
         "call": "dispatch", "state": "pool 256 records, all open (Reserved); executor 31 jobs",
@@ -735,7 +777,7 @@ async fn res_1_gas_at_max_state() {
         &format!("dispatch #{rb} with 300 Tgas after failed low-gas attempts"),
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let r = tx_gas(
         &actor,
@@ -757,7 +799,7 @@ async fn res_1_gas_at_max_state() {
         &format!("dispatch #{rc} with {min_dispatch} Tgas prepaid (the minimum, again)"),
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
 
     let (min_reconcile, r) = min_prepaid(
@@ -784,7 +826,7 @@ async fn res_1_gas_at_max_state() {
         &format!("reconcile #{ra} with {min_reconcile} Tgas prepaid (the minimum)"),
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     minimum.push(json!({
         "call": "reconcile", "state": "pool 256 records, all open, record Active; executor 3 jobs",
@@ -806,7 +848,7 @@ async fn res_1_gas_at_max_state() {
         "dispatch, execute returns cancelled, on_result releases (255 other open records)",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     // on_result for a failed execute: Unknown.
     let _ = ok(&owner, exec.id(), "set_mode", json!({ "mode": "panic" })).await;
@@ -818,7 +860,7 @@ async fn res_1_gas_at_max_state() {
         "dispatch, execute fails, on_result marks Unknown",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let _ = ok(&owner, exec.id(), "set_mode", json!({ "mode": "normal" })).await;
 
@@ -852,12 +894,16 @@ async fn res_1_gas_at_max_state() {
     .await;
     reference.settle(&x, 283, false).unwrap();
     assert_eq!(pool(&lock).await, reference, "after confirm at the minimum");
+    // The executor's receipts (its call, then on_settled), then the lock's settle.
     let exec_first = [(exec.id(), "exec"), (lock.id(), "pool")];
-    gas.add(&format!("confirm_not_executed with {min_confirm} Tgas prepaid (the minimum) -> notify settle(false) [40 Tgas]"), &r, &exec_first, Some((1, 40 * TGAS)));
+    let notify_budgets = [(1, ON_SETTLED_TGAS * TGAS), (2, 40 * TGAS)];
+    gas.add(&format!("confirm_not_executed with {min_confirm} Tgas prepaid (the minimum) -> settle(false) [40 Tgas], on_settled [10 Tgas]"), &r, &exec_first, &notify_budgets);
+    let on_settled_after_confirm = on_settled("confirm 283", &r, exec.id(), lock.id(), true);
     minimum.push(json!({
         "call": "confirm_not_executed (executor)", "state": "executor 254 jobs (255 after); pool 256 records, 254 open, the record Unknown",
         "min_prepaid_tgas": min_confirm, "fails_at_tgas": format!("40..={}", min_confirm - 1),
-        "static_gas_attached_tgas": "notify (pool.settle) 40", "first_receipt_burnt_tgas": tgas(receipts_on(&r, exec.id())[0].gas_burnt.as_gas()),
+        "static_gas_attached_tgas": "settle 40 + on_settled 10", "first_receipt_burnt_tgas": tgas(receipts_on(&r, exec.id())[0].gas_burnt.as_gas()),
+        "on_settled_burnt_tgas": tgas(on_settled_after_confirm),
     }));
     // The 256th job.
     let last = 282u32;
@@ -869,7 +915,7 @@ async fn res_1_gas_at_max_state() {
         "dispatch at the retention bound (exec.execute: 255 jobs -> 256)",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let execute_256 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
     assert!(execute_256 < 30 * TGAS);
@@ -892,7 +938,7 @@ async fn res_1_gas_at_max_state() {
         "reconcile at the retention bound (exec.status: 256 jobs, the job is last)",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let status_256 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
     assert!(status_256 < 10 * TGAS);
@@ -913,12 +959,14 @@ async fn res_1_gas_at_max_state() {
     .await;
     reference.settle(&x, last, true).unwrap();
     assert_eq!(pool(&lock).await, reference, "after finish at the minimum");
-    gas.add(&format!("finish at the retention bound with {min_finish} Tgas prepaid (the minimum) -> notify settle(true) [40 Tgas]"), &r, &exec_first, Some((1, 40 * TGAS)));
+    gas.add(&format!("finish at the retention bound with {min_finish} Tgas prepaid (the minimum) -> settle(true) [40 Tgas], on_settled [10 Tgas]"), &r, &exec_first, &notify_budgets);
     let finish_256 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
+    let on_settled_256 = on_settled("finish 282", &r, exec.id(), lock.id(), true);
     minimum.push(json!({
         "call": "finish (executor)", "state": "executor 256 jobs (the last job); pool 256 records, 253 open",
         "min_prepaid_tgas": min_finish, "fails_at_tgas": format!("40..={}", min_finish - 1),
-        "static_gas_attached_tgas": "notify (pool.settle) 40", "first_receipt_burnt_tgas": tgas(finish_256),
+        "static_gas_attached_tgas": "settle 40 + on_settled 10", "first_receipt_burnt_tgas": tgas(finish_256),
+        "on_settled_burnt_tgas": tgas(on_settled_256),
     }));
     // settle both ways by the executor key.
     for (id, completed) in [(100u32, true), (101u32, false)] {
@@ -934,7 +982,7 @@ async fn res_1_gas_at_max_state() {
             &format!("settle({completed}) by the executor key (about 250 other open records)"),
             &r,
             &pool_on,
-            None,
+            &[],
         );
     }
     assert_eq!(pool(&lock).await, reference, "256 jobs, final");
@@ -944,13 +992,19 @@ async fn res_1_gas_at_max_state() {
         .map(Vec::len)
         .unwrap();
 
-    // ---- F. The executor at its job cap (512). The operator confirms the
-    // 256 ids 289..=544, above the newest executed id (287), that the lock has
-    // not assigned yet. Each confirmation adds a "cancelled" job; its notify
-    // fails NotFound on the lock, which changes nothing there. (Honest use
-    // reaches this state only through 256 dispatches whose execute failed,
-    // each confirmed by the operator; the executor's work is the same.)
-    let mut confirm_512 = 0;
+    // ---- F. The executor at its job cap (512), the largest state it can
+    // reach. An accepted confirmation moves the executor's newest id (its
+    // on_settled), so honest use no longer gets here: only confirmations the
+    // lock refuses (operator error) or confirmations whose on_settled has not
+    // run yet do, and the executor's work is the same either way, so this
+    // bounds every reachable state. The cheapest route: the operator confirms
+    // the 256 ids 289..=544, above the newest id (287), that the lock has not
+    // assigned. Each adds a "cancelled" job; its settle fails NotFound on the
+    // lock, which changes nothing there, and its on_settled takes the refused
+    // branch. The final state, 256 jobs at or below the newest id and 256
+    // refused jobs above it, is the operator-error case of docs/api.md's
+    // executor protocol.
+    let (mut confirm_512, mut on_settled_refused) = (0, 0);
     for id in 289..=544u32 {
         let r = tx(
             &owner,
@@ -959,21 +1013,13 @@ async fn res_1_gas_at_max_state() {
             json!({ "id": id, "recipe": 31, "units": 100 }),
         )
         .await;
-        let (on_exec, on_lock) = (receipts_on(&r, exec.id()), receipts_on(&r, lock.id()));
-        assert!(
-            on_exec.len() == 1 && on_exec[0].is_success(),
-            "confirm {id}: {:?}",
-            r.failures()
-        );
-        assert!(
-            on_lock.len() == 1 && on_lock[0].is_failure(),
-            "confirm {id}: the lock's settle should fail"
-        );
+        let g = on_settled(&format!("confirm {id}"), &r, exec.id(), lock.id(), false);
+        on_settled_refused = on_settled_refused.max(g);
         let text = format!("{:?}", r.clone().into_result().unwrap_err());
         assert!(text.contains("NotFound"), "confirm {id}: {text}");
         if id == 544 {
-            confirm_512 = on_exec[0].gas_burnt.as_gas();
-            gas.add("confirm_not_executed of an unassigned id, 511 jobs -> 512 (the lock's settle fails NotFound)", &r, &exec_first, None);
+            confirm_512 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
+            gas.add("confirm_not_executed of an unassigned id, 511 jobs -> 512 (the lock's settle fails NotFound; on_settled changes nothing)", &r, &exec_first, &notify_budgets);
         }
     }
     assert_eq!(jobs(&exec).await.len(), 512);
@@ -1013,7 +1059,7 @@ async fn res_1_gas_at_max_state() {
         "reconcile at the job cap (exec.status: 512 jobs)",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let status_512 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
     assert!(status_512 < 10 * TGAS);
@@ -1035,12 +1081,16 @@ async fn res_1_gas_at_max_state() {
     .await;
     reference.settle(&x, 281, true).unwrap();
     assert_eq!(pool(&lock).await, reference, "after finish at the job cap");
-    gas.add(&format!("finish at the job cap with {min_finish_512} Tgas prepaid (the minimum) -> notify settle(true) [40 Tgas]"), &r, &exec_first, Some((1, 40 * TGAS)));
+    gas.add(&format!("finish at the job cap with {min_finish_512} Tgas prepaid (the minimum) -> settle(true) [40 Tgas], on_settled [10 Tgas]"), &r, &exec_first, &notify_budgets);
     let finish_512 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
+    // Accepted: on_settled scans and rewrites all 512 jobs.
+    let on_settled_512 = on_settled("finish 281", &r, exec.id(), lock.id(), true);
+    assert_eq!(jobs(&exec).await.len(), 512, "finish 281 forgot nothing");
     minimum.push(json!({
         "call": "finish (executor) at the job cap", "state": "executor 512 jobs; pool 256 records, 251 open",
         "min_prepaid_tgas": min_finish_512, "fails_at_tgas": format!("40..={}", min_finish_512 - 1),
-        "static_gas_attached_tgas": "notify (pool.settle) 40", "first_receipt_burnt_tgas": tgas(finish_512),
+        "static_gas_attached_tgas": "settle 40 + on_settled 10", "first_receipt_burnt_tgas": tgas(finish_512),
+        "on_settled_burnt_tgas": tgas(on_settled_512),
     }));
     // execute of a new id with 512 jobs: finish the front record (32), submit
     // (prunes it, id 288) and dispatch. execute forgets job 32 and adds 288.
@@ -1066,7 +1116,7 @@ async fn res_1_gas_at_max_state() {
         "dispatch at the job cap (exec.execute: 512 jobs, forgets id 32, adds 288)",
         &r,
         &both,
-        Some((1, 30 * TGAS)),
+        &[(1, 30 * TGAS)],
     );
     let execute_512 = receipts_on(&r, exec.id())[0].gas_burnt.as_gas();
     assert!(execute_512 < 30 * TGAS);
@@ -1079,6 +1129,24 @@ async fn res_1_gas_at_max_state() {
     assert!(!ids.contains(&32) && ids.contains(&288));
     assert_eq!(pool(&lock).await, reference, "final");
 
+    let on_settled_max = [
+        on_settled_after_confirm,
+        on_settled_256,
+        on_settled_512,
+        on_settled_refused,
+    ]
+    .into_iter()
+    .max()
+    .unwrap();
+    let on_settled_margin = ON_SETTLED_TGAS * TGAS - on_settled_max;
+    eprintln!(
+        "RES-1 on_settled: after confirm {}, at 256 jobs {}, at 512 jobs {}, refused (max) {}; margin {} of {ON_SETTLED_TGAS} Tgas",
+        tgas(on_settled_after_confirm),
+        tgas(on_settled_256),
+        tgas(on_settled_512),
+        tgas(on_settled_refused),
+        tgas(on_settled_margin)
+    );
     let worst = gas
         .rows
         .iter()
@@ -1147,6 +1215,10 @@ async fn res_1_gas_at_max_state() {
             "execute_256th_tgas": tgas(execute_256), "status_at_256_tgas": tgas(status_256), "finish_last_of_256_tgas": tgas(finish_256),
             "confirm_511_to_512_tgas": tgas(confirm_512), "status_at_512_tgas": tgas(status_512), "finish_at_512_tgas": tgas(finish_512),
             "finish_min_prepaid_at_512_tgas": min_finish_512, "execute_at_512_tgas": tgas(execute_512),
+            "confirm_min_prepaid_tgas": min_confirm, "finish_min_prepaid_at_256_tgas": min_finish,
+            "on_settled_after_confirm_tgas": tgas(on_settled_after_confirm), "on_settled_at_256_tgas": tgas(on_settled_256),
+            "on_settled_at_512_tgas": tgas(on_settled_512), "on_settled_refused_tgas": tgas(on_settled_refused),
+            "on_settled_attached_tgas": ON_SETTLED_TGAS, "on_settled_margin_tgas": tgas(on_settled_margin),
         },
         "calls": gas.rows,
         "submit_gas_by_submit": curve_rows,
