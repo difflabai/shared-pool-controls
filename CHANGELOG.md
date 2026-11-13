@@ -75,9 +75,11 @@ unit tests, seeded random tests and the sandbox suite.
   `Arithmetic` from `VERSION_CAP` (u32::MAX - 768). `preview` reports it too.
 - Executor retention. The synthetic executor forgets a job once the newest
   id the lock has vouched for is 256 or more past its id. That newest id is
-  the largest one the lock has sent to `execute`, or whose `settle` (from
-  `finish` or `confirm_not_executed`) it accepted, recorded by a new private
-  callback `on_settled`; both methods still return the lock's result.
+  the largest one for which the lock's `execute` created a job, or whose
+  `settle` (from `finish` or `confirm_not_executed`) the lock accepted,
+  recorded by a new private callback `on_settled`; both methods still
+  return the lock's result. An `execute` of an id that already has a job
+  moves nothing.
   Forgotten id: `execute` returns `"cancelled"`, `confirm_not_executed`
   fails `stale id`, `finish` fails `unknown job`. At most 256 jobs have ids
   at or below the newest id, so honest use holds 256 jobs plus
@@ -117,7 +119,8 @@ unit tests, seeded random tests and the sandbox suite.
 - [docs/api.md](docs/api.md) has a gas table, measured on the v1.1.0 Wasm at
   a maximum-size state by `crates/sandbox/tests/res1.rs` (ignored by
   default; run it with `--ignored`). Executor `finish` and
-  `confirm_not_executed` need 70 Tgas (least measured 56).
+  `confirm_not_executed` need 70 Tgas (least measured 55; 56 for `finish`
+  with 512 jobs).
 - [docs/verification-findings.md](docs/verification-findings.md) gives each
   finding's status.
 

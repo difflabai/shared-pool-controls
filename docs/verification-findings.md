@@ -294,9 +294,9 @@ executor's report once it is dispatched (F-1's fix makes each of these
 calls succeed). Until a dispatched oldest record's executor reports,
 submit stays `Full`, even if the other 255 records are terminal.
 Prerequisites count completed units over the pool's life. The executor
-forgets jobs once the newest id the lock has sent it or accepted a settle
-for is 256 or more past them, and holds at most 512 jobs. Honest
-confirmations no longer fill that cap (`4d69f19`);
+forgets jobs once the newest id for which the lock's `execute` created a
+job or the lock accepted a settle is 256 or more past them, and holds at
+most 512 jobs. Honest confirmations no longer fill that cap (`4d69f19`);
 [api.md](api.md#executor-protocol) says when refused confirmations can.
 Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
 `f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract
@@ -623,10 +623,11 @@ to 254 for the executor calls. The test is now
 `crates/sandbox/tests/res1.rs` (ignored by default; it takes about eight
 minutes). The minimums for `dispatch` (70 Tgas) and `reconcile` (46) are
 the same as above. Executor `finish` and `confirm_not_executed` need 55
-Tgas, and `finish` with the executor at its 512-job cap 56: they now also
-attach 10 Tgas to the executor's `on_settled` (`4d69f19`). Before that
-change both needed 43, and `finish` at the cap 44. The largest single
-receipt is a `submit` with 255 open records, at 14.81 Tgas.
+Tgas (`confirm_not_executed` swept with 254 jobs), and `finish` with the
+executor at its 512-job cap 56: they now also attach 10 Tgas to the
+executor's `on_settled` (`4d69f19`). Before that change both needed 43,
+and `finish` at the cap 44. The largest single receipt is a `submit`
+with 255 open records, at 14.81 Tgas.
 
 ## Observation (not a finding)
 
