@@ -614,10 +614,12 @@ retained records. The open records differ from the v1.0.0 sweep above
 (225 of 256): all 256 were open for `dispatch` and `reconcile`, and 251
 to 254 for the executor calls. The test is now
 `crates/sandbox/tests/res1.rs` (ignored by default; it takes about eight
-minutes). The minimums for `dispatch` (70 Tgas), `reconcile` (46) and
-executor `finish` (43) are the same as above; `confirm_not_executed` also
-needs 43. With the executor at its 512-job cap, `finish` needs 44. The
-largest single receipt is a `submit` with 255 open records, at 14.81 Tgas.
+minutes). The minimums for `dispatch` (70 Tgas) and `reconcile` (46) are
+the same as above. Executor `finish` and `confirm_not_executed` need 55
+Tgas, and `finish` with the executor at its 512-job cap 56: they now also
+attach 10 Tgas to the executor's `on_settled` (`4d69f19`). Before that
+change both needed 43, and `finish` at the cap 44. The largest single
+receipt is a `submit` with 255 open records, at 14.81 Tgas.
 
 ## Observation (not a finding)
 

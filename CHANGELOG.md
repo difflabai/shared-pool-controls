@@ -106,7 +106,8 @@ unit tests, seeded random tests and the sandbox suite.
   keep a deposit sent with a transaction.
 - [docs/api.md](docs/api.md) has a gas table, measured on the v1.1.0 Wasm at
   a maximum-size state by `crates/sandbox/tests/res1.rs` (ignored by
-  default; run it with `--ignored`).
+  default; run it with `--ignored`). Executor `finish` and
+  `confirm_not_executed` need 70 Tgas (least measured 56).
 - [docs/verification-findings.md](docs/verification-findings.md) gives each
   finding's status.
 
