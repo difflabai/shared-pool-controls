@@ -292,13 +292,16 @@ executor's report once it is dispatched (F-1's fix makes each of these
 calls succeed). Until a dispatched oldest record's executor reports,
 submit stays `Full`, even if the other 255 records are terminal.
 Prerequisites count completed units over the pool's life. The executor
-forgets jobs 256 ids behind the newest it has executed and holds at most
-512 jobs; [api.md](api.md#executor-protocol) says when that cap can block
-the operator's confirmations. Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
+forgets jobs once the newest id the lock has sent it or accepted a settle
+for is 256 or more past them, and holds at most 512 jobs. Honest
+confirmations no longer fill that cap (`4d69f19`);
+[api.md](api.md#executor-protocol) says when refused confirmations can.
+Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
 `f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract
-and executor `f3_*` tests, and the sandbox test
-`window_of_300_records_through_the_executor`. Formal re-verification
-pending.
+and executor `f3_*` tests, the executor `d1_*` tests, and the sandbox
+tests `window_of_300_records_through_the_executor` and
+`confirmed_failed_executes_keep_the_executor_at_256_jobs`. Formal
+re-verification pending.
 
 **What happens.** Records are never deleted (spec:54: `observe` does not
 delete history), and `submit` fails `Full` at 256 records. A submit followed
@@ -522,9 +525,10 @@ outgoing calls carry 0, so the contract keeps the deposit.
 **Status.** Fixed in v1.1.0 (`3598902`). Both contracts create promises
 with `promise_create`, `promise_then` and `promise_return` instead of
 near-sdk's `Promise`. The 15 imports are gone: the contract imports 18 host
-functions and the executor 13. `scripts/build.sh` fails if a Wasm imports a
-host function for any action other than a function call, or any import
-that is not on its list of those 18 and 13.
+functions and the executor 16 (13 until its `on_settled` callback,
+`4d69f19`). `scripts/build.sh` fails if a Wasm imports a host function for
+any action other than a function call, or any import that is not on its
+list of those 18 and 16.
 
 **What happens.** Both contracts, in both builds, import 15 host functions
 that create or delete accounts, deploy code (including global contracts),

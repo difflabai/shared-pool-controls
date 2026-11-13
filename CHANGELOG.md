@@ -71,23 +71,31 @@ unit tests, seeded random tests and the sandbox suite.
   Dispatched, Active and Unknown records still fail `Pending`.
 - Version reserve: submit, dispatch, `set_paused` and `observe` fail
   `Arithmetic` from `VERSION_CAP` (u32::MAX - 768). `preview` reports it too.
-- Executor retention. The synthetic executor forgets a job once its id is 256
-  or more behind the newest id it has executed. `execute` of a forgotten id
-  returns `"cancelled"`, `confirm_not_executed` of one fails `stale id`, and
-  the job cap is 512 (v1.0.0: 256 jobs over the executor's life). The cap is
-  reached only after 256 or more operator confirmations of ids above the
-  newest executed id. At the cap `confirm_not_executed` fails `full`, even
-  for a record the lock still holds. If executes keep failing, the lock can
-  then stay at `Full` until the executor account itself signs a `settle`.
-  [docs/api.md](docs/api.md#executor-protocol) gives the details.
+- Executor retention. The synthetic executor forgets a job once the newest
+  id the lock has vouched for is 256 or more past its id. That newest id is
+  the largest one the lock has sent to `execute`, or whose `settle` (from
+  `finish` or `confirm_not_executed`) it accepted, recorded by a new private
+  callback `on_settled`; both methods still return the lock's result.
+  Forgotten id: `execute` returns `"cancelled"`, `confirm_not_executed`
+  fails `stale id`, `finish` fails `unknown job`. At most 256 jobs have ids
+  at or below the newest id, so honest use holds 256 jobs plus
+  confirmations in flight. The cap is 512 (v1.0.0: 256 over the executor's
+  life). It is reached only with at least 256 jobs above the newest id
+  (more if fewer sit at or below it): confirmations the lock refused, which
+  keep their jobs (a typo of a far id for good), or confirmations whose
+  callback has not run. At the cap `confirm_not_executed` fails `full`, and
+  if executes keep failing the lock can stay at `Full`
+  ([docs/api.md](docs/api.md#executor-protocol)).
 - Wasm import surface (NT-F3). Both contracts create promises with
   `promise_create`, `promise_then` and `promise_return` instead of near-sdk's
   `Promise`. The 15 host imports for accounts, deploys, keys, transfers and
   staking are gone, and `scripts/build.sh` fails if one comes back. It also
   fails on any import that is not on its list of the current 18 contract and
-  13 executor imports.
-  `dispatch`, `reconcile`, `finish` and `confirm_not_executed` return `()` in
-  Rust; on chain the result is still the callback's.
+  16 executor imports (the executor's `on_settled` reads the lock's `settle`
+  result). `dispatch`, `reconcile`, `finish` and `confirm_not_executed`
+  return `()` in Rust; on chain the result is still that of the promise each
+  returns: `on_result` for `dispatch` and `reconcile`, the lock's `settle`
+  for `finish` and `confirm_not_executed`.
 - Build: `scripts/build.sh` sets `RUSTFLAGS="--cfg near"`, and
   `artifacts/build.json` records the flags and each Wasm's imports.
 - `on_result` logs a result for an id with no record (`error: "NotFound"`)
