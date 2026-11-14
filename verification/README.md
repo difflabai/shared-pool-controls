@@ -38,10 +38,17 @@ The files are unchanged from formalver, so their paths still assume formalver's 
 Nothing here runs in this repository's CI yet, and the root Cargo workspace does not include these
 crates. Follow-ups to make it run here:
 
-1. Rewrite the paths above (90 of the copied files refer to `source-mirror`).
-2. Replace the submodule pin (`tools/scripts/check-pin.sh`) with a check against this repository's
-   own commit, and decide how the Kani record's fingerprint should treat contract changes: inside this
-   repository, any change to the contract makes the record stale.
+1. Rewrite the paths above (90 of the copied files refer to `source-mirror`), unless follow-up 2
+   restores formalver's layout.
+2. Keep the Kani record valid. `tools/scripts/check-kani-record.py` (lines 95-104) fingerprints
+   paths under `projects/shared-pool/`, including the `source-mirror` gitlink, so the record does not
+   match at `verification/`, and a path rewrite would not fix that. There are two ways to keep it:
+   - Restore formalver's layout: `projects/shared-pool/`, with `source-mirror` as a submodule of this
+     repository pinned at `57b3f02`. A trial extraction in that layout kept the record's fingerprint.
+   - Re-run the 48 large harnesses. The current record took about 7 hours on a 64 GB Mac.
+
+   Either way, replace the submodule pin check (`tools/scripts/check-pin.sh`). Inside this repository,
+   any change to the contract makes the record stale.
 3. Check the verification crates' toolchains against the root `rust-toolchain.toml`. The crates
    (`kani`, `conformance`, `near-tests`, `sandbox` with `sandbox/relay`) already declare their own
    `[workspace]`, so the root workspace leaves them alone.
