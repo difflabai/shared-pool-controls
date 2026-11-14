@@ -42,8 +42,11 @@ paragraphs below cite results as that section reports them. In this
 repository the findings are checked by the regression tests in
 `crates/core/src/findings.rs` (the v1.0.0 reproducers, rewritten for
 v1.1.0) and by the unit, build and sandbox tests that v1.1.0 added. The
-TLC, Lean, Prolog, shell and sandbox results of the verification project
-were not re-run for this page, and none of them covers v1.1.0.
+findings and the Evidence paragraphs below come from the v1.0.0 verification
+(PR #31). The v1.1.0 fixes are covered by the separate
+[v1.1.0 verification](https://github.com/difflabai/formalver/pull/32), which
+targets source revision `57b3f02`. The TLC, Lean, Prolog, shell and sandbox
+results cited on this page were not re-run for it.
 
 ## How the findings were found
 
