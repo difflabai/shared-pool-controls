@@ -9,8 +9,9 @@ All notable changes to this project are listed here. The format follows
 This release fixes the findings of an outside verification of v1.0.0. They are
 described in [docs/verification-findings.md](docs/verification-findings.md).
 The formal results there (TLA+, Lean, Prolog, conformance traces) apply to
-v1.0.0. v1.1.0 has not been formally re-verified. Its fixes are covered by
-unit tests, seeded random tests and the sandbox suite.
+v1.0.0. The v1.1.0 fixes are covered by unit tests, seeded random tests, the
+sandbox suite and the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32)
+(source revision `57b3f02`).
 
 ### Fixed
 

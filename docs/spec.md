@@ -1,6 +1,6 @@
 # Core specification
 
-This document describes v1.1.0 of the implemented prototype. It is not a claim of completed formal verification. An outside verification checked v1.0.0; v1.1.0 fixes its findings and has not been re-verified ([verification findings](verification-findings.md), [changelog](../CHANGELOG.md)).
+This document describes v1.1.0 of the implemented prototype. An outside verification checked v1.0.0 and found issues; v1.1.0 fixes them and is covered by a [formal verification](https://github.com/difflabai/formalver/pull/32) of source revision `57b3f02`. Its proofs have stated scopes and assumptions ([verification findings](verification-findings.md), [changelog](../CHANGELOG.md)).
 
 ## State and identity
 

@@ -1,6 +1,6 @@
 # Security and scope
 
-This is an unaudited, not-formally-verified prototype. Do not treat synthetic credits or risk coefficients as a live financial system.
+This is an unaudited prototype. Its v1.1.0 source (`57b3f02`) has been through [multi-level formal verification](https://github.com/difflabai/formalver/pull/32); the proofs have stated scopes and assumptions. Do not treat synthetic credits or risk coefficients as a live financial system.
 
 Trust assumptions: immutable configuration is honestly designed; registered executor/operator truthfully reports execution; the owner truthfully reports observed values; NEAR runtime/SDK behavior is correct; the deployment account's upgrade authority is controlled. The lock cannot stop external actions using bypass credentials.
 

@@ -9,8 +9,8 @@ owner may remain a recipe's executor. The repository owner also accepted
 the record window (F-3) and the stricter admission (F-1, F-2). Each
 finding has a **Status** line with the fixing commit and the tests that
 check the fix; [CHANGELOG.md](../CHANGELOG.md) lists the changes. The
-formal results cited here apply to v1.0.0. v1.1.0 has not been formally
-re-verified: its fixes are checked by tests in this repository only. The
+formal results cited here apply to v1.0.0. The v1.1.0 fixes are checked by tests in
+this repository and by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32). The
 commit hashes on this page are commits of
 [PR #4](https://github.com/difflabai/shared-pool-controls/pull/4), which
 lists them.
@@ -65,8 +65,8 @@ The formalver project checked the code with several independent methods:
   runtime.
 - **Sandbox.** Both wasm files on a local near-workspaces chain, compared
   with the host core.
-- **Kani** (bounded model checking of the Rust core) is in progress. It has
-  produced no results yet.
+- **Kani** (bounded model checking of the Rust core) ran on v1.0.0 and, in the
+  v1.1.0 verification, on `57b3f02`.
 
 Nothing here is a proof about the Rust core or the NEAR shell. The Lean
 results hold for the transcription, and the TLC and MC-1 results hold
@@ -104,7 +104,7 @@ refused (`Bounds`). Every open record can now be resolved: a Reserved one
 by cancel, a dispatched one by its executor's report.
 Regression tests: `f1_hedge_that_cures_by_reservation_is_refused`,
 `f1_recovery_by_completion_is_admitted_and_live`, `live_all_on_random_runs`.
-Formal re-verification pending.
+Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** An `observe` puts metric 0 at 12, above its max of 10.
 The recovery rule (spec:21, spec:23) admits a hedge that reserves −2 on
@@ -175,8 +175,7 @@ the position open, 8- and 7-unit hedges are refused and 6 units are
 admitted. After the hedge completes, the position can still be released by
 `settle(false)` or `cancel`. Regression tests:
 `f2_hedge_cannot_rely_on_an_unexecuted_position`,
-`f2_reserved_position_can_always_be_cancelled`. Formal re-verification
-pending.
+`f2_reserved_position_can_always_be_cancelled`. Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** There is no `observe`, and every metric is in bounds. A
 credit position (recipe 0, 1 unit) reserves +20 selloff loss: 60 becomes
@@ -252,7 +251,7 @@ settle(executor, 0, true)                     Ok
 **Status.** Fixed in v1.1.0 (`59e404f`). The release is inside the
 admission interval, so b x 100 fails `Arithmetic` at admission and b x 66
 is admitted; after b completes, a can be cancelled. Regression test:
-`f2b_release_stays_in_the_value_range`. Formal re-verification pending.
+`f2b_release_stays_in_the_value_range`. Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** A release subtracts the reservation
 (`values - reserve * units`), and nothing bounds that result in advance. If
@@ -302,8 +301,7 @@ Regression tests: `f3_window_frees_terminal_records_and_keeps_ids`,
 `f3_prerequisites_survive_pruning`, `window_on_random_runs`, the contract
 and executor `f3_*` tests, the executor `d1_*` tests, and the sandbox
 tests `window_of_300_records_through_the_executor` and
-`confirmed_failed_executes_keep_the_executor_at_256_jobs`. Formal
-re-verification pending.
+`confirmed_failed_executes_keep_the_executor_at_256_jobs`. Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** Records are never deleted (spec:54: `observe` does not
 delete history), and `submit` fails `Full` at 256 records. A submit followed
@@ -340,7 +338,7 @@ actor is its executor (`InvalidConfig`), so both mutations below are
 refused. The owner may be a recipe's actor, or its executor, when the
 other role is a different account: the repository owner decided to allow
 it. This is the owner's decision, not an open question. Regression test:
-`f4_actor_cannot_be_its_own_executor`. Formal re-verification pending.
+`f4_actor_cannot_be_its_own_executor`. Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** `Config::validate` does not compare a recipe's actor with
 its executor or with the owner. A recipe with actor = executor, or with
@@ -382,7 +380,7 @@ and at most 256 records are open. At the cap a paused pool stays paused,
 and its open records still settle. Regression tests:
 `f5_open_records_resolve_above_the_version_cap`,
 `f5_paused_pool_at_the_cap_still_settles`, `f5_reserve_is_exactly_enough`.
-Formal re-verification pending.
+Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** Every effective transition adds 1 to `version` with
 `checked_add`. At `version = u32::MAX` every transition fails `Arithmetic`:
@@ -434,8 +432,7 @@ observe(owner, [0, 0, 0, 0, 0])                         Arithmetic
 **Status.** Fixed in v1.1.0 (`3eaf1cb`). The owner can restate the current
 values at any time, which renews the snapshot timestamp. New values still
 need every record terminal. Regression test:
-`f6_owner_refreshes_the_snapshot_with_records_open`. Formal re-verification
-pending.
+`f6_owner_refreshes_the_snapshot_with_records_open`. Re-checked by the [v1.1.0 verification](https://github.com/difflabai/formalver/pull/32).
 
 **What happens.** With `max_age_seconds > 0`, `submit` and `dispatch` need
 a snapshot no older than `max_age_seconds` (spec:19, spec:37). Only
