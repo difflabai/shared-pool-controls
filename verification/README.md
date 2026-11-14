@@ -38,17 +38,19 @@ The files are unchanged from formalver, so their paths still assume formalver's 
 Nothing here runs in this repository's CI yet, and the root Cargo workspace does not include these
 crates. Follow-ups to make it run here:
 
-1. Rewrite the paths above (about 85 files refer to `source-mirror`).
+1. Rewrite the paths above (90 of the copied files refer to `source-mirror`).
 2. Replace the submodule pin (`tools/scripts/check-pin.sh`) with a check against this repository's
    own commit, and decide how the Kani record's fingerprint should treat contract changes: inside this
    repository, any change to the contract makes the record stale.
-3. Exclude `verification/` from the root workspace (or give each crate its own `[workspace]`), and
-   check the crates' toolchains against `rust-toolchain.toml`.
+3. Check the verification crates' toolchains against the root `rust-toolchain.toml`. The crates
+   (`kani`, `conformance`, `near-tests`, `sandbox` with `sandbox/relay`) already declare their own
+   `[workspace]`, so the root workspace leaves them alone.
 4. Move `ci/shared-pool.yml` into `.github/workflows/`, limited by `paths:` filters (a full run takes
    about 48 minutes), and set `vars.CI_RUNNER` / `vars.KANI_RUNNER` if self-hosted runners are used.
 
 ## History
 
+The root `README.md` and `docs/verification-handoff.md` point here as well as to formalver.
 The commit history, review threads and CI runs stay in formalver: PR #31 (v1.0.0 verification) and
 PR #32 (v1.1.0 re-verification). The v1.0.0 findings, their fixes in this repository's PR #4, and the
 regression evidence (fails on v1.0.0, passes on v1.1.0) are recorded in `status.toml` and
