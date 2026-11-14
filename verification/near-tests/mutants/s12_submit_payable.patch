@@ -1,0 +1,14 @@
+Mutant s12_submit_payable: SH-10: submit accepts an attached deposit.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -66,6 +66,7 @@
+     pub fn preview(&self, actor: AccountId, request: Request) -> Decision {
+         self.pool.preview(actor.as_str(), &request, now())
+     }
++    #[payable]
+     pub fn submit(&mut self, request: Request) -> Submission {
+         let decision = self.pool.preview(&caller(), &request, now());
+         let id = if decision.allowed {

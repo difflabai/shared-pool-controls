@@ -1,0 +1,13 @@
+# killed-by: h_step_cancel_tx
+# cancel: a Dispatched record can be cancelled (reservation released while in flight)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -467,7 +467,7 @@
+         if c.status == Status::Completed {
+             return Err(Error::InvalidState);
+         }
+-        if c.status != Status::Reserved {
++        if !matches!(c.status, Status::Reserved | Status::Dispatched) {
+             return Err(Error::Pending);
+         }
+         let _ = now;

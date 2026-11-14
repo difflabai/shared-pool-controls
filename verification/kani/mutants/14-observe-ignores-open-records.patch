@@ -1,0 +1,15 @@
+# killed-by: h_step_observe_tx
+# observe: no Pending check (a new baseline replaces the values under open
+# obligations)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -535,9 +535,6 @@
+         if caller != self.config.owner {
+             return Err(Error::Unauthorized);
+         }
+-        if values != self.values && self.records.iter().any(|c| open(&c.status)) {
+-            return Err(Error::Pending);
+-        }
+         if values.len() != self.values.len() || values.iter().any(|v| !bounded(*v)) {
+             return Err(Error::Bounds);
+         }

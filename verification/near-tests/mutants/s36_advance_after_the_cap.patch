@@ -1,0 +1,16 @@
+Mutant s36_advance_after_the_cap: EX-6: execute checks the cap before advance frees jobs.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -74,8 +74,8 @@
+             return "cancelled".into();
+         }
+         // The lock dispatched `id`, so it retains the record.
+-        self.advance(id);
+         assert!(self.jobs.len() < MAX_JOBS, "full");
++        self.advance(id);
+         assert_ne!(self.mode, "panic", "injected failure");
+         let status = if self.mode == "reject" {
+             "cancelled"

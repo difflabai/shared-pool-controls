@@ -1,0 +1,13 @@
+# checks: cap
+# FR-6. set_paused uses the plain bump (no cap).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -338,7 +338,7 @@
+                  IF cb # "Ok" THEN cb ELSE VerErr
+ 
+ PauseErr(c, b) ==
+-    IF c # cfg.owner THEN "Unauthorized" ELSE CapErr
++    IF c # cfg.owner THEN "Unauthorized" ELSE VerErr
+ 
+ \* observe (U:534-549): Pending only if the values change while a record is
+ \* open (restating the current values, a refresh, is Ok). energy(values)?

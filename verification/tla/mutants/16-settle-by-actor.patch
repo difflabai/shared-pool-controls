@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# settle authorizes the actor instead of the executor.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -326,7 +326,7 @@
+ 
+ SettleErr(c, id, done) ==
+     IF ~Found(id) THEN "NotFound"
+-    ELSE IF c # RecRcp(id).executor THEN "Unauthorized"
++    ELSE IF c # RecRcp(id).actor THEN "Unauthorized"
+     ELSE IF (done /\ Rec(id).status = "Completed") \/ (~done /\ Rec(id).status = "Cancelled")
+          THEN "Noop"
+     ELSE IF ~InFlight(Rec(id).status) THEN "InvalidState"

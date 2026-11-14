@@ -1,0 +1,15 @@
+Lean mutant 23-dispatch-plain-bump
+FR-6 (X H12): dispatch uses bump (checked_add) instead of bump_new, so it
+ignores VERSION_CAP (lib.rs 431; bump_new at 401-406).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -426,7 +426,7 @@
+    (.err .expired, decide (c.expiresAt ≤ now)),
+    (.err .snapshotExpired, snapshotOld cfg s now),
+    foundGuard s id] ++
+-  bumpNewGuards s
++  [verGuard s]
+ 
+ /-- `acknowledge`'s target status. -/
+ def ackStatus (accepted : Bool) : Status := if accepted then .active else .unknown

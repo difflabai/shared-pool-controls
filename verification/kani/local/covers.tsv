@@ -1,0 +1,1474 @@
+family	cover	status	harness
+h_init	init: Ok	SATISFIED	h_init
+h_init	init: InvalidConfig	SATISFIED	h_init
+h_validate	validate: Ok	SATISFIED	h_validate
+h_validate	validate: InvalidConfig with actor = executor (F-4 fixed)	SATISFIED	h_validate
+h_validate	validate: Ok with owner = executor (Q3)	SATISFIED	h_validate
+h_validate	validate: Ok with two requirements	SATISFIED	h_validate
+h_validate	validate: empty name	SATISFIED	h_validate
+h_validate	validate: no metrics	SATISFIED	h_validate
+h_validate	validate: no terms	SATISFIED	h_validate
+h_validate	validate: no recipes	SATISFIED	h_validate
+h_validate	validate: min > max	SATISFIED	h_validate
+h_validate	validate: duplicate requirement	SATISFIED	h_validate
+h_validate	validate: requirement not earlier	SATISFIED	h_validate
+h_energy	energy: large energy	SATISFIED	h_energy
+h_energy	energy: zero energy	SATISFIED	h_energy
+h_energy	energy: wrong length	SATISFIED	h_energy
+h_energy	energy: value out of range	SATISFIED	h_energy
+h_energy	energy: large energy	UNSATISFIABLE	h_energy_exact
+h_energy	energy: zero energy	UNSATISFIABLE	h_energy_exact
+h_energy	energy: wrong length	UNSATISFIABLE	h_energy_exact
+h_energy	energy: value out of range	UNSATISFIABLE	h_energy_exact
+h_energy_max	energy max: Ok	SATISFIED	h_energy_max
+h_preview	preview: allowed	SATISFIED	h_preview
+h_preview	preview: rejected with a candidate	SATISFIED	h_preview
+h_preview	preview: rejected without a candidate	SATISFIED	h_preview
+h_preview	preview: Energy	SATISFIED	h_preview
+h_preview	preview: Bounds	SATISFIED	h_preview
+h_preview	preview: Arithmetic at the cap	SATISFIED	h_preview
+h_preview	preview: allowed	UNSATISFIABLE	h_preview_post
+h_preview	preview: rejected with a candidate	UNSATISFIABLE	h_preview_post
+h_preview	preview: rejected without a candidate	UNSATISFIABLE	h_preview_post
+h_preview	preview: Energy	UNSATISFIABLE	h_preview_post
+h_preview	preview: Bounds	UNSATISFIABLE	h_preview_post
+h_preview	preview: Arithmetic at the cap	UNSATISFIABLE	h_preview_post
+h_live_all	live all: Reserved, cancelled by the owner	SATISFIED	h_live_all
+h_live_all	live all: Reserved, cancelled by the actor	SATISFIED	h_live_all
+h_live_all	live all: Dispatched, completed	SATISFIED	h_live_all
+h_live_all	live all: Dispatched, released	SATISFIED	h_live_all
+h_live_all	live all: Active, completed	SATISFIED	h_live_all
+h_live_all	live all: Active, released	SATISFIED	h_live_all
+h_live_all	live all: Unknown, completed	SATISFIED	h_live_all
+h_live_all	live all: Unknown, released	SATISFIED	h_live_all
+h_live_all	live all: a disturbed base (B > 0)	SATISFIED	h_live_all
+h_live_all	live all: at or above the cap	SATISFIED	h_live_all
+h_live_all	live all: with two other open records	SATISFIED	h_live_all
+h_live_all	live all: the F-2 shape (a Dispatched position released beside a Completed record, B = 0)	SATISFIED	h_live_all
+h_wedge	wedge: disturbed state, hedge admitted and dispatched	SATISFIED	h_wedge
+h_wedge	wedge: submit refused with Bounds after a disturbing observe	SATISFIED	h_wedge
+h_wedge	wedge: the dispatched hedge is released in a disturbed state	SATISFIED	h_wedge
+h_wedge_healthy	wedge healthy: the position releases (F-2 fixed)	SATISFIED	h_wedge_healthy
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_po
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_po
+h_slot_cycle	slot cycle: submit, cancel and submit again by the actor (F-3)	SATISFIED	h_slot_cycle_0
+h_slot_cycle	slot cycle: submit, cancel and submit again by the actor (F-3)	SATISFIED	h_slot_cycle_2
+h_full	full: Ok with prune	UNSATISFIABLE	h_full_255
+h_full	full: Ok with prune, prerequisite met by a pruned completion	UNSATISFIABLE	h_full_255
+h_full	full: Prerequisite with prune (completed_units kept)	UNSATISFIABLE	h_full_255
+h_full	full: Full at 256 records with an open front	UNSATISFIABLE	h_full_255
+h_full	full: Ok at 255 records	SATISFIED	h_full_255
+h_full	full: Ok at 255 records with an open front	SATISFIED	h_full_255
+h_full	full: Ok with prune	UNSATISFIABLE	h_full_256
+h_full	full: Ok with prune, prerequisite met by a pruned completion	UNSATISFIABLE	h_full_256
+h_full	full: Prerequisite with prune (completed_units kept)	UNSATISFIABLE	h_full_256
+h_full	full: Full at 256 records with an open front	SATISFIED	h_full_256
+h_full	full: Ok at 255 records	UNSATISFIABLE	h_full_256
+h_full	full: Ok at 255 records with an open front	UNSATISFIABLE	h_full_256
+h_full	full: Ok with prune	SATISFIED	h_full_256_prune
+h_full	full: Ok with prune, prerequisite met by a pruned completion	SATISFIED	h_full_256_prune
+h_full	full: Prerequisite with prune (completed_units kept)	SATISFIED	h_full_256_prune
+h_full	full: Full at 256 records with an open front	UNSATISFIABLE	h_full_256_prune
+h_full	full: Ok at 255 records	UNSATISFIABLE	h_full_256_prune
+h_full	full: Ok at 255 records with an open front	UNSATISFIABLE	h_full_256_prune
+h_version_cap	version cap: submit Arithmetic	SATISFIED	h_version_cap_submit
+h_version_cap	version cap: dispatch Arithmetic	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: pause Arithmetic	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: observe Arithmetic	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: ack Ok	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: cancel Ok (released)	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: settle Ok	UNSATISFIABLE	h_version_cap_submit
+h_version_cap	version cap: submit Arithmetic	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: dispatch Arithmetic	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: pause Arithmetic	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: observe Arithmetic	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: ack Ok	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: cancel Ok (released)	UNSATISFIABLE	h_version_cap_settle
+h_version_cap	version cap: settle Ok	SATISFIED	h_version_cap_settle
+h_wf	wf: NotFound (pruned id)	UNSATISFIABLE	h_wf_submit
+h_wf	wf: Ok on a record at first_id > 0	UNSATISFIABLE	h_wf_submit
+h_wf	wf submit: Arithmetic (id overflow)	SATISFIED	h_wf_submit
+h_wf	wf cancel: Bounds (release)	UNSATISFIABLE	h_wf_submit
+h_wf	wf cancel: Arithmetic (release)	UNSATISFIABLE	h_wf_submit
+h_wf	wf settle: Bounds	UNSATISFIABLE	h_wf_submit
+h_wf	wf settle(true): completed units saturate	UNSATISFIABLE	h_wf_submit
+h_wf	wf: NotFound (pruned id)	SATISFIED	h_wf_settle
+h_wf	wf: Ok on a record at first_id > 0	SATISFIED	h_wf_settle
+h_wf	wf submit: Arithmetic (id overflow)	UNSATISFIABLE	h_wf_settle
+h_wf	wf cancel: Bounds (release)	UNSATISFIABLE	h_wf_settle
+h_wf	wf cancel: Arithmetic (release)	UNSATISFIABLE	h_wf_settle
+h_wf	wf settle: Bounds	SATISFIED	h_wf_settle
+h_wf	wf settle(true): completed units saturate	SATISFIED	h_wf_settle
+h_bmc_from_init	bmc: a replayed request is rejected	SATISFIED	h_bmc_from_init_s_submit
+h_bmc_from_init	bmc: two accepted requests	SATISFIED	h_bmc_from_init_s_submit
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_dispatch
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_dispatch
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_ack
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_ack
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_cancel
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_cancel
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_settle
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_settle
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_pause
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_pause
+h_bmc_from_init	bmc: a replayed request is rejected	UNSATISFIABLE	h_bmc_from_init_s_observe
+h_bmc_from_init	bmc: two accepted requests	UNSATISFIABLE	h_bmc_from_init_s_observe
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_tx
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_tx
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_tx
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_tx
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_tx
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_tx
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_tx
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_tx
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_tx
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_tx
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_post
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_post
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_post
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_post
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_post
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_post
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_post
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_post
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_post
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_post
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_post
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_post
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_post
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_post
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_post
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_post
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_post
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_post
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_post
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_post
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_post
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_post
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_post
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_post
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_inv
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_inv
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_inv
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_inv
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_inv
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_inv
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_inv
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_inv
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_cov
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_cov
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_cov
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_cov
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_cov
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_cov
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_cov
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_cov
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_cov
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_cov
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_cov
+h_step	submit: Ok	SATISFIED	h_step_submit_cov
+h_step	submit: Ok in a violating state (recovery)	SATISFIED	h_step_submit_cov
+h_step	submit: Ok with 2 earlier records	SATISFIED	h_step_submit_cov
+h_step	submit: Prerequisite met by completed units	SATISFIED	h_step_submit_cov
+h_step	submit: Paused	SATISFIED	h_step_submit_cov
+h_step	submit: Stale	SATISFIED	h_step_submit_cov
+h_step	submit: Expired	SATISFIED	h_step_submit_cov
+h_step	submit: SnapshotExpired	SATISFIED	h_step_submit_cov
+h_step	submit: InvalidRecipe	SATISFIED	h_step_submit_cov
+h_step	submit: Unauthorized	SATISFIED	h_step_submit_cov
+h_step	submit: InvalidUnits	SATISFIED	h_step_submit_cov
+h_step	submit: Prerequisite	SATISFIED	h_step_submit_cov
+h_step	submit: Arithmetic (reserve)	SATISFIED	h_step_submit_cov
+h_step	submit: Arithmetic (envelope)	SATISFIED	h_step_submit_cov
+h_step	submit: Arithmetic (cap)	SATISFIED	h_step_submit_cov
+h_step	submit: Bounds	SATISFIED	h_step_submit_cov
+h_step	submit: Energy (increase)	SATISFIED	h_step_submit_cov
+h_step	submit: Energy (recovery rule)	SATISFIED	h_step_submit_cov
+h_step	observe: Ok	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_post
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_cancel_post
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_cancel_post
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_cancel_post
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: NotFound	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_cancel_post
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: Pending	UNSATISFIABLE	h_step_cancel_post
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_cancel_post
+h_step	ack: NotFound	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_cancel_post
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Ok	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Paused	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Stale	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Expired	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Bounds	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_cancel_post
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_cancel_post
+h_step	observe: Ok	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_cancel_inv
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_cancel_inv
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_cancel_inv
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: NotFound	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_cancel_inv
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: Pending	UNSATISFIABLE	h_step_cancel_inv
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_cancel_inv
+h_step	ack: NotFound	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_cancel_inv
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Ok	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Paused	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Stale	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Expired	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Bounds	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_cancel_inv
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_cancel_inv
+h_step	observe: Ok	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_cov
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_cancel_cov
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_cancel_cov
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_cancel_cov
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_cancel_cov
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: NotFound	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_cancel_cov
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_cancel_cov
+h_step	cancel: Ok (released)	SATISFIED	h_step_cancel_cov
+h_step	cancel: Ok released after a disturbing observe	SATISFIED	h_step_cancel_cov
+h_step	cancel: Ok released at or above the cap	SATISFIED	h_step_cancel_cov
+h_step	cancel: no-op on Cancelled	SATISFIED	h_step_cancel_cov
+h_step	cancel: NotFound	SATISFIED	h_step_cancel_cov
+h_step	cancel: Unauthorized	SATISFIED	h_step_cancel_cov
+h_step	cancel: Pending	SATISFIED	h_step_cancel_cov
+h_step	cancel: InvalidState (Completed)	SATISFIED	h_step_cancel_cov
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_cancel_cov
+h_step	ack: NotFound	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_cancel_cov
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Ok	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Paused	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Stale	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Expired	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Bounds	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_cancel_cov
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_cancel_cov
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_tx
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_tx
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_tx
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_tx
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: NotFound	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_settle_tx
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_tx
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_tx
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_tx
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_tx
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_tx
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_post
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_post
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_post
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_post
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_settle_post
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_settle_post
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_settle_post
+h_step	settle: NotFound	UNSATISFIABLE	h_step_settle_post
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_settle_post
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_post
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_post
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_post
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_post
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_post
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_post
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_post
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_post
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_post
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_post
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_post
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_post
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_post
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_post
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_post
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_inv
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_inv
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_inv
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: NotFound	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_settle_inv
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_inv
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_inv
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_inv
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_inv
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_cov
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_cov
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_cov
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_cov
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_cov
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_cov
+h_step	settle: Ok completed	SATISFIED	h_step_settle_cov
+h_step	settle: Ok completed after a disturbing observe	SATISFIED	h_step_settle_cov
+h_step	settle: Ok completed at or above the cap	SATISFIED	h_step_settle_cov
+h_step	settle: Ok cancelled (released)	SATISFIED	h_step_settle_cov
+h_step	settle: Ok cancelled after a disturbing observe	SATISFIED	h_step_settle_cov
+h_step	settle: no-op Completed again	SATISFIED	h_step_settle_cov
+h_step	settle: no-op Cancelled again	SATISFIED	h_step_settle_cov
+h_step	settle: NotFound	SATISFIED	h_step_settle_cov
+h_step	settle: Unauthorized	SATISFIED	h_step_settle_cov
+h_step	settle: InvalidState (Reserved)	SATISFIED	h_step_settle_cov
+h_step	settle: InvalidState (opposite terminal)	SATISFIED	h_step_settle_cov
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_cov
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_cov
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_cov
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_cov
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_cov
+h_step	observe: Ok	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_observe_post
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_observe_post
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_observe_post
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_observe_post
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_observe_post
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_observe_post
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_observe_post
+h_step	settle: NotFound	UNSATISFIABLE	h_step_observe_post
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_observe_post
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: Pending	UNSATISFIABLE	h_step_observe_post
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_observe_post
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_observe_post
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_observe_post
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_observe_post
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_observe_post
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_observe_post
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_observe_post
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_observe_post
+h_step	ack: NotFound	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_observe_post
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Ok	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Paused	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Stale	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Expired	UNSATISFIABLE	h_step_observe_post
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_observe_post
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_observe_post
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Bounds	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_observe_post
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_observe_post
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_inv_0
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_inv_0
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_inv_0
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_inv_0
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_inv_0
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_0
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_inv_0
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_inv_1
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_inv_1
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_inv_1
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_inv_1
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_inv_1
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_1
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_inv_1
+h_step	observe: Ok	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_submit_inv_3
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_submit_inv_3
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_submit_inv_3
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: NotFound	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: Pending	UNSATISFIABLE	h_step_submit_inv_3
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_submit_inv_3
+h_step	ack: NotFound	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_3
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Ok	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Paused	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Stale	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Expired	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Bounds	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_submit_inv_3
+h_step	observe: Ok	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: NotFound	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: Pending	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	ack: NotFound	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Ok	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Paused	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Stale	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Expired	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Bounds	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_dispatch_inv_3
+h_step	observe: Ok	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: NotFound	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: Pending	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	ack: NotFound	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Ok	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Paused	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Stale	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Expired	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Bounds	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_cancel_inv_3
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_inv_1
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_inv_1
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_inv_1
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: NotFound	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_inv_1
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_inv_1
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv_1
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_inv_1
+h_step	observe: Ok	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Ok exposing a violation	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Ok after terminal records	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Ok refresh with an open record	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Pending (values differ, record open)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Bounds (length)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Bounds (value)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	observe: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	pause: Ok pause	UNSATISFIABLE	h_step_settle_inv_3
+h_step	pause: Ok unpause	UNSATISFIABLE	h_step_settle_inv_3
+h_step	pause: Ok without change still bumps	UNSATISFIABLE	h_step_settle_inv_3
+h_step	pause: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	pause: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Ok completed	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Ok completed after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Ok completed at or above the cap	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Ok cancelled (released)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Ok cancelled after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: no-op Completed again	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: no-op Cancelled again	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: NotFound	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: InvalidState (Reserved)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	settle: InvalidState (opposite terminal)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: Ok (released)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: Ok released after a disturbing observe	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: Ok released at or above the cap	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: no-op on Cancelled	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: NotFound	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: Pending	UNSATISFIABLE	h_step_settle_inv_3
+h_step	cancel: InvalidState (Completed)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: Dispatched -> Active	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: Dispatched -> Unknown	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: Unknown -> Active	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: Ok at or above the cap	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: no-op Unknown -> Unknown	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: no-op on Active (late ack)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: no-op on a terminal record	UNSATISFIABLE	h_step_settle_inv_3
+h_step	ack: NotFound	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: Ok	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: NotFound	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: Paused	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: InvalidState	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: Expired	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv_3
+h_step	dispatch: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Ok	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Ok in a violating state (recovery)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Ok with 2 earlier records	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Prerequisite met by completed units	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Paused	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Stale	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Expired	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: SnapshotExpired	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: InvalidRecipe	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Unauthorized	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: InvalidUnits	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Prerequisite	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Arithmetic (reserve)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Arithmetic (envelope)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Arithmetic (cap)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Bounds	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Energy (increase)	UNSATISFIABLE	h_step_settle_inv_3
+h_step	submit: Energy (recovery rule)	UNSATISFIABLE	h_step_settle_inv_3
+h_ref	ref observe: Ok (Observe enabled, re-base)	UNSATISFIABLE	h_ref_submit
+h_ref	ref observe: Ok (Observe enabled, refresh keeps base and k0)	UNSATISFIABLE	h_ref_submit
+h_ref	ref observe: Unauthorized	UNSATISFIABLE	h_ref_submit
+h_ref	ref observe: Pending	UNSATISFIABLE	h_ref_submit
+h_ref	ref observe: Bounds	UNSATISFIABLE	h_ref_submit
+h_ref	ref observe: Arithmetic	UNSATISFIABLE	h_ref_submit
+h_ref	ref pause: Ok (SetPaused enabled)	UNSATISFIABLE	h_ref_submit
+h_ref	ref pause: Unauthorized	UNSATISFIABLE	h_ref_submit
+h_ref	ref pause: Arithmetic	UNSATISFIABLE	h_ref_submit
+h_ref	ref settle: Ok (Settle enabled)	UNSATISFIABLE	h_ref_submit
+h_ref	ref settle: Noop	UNSATISFIABLE	h_ref_submit
+h_ref	ref settle: NotFound	UNSATISFIABLE	h_ref_submit
+h_ref	ref settle: Unauthorized	UNSATISFIABLE	h_ref_submit
+h_ref	ref settle: InvalidState	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: Ok (Cancel enabled)	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: Noop	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: NotFound	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: Unauthorized	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: InvalidState (Completed)	UNSATISFIABLE	h_ref_submit
+h_ref	ref cancel: Pending	UNSATISFIABLE	h_ref_submit
+h_ref	ref ack: Ok (Ack enabled)	UNSATISFIABLE	h_ref_submit
+h_ref	ref ack: Noop	UNSATISFIABLE	h_ref_submit
+h_ref	ref ack: NotFound	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: Ok (Dispatch enabled)	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: NotFound	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: Unauthorized	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: Paused	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: InvalidState	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: Expired	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: SnapshotExpired	UNSATISFIABLE	h_ref_submit
+h_ref	ref dispatch: Arithmetic	UNSATISFIABLE	h_ref_submit
+h_ref	ref submit: Ok (Submit enabled)	SATISFIED	h_ref_submit
+h_ref	ref submit: Paused	SATISFIED	h_ref_submit
+h_ref	ref submit: Stale	SATISFIED	h_ref_submit
+h_ref	ref submit: Expired	SATISFIED	h_ref_submit
+h_ref	ref submit: SnapshotExpired	SATISFIED	h_ref_submit
+h_ref	ref submit: InvalidRecipe	SATISFIED	h_ref_submit
+h_ref	ref submit: Unauthorized	SATISFIED	h_ref_submit
+h_ref	ref submit: InvalidUnits	SATISFIED	h_ref_submit
+h_ref	ref submit: Prerequisite	SATISFIED	h_ref_submit
+h_ref	ref submit: Arithmetic	SATISFIED	h_ref_submit
+h_ref	ref submit: Bounds	SATISFIED	h_ref_submit
+h_ref	ref submit: Energy	SATISFIED	h_ref_submit
+h_ref	ref observe: Ok (Observe enabled, re-base)	UNSATISFIABLE	h_ref_settle
+h_ref	ref observe: Ok (Observe enabled, refresh keeps base and k0)	UNSATISFIABLE	h_ref_settle
+h_ref	ref observe: Unauthorized	UNSATISFIABLE	h_ref_settle
+h_ref	ref observe: Pending	UNSATISFIABLE	h_ref_settle
+h_ref	ref observe: Bounds	UNSATISFIABLE	h_ref_settle
+h_ref	ref observe: Arithmetic	UNSATISFIABLE	h_ref_settle
+h_ref	ref pause: Ok (SetPaused enabled)	UNSATISFIABLE	h_ref_settle
+h_ref	ref pause: Unauthorized	UNSATISFIABLE	h_ref_settle
+h_ref	ref pause: Arithmetic	UNSATISFIABLE	h_ref_settle
+h_ref	ref settle: Ok (Settle enabled)	SATISFIED	h_ref_settle
+h_ref	ref settle: Noop	SATISFIED	h_ref_settle
+h_ref	ref settle: NotFound	SATISFIED	h_ref_settle
+h_ref	ref settle: Unauthorized	SATISFIED	h_ref_settle
+h_ref	ref settle: InvalidState	SATISFIED	h_ref_settle
+h_ref	ref cancel: Ok (Cancel enabled)	UNSATISFIABLE	h_ref_settle
+h_ref	ref cancel: Noop	UNSATISFIABLE	h_ref_settle
+h_ref	ref cancel: NotFound	UNSATISFIABLE	h_ref_settle
+h_ref	ref cancel: Unauthorized	UNSATISFIABLE	h_ref_settle
+h_ref	ref cancel: InvalidState (Completed)	UNSATISFIABLE	h_ref_settle
+h_ref	ref cancel: Pending	UNSATISFIABLE	h_ref_settle
+h_ref	ref ack: Ok (Ack enabled)	UNSATISFIABLE	h_ref_settle
+h_ref	ref ack: Noop	UNSATISFIABLE	h_ref_settle
+h_ref	ref ack: NotFound	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: Ok (Dispatch enabled)	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: NotFound	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: Unauthorized	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: Paused	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: InvalidState	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: Expired	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: SnapshotExpired	UNSATISFIABLE	h_ref_settle
+h_ref	ref dispatch: Arithmetic	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Ok (Submit enabled)	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Paused	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Stale	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Expired	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: SnapshotExpired	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: InvalidRecipe	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Unauthorized	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: InvalidUnits	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Prerequisite	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Arithmetic	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Bounds	UNSATISFIABLE	h_ref_settle
+h_ref	ref submit: Energy	UNSATISFIABLE	h_ref_settle

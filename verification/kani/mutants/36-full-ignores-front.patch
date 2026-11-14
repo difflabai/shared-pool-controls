@@ -1,0 +1,15 @@
+# killed-by: h_full_256_prune
+# fix-revert: FR-3 (N5; F-3; upstream 1f01d43)
+# candidate: Full whenever 256 records are retained (the v1.0.0 rule), even
+# with a terminal front that could be pruned (WIN-1, WIN-2).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -284,7 +284,7 @@
+         }
+         // A full window frees a slot by pruning its oldest record, which must
+         // be terminal.
+-        if self.records.len() >= MAX_RECORDS && open(&self.records[0].status) {
++        if self.records.len() >= MAX_RECORDS {
+             return Err(Error::Full);
+         }
+         let r = self

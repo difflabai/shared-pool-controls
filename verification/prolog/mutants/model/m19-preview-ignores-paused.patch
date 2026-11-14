@@ -1,0 +1,14 @@
+# mutant: m19-preview-ignores-paused
+# mutates: RD-PREVIEW: preview_allowed skips the paused check (submit still has it)
+# expect: test_reads RD-PREVIEW/RD-BEST differential
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -596,7 +596,7 @@
+     ;   holds(submit, G, S, Op)
+     ).
+ 
+-preview_allowed(S, Caller, Req) :- admissible(S, Caller, Req).
++preview_allowed(pool(C, V, N, O, _, R, F, D), Caller, Req) :- admissible(pool(C, V, N, O, false, R, F, D), Caller, Req).
+ 
+ %% best_quantity(+S, +Caller, +Req, -Best): spec:29 enumerate units 1..min(units, 100)
+ %% (CODE-ONLY cap MAX_UNITS), minimise energy of the candidate, ties -> larger units.

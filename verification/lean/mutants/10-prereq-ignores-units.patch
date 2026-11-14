@@ -1,0 +1,14 @@
+Lean mutant 10-prereq-ignores-units
+A prerequisite needs one completed unit, not the required number.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -335,7 +335,7 @@
+ 
+ /-- `r.requires.iter().any(|(p, units)| self.completed_units[p] < units)`. -/
+ def prereqFail (rc : Recipe A) (s : State) : Bool :=
+-  rc.requires.any fun pu => decide (doneU s pu.1 < pu.2)
++  rc.requires.any fun pu => decide (doneU s pu.1 < 1)
+ 
+ /-! ## Guards, in the code's order -/
+ 

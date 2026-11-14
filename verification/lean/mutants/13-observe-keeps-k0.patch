@@ -1,0 +1,15 @@
+Lean mutant 13-observe-keeps-k0
+observe never resets the ghost k0, also when it re-bases (values changed,
+every record terminal).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -548,7 +548,7 @@
+   | .observe _ vals now =>
+     { s with values := vals, observedAt := now, version := s.version + 1,
+              base := if refresh s vals then s.base else vals,
+-             k0 := if refresh s vals then s.k0 else s.records.length }
++             k0 := s.k0 }
+ 
+ /-- A call's result. -/
+ inductive Res where

@@ -1,0 +1,15 @@
+# checks: safety-1 trace
+# observe's Pending guard counts only in-flight records, so new values
+# are accepted while a Reserved record is open (v1.0's 09 dropped the
+# guard; at v1.1 that is t46).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -346,7 +346,7 @@
+ \* no exit here.
+ ObserveErr(c, vals, now) ==
+     IF c # cfg.owner THEN "Unauthorized"
+-    ELSE IF vals # values /\ AnyOpen THEN "Pending"
++    ELSE IF vals # values /\ \E k \in 1 .. NR : InFlight(records[k].status) THEN "Pending"
+     ELSE IF Len(vals) # NM \/ \E k \in DOMAIN vals : ~Bounded(vals[k]) THEN "Bounds"
+     ELSE CapErr
+ 

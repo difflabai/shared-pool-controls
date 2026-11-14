@@ -1,0 +1,15 @@
+Mutant s32a_execute_stale_off_by_one: EX-6: execute starts an id exactly WINDOW below newest (`<`, not `<=`).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -70,7 +70,7 @@
+             return j.status.clone();
+         }
+         // A forgotten id belongs to a pruned record: never start it.
+-        if u64::from(id) + WINDOW <= u64::from(self.newest) {
++        if u64::from(id) + WINDOW < u64::from(self.newest) {
+             return "cancelled".into();
+         }
+         // The lock dispatched `id`, so it retains the record.

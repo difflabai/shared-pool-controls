@@ -1,0 +1,17 @@
+# mutant: m12-observe-pending-dropped
+# mutates: OBS-1: observe sets new values with records open (no Pending at all)
+# expect: test_model observe: owner, all terminal or a restatement
+# expect: test_model F-6 fixed
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 wedge
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -491,7 +491,7 @@
+ holds(observe, all_terminal_or_restate, S, observe(_, Vs, _)) :-
+     pool_values(S, V0),
+     (   Vs == V0 -> true
+-    ;   pool_records(S, Rs), \+ ( member(c(_, _, _, St), Rs), open_status(St) )
++    ;   pool_records(S, _), Rs = [], \+ ( member(c(_, _, _, St), Rs), open_status(St) )
+     ).
+ holds(observe, bounded_values, S, observe(_, Vs, _)) :-
+     pool_values(S, V0), length(V0, N), length(Vs, N),          % CODE-ONLY: length (amb-observe-length)

@@ -1,0 +1,16 @@
+Lean mutant 21-prereq-over-window
+FR-4 (X H8): prerequisites scan the retained records (v1.0.0) instead of
+the lifetime completed_units (lib.rs 301-306, 519): pruned completions
+no longer count.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -331,7 +331,7 @@
+ 
+ /-- `completed_units[p]`: the lifetime count, pruned records included,
+ saturated at `u32::MAX` (`saturating_add`, lib.rs 519). -/
+-def doneU (s : State) (p : Nat) : Nat := min (doneUnits s.records p) U32_MAX
++def doneU (s : State) (p : Nat) : Nat := min (doneUnits s.win p) U32_MAX
+ 
+ /-- `r.requires.iter().any(|(p, units)| self.completed_units[p] < units)`. -/
+ def prereqFail (rc : Recipe A) (s : State) : Bool :=

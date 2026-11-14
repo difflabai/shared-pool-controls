@@ -1,0 +1,20 @@
+name = "pool-lean"
+version = "0.1.0"
+defaultTargets = ["PoolLean", "pool-lean", "pool-lean-guards"]
+
+[leanOptions]
+linter.unusedSectionVars = false
+linter.unusedSimpArgs = false
+linter.deprecated = false
+linter.unusedVariables = false
+
+[[lean_lib]]
+name = "PoolLean"
+
+[[lean_exe]]
+name = "pool-lean"
+root = "Main"
+
+[[lean_exe]]
+name = "pool-lean-guards"
+root = "Guards"

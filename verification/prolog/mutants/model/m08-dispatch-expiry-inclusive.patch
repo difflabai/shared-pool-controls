@@ -1,0 +1,14 @@
+# mutant: m08-dispatch-expiry-inclusive
+# mutates: dispatch at exactly expires_at is accepted
+# expect: test_model dispatch: actor, unpaused, Reserved
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -435,7 +435,7 @@
+     record_of(S, Id, c(RI, _, _, _)), pool_config(S, C), actor_of(C, RI, A), Caller == A.
+ holds(dispatch, paused, S, _) :- pool_paused(S, false).
+ holds(dispatch, reserved, S, dispatch(_, Id, _)) :- record_of(S, Id, c(_, _, _, reserved)).
+-holds(dispatch, unexpired, S, dispatch(_, Id, Now)) :- record_of(S, Id, c(_, _, Exp, _)), Now < Exp.
++holds(dispatch, unexpired, S, dispatch(_, Id, Now)) :- record_of(S, Id, c(_, _, Exp, _)), Now =< Exp.
+ holds(dispatch, freshness, S, dispatch(_, _, Now)) :- fresh(S, Now).
+ 
+ % --- acknowledge (spec:40-41, 46)

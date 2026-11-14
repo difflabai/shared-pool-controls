@@ -1,0 +1,14 @@
+Lean mutant 25-cancel-completed-pending
+FR-8 (X H13): cancel drops the Completed -> InvalidState check
+(lib.rs 466-468), so a Completed record gives Pending as on v1.0.0.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -458,7 +458,6 @@
+   [foundGuard s id,
+    (.err .unauthorized, decide (caller ≠ (cfg.recipe c.recipe).actor ∧ caller ≠ cfg.owner)),
+    (.noop, decide (c.status = .cancelled)),
+-   (.err .invalidState, decide (c.status = .completed)),
+    (.err .pending, decide (c.status ≠ .reserved))] ++
+   releaseGuards cfg s id
+ 

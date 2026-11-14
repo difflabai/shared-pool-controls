@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# submit accepts any expiry after now.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -263,7 +263,7 @@
+ SubmitErr(c, r, u, v, exp, now) ==
+     IF paused THEN "Paused"
+     ELSE IF v # version THEN "Stale"
+-    ELSE IF exp <= now \/ exp > now + Window THEN "Expired"
++    ELSE IF exp <= now THEN "Expired"
+     ELSE IF SnapExpired(now) THEN "SnapshotExpired"
+     ELSE IF WinFull THEN "Full"
+     ELSE IF r >= NRcp THEN "InvalidRecipe"

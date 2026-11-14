@@ -1,0 +1,27 @@
+# killed-by: h_preview
+# fix-revert: FR-6b (N14; preview observation; upstream da43188)
+# The VERSION_CAP check is in submit, not candidate: preview (and
+# best_quantity) at the cap allow a request that submit refuses with
+# Arithmetic (RD-PREVIEW).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -315,9 +315,6 @@
+             && self.energy(&add(&next, &r.complete, req.units)?)? >= before
+         {
+             return Err(Error::Energy);
+-        }
+-        if self.version >= VERSION_CAP {
+-            return Err(Error::Arithmetic);
+         }
+         Ok(next)
+     }
+@@ -359,6 +356,9 @@
+     }
+     pub fn submit(&mut self, caller: &str, req: Request, now: u64) -> Result<u32, Error> {
+         let next = self.candidate(caller, &req, now)?;
++        if self.version >= VERSION_CAP {
++            return Err(Error::Arithmetic);
++        }
+         let version = self.version.checked_add(1).ok_or(Error::Arithmetic)?;
+         let id = self
+             .first_id

@@ -1,0 +1,15 @@
+# checks: f2b trace
+# The envelope leaves out every open record. It takes two open records:
+# MaxRecords 1 (safety-1) has one, and MC_Cap's four calls make no bad
+# pair; in F2bConfig B x 2 is admitted with A open and INV-RES fails.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -187,7 +187,7 @@
+ OpenSum(m, skip, neg) ==
+     SumTo([k \in 1 .. NR |->
+               LET c == records[k] IN
+-              IF Open(c.status) /\ firstId + k - 1 # skip
++              IF FALSE /\ Open(c.status) /\ firstId + k - 1 # skip
+               THEN (IF neg THEN LoTerm(Rcp(c.recipe), c.units, m)
+                     ELSE HiTerm(Rcp(c.recipe), c.units, m))
+               ELSE 0], NR)

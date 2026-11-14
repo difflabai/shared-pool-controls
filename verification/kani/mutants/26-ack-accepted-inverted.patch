@@ -1,0 +1,16 @@
+# killed-by: h_step_ack_tx
+# acknowledge: accepted maps to Unknown and rejected to Active
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -439,9 +439,9 @@
+             return Ok(());
+         }
+         let next = if accepted {
+-            Status::Active
+-        } else {
+             Status::Unknown
++        } else {
++            Status::Active
+         };
+         // reconcile is permissionless: a no-op must not bump the version, or
+         // anyone could repeatedly invalidate every in-flight request.

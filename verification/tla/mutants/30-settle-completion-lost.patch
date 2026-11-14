@@ -1,0 +1,22 @@
+# checks: liveness
+# settle(true) returns Ok but writes nothing: the record stays in flight.
+# Invariants still hold; only LIVE-2 (temporal) can kill it.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -438,13 +438,9 @@
+ Settle(c, id, done) ==
+     /\ SettleErr(c, id, done) = "Ok"
+     /\ IF done
+-       THEN /\ values' = AddVec(values, RecRcp(id).complete, Rec(id).units)
+-            /\ SetStatus(id, "Completed")
+-            /\ doneU' = [doneU EXCEPT ![Rec(id).recipe + 1] = Min(@ + Rec(id).units, DoneCap)]
+-            /\ version' = version + 1
+-            /\ UNCHANGED <<cfg, observedAt, paused, firstId, base, k0>>
+-       ELSE Release(id)
+-    /\ Step("settle", c, id, Rec(id).recipe, Rec(id).units, 0, done, 0, 0)
++       THEN UNCHANGED vars
++       ELSE /\ Release(id)
++            /\ Step("settle", c, id, Rec(id).recipe, Rec(id).units, 0, done, 0, 0)
+ 
+ SetPaused(c, b) ==
+     /\ PauseErr(c, b) = "Ok"

@@ -1,0 +1,21 @@
+# mutant: c01-submit-stale-before-paused
+# mutates: C-2: core checks Stale before Paused in candidate
+# expect: test_requirements C-2 guard order
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -265,12 +265,12 @@
+         Ok(())
+     }
+     fn candidate(&self, caller: &str, req: &Request, now: u64) -> Result<Vec<i64>, Error> {
+-        if self.paused {
+-            return Err(Error::Paused);
+-        }
+         if req.version != self.version {
+             return Err(Error::Stale);
+         }
++        if self.paused {
++            return Err(Error::Paused);
++        }
+         if req.expires_at <= now || req.expires_at > now.saturating_add(86_400) {
+             return Err(Error::Expired);
+         }

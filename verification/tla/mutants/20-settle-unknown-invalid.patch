@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# An Unknown record is not in flight: settle is InvalidState.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -130,7 +130,7 @@
+ MaxU == LET us == {cfg.recipes[k].maxUnits : k \in 1 .. NRcp} IN CHOOSE u \in us : \A w \in us : w <= u
+ 
+ Open(s)     == s \notin {"Completed", "Cancelled"}
+-InFlight(s) == s \in {"Dispatched", "Active", "Unknown"}
++InFlight(s) == s \in {"Dispatched", "Active"}
+ AnyOpen     == \E k \in 1 .. NR : Open(records[k].status)
+ \* candidate()'s Full (U:287-289): the window is full and its oldest
+ \* record, which a submit would prune, is open.

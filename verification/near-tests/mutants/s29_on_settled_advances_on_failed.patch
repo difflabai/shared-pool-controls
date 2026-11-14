@@ -1,0 +1,18 @@
+Mutant s29_on_settled_advances_on_failed: EX-8: on_settled advances even when the lock's settle failed.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -154,9 +154,8 @@
+     pub fn on_settled(&mut self, id: u32) {
+         assert_eq!(env::promise_results_count(), 1, "not a settle callback");
+         // Settle returns no value, but any success counts (even `Err(TooLong)`).
+-        if env::promise_result_checked(0, 0) != Err(PromiseError::Failed) {
+-            self.advance(id);
+-        }
++        let _: Result<Vec<u8>, PromiseError> = env::promise_result_checked(0, 0);
++        self.advance(id);
+     }
+ }
+ impl Executor {

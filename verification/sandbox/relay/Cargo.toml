@@ -1,0 +1,12 @@
+[package]
+name = "sandbox-relay"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# The mirror's near-sdk pin.
+near-sdk = { version = "=5.29.1", default-features = false }

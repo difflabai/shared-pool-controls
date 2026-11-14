@@ -1,0 +1,15 @@
+Mutant s34_max_jobs_256: EX-6/EX-7: the executor holds at most 256 jobs (the v1.0 cap).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -9,7 +9,7 @@
+ /// Every other job is a confirmation above `newest` whose `on_settled` has
+ /// not run yet, or whose `settle` the lock refused. So the cap needs at
+ /// least WINDOW such jobs above `newest`.
+-const MAX_JOBS: usize = 512;
++const MAX_JOBS: usize = 256;
+ /// Gas for the lock's `settle`, and for this contract's `on_settled` after it.
+ const SETTLE_TGAS: u64 = 40;
+ const ON_SETTLED_TGAS: u64 = 10;

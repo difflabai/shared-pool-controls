@@ -1,0 +1,16 @@
+# mutant: m23-release-endpoint-unbounded
+# mutates: envelope Arithmetic: only the completion endpoints are held to +-1e6, not the release terms; Bounds, over the same hull, still refuses those submits (FR-2; F-2b)
+# expect: test_model F-2b fixed
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -261,7 +261,8 @@
+     ;   Ts = Ts1
+     ),
+     sum_hull(Ts, Values, Low, High),
+-    maplist(bounded, Low), maplist(bounded, High).
++    findall(h(D, D), member(h(D, _), Ts), Tc), sum_hull(Tc, Values, LowC, HighC),
++    maplist(bounded, LowC), maplist(bounded, HighC).
+ 
+ %% open_terms(+Records, +Id, +Recipes, +Skip, -Terms): h(D, X) per open record
+ %% other than Skip; Id is the first record's id.

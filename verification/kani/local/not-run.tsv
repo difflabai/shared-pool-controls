@@ -1,0 +1,28 @@
+mutant	reason
+01-guard-swap-paused-stale	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+03-submit-expiry-off-by-one	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+05-check-bounds-without-skip	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+06-envelope-ignores-reserved	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+10-settle-accepts-opposite-terminal	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+11-release-counts-completed-units	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+12-energy-ge	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+15-submit-actor-check-dropped	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+16-settle-executor-check-dropped	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+18-preview-candidate-divergence	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+19-recovery-gt	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+23-envelope-ignores-extra	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+25-energy-excess-sign	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+28-check-bounds-vs-candidate	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+29-observe-keeps-observed-at	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+30-full-rejects-at-255	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+21-full-off-by-one	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+32-envelope-no-release-term	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+33-check-bounds-old-only	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+35-candidate-without-cap	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+36-full-ignores-front	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+37-validate-actor-is-executor	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+40-settle-no-completed-units	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+41-completed-units-wrap	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+42-prune-keeps-first-id	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+44-prereq-scan-retained	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+45-cap-in-submit-only	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI

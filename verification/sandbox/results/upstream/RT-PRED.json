@@ -1,0 +1,67 @@
+{
+  "assumption": "ASM-PRED",
+  "cases": [
+    {
+      "allowed": false,
+      "attributed_to": "relay.test.near",
+      "case": "actor signs relay.forward(submit recipe 0)",
+      "reason": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "allowed": true,
+      "case": "actor submits the same request directly",
+      "id": 0
+    },
+    {
+      "allowed": true,
+      "attributed_to": "relay.test.near",
+      "case": "mallory signs relay.forward(submit recipe 1); the relay is recipe 1's actor"
+    },
+    {
+      "allowed": false,
+      "case": "mallory submits recipe 1 directly",
+      "reason": "Unauthorized"
+    },
+    {
+      "case": "actor.test.near signs relay.forward(dispatch)",
+      "core": "Unauthorized",
+      "observed_panic": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "case": "actor.test.near signs relay.forward(cancel)",
+      "core": "Unauthorized",
+      "observed_panic": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "case": "exec.test.near signs relay.forward(settle)",
+      "core": "Unauthorized",
+      "observed_panic": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "case": "owner.test.near signs relay.forward(set_paused)",
+      "core": "Unauthorized",
+      "observed_panic": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "case": "owner.test.near signs relay.forward(observe)",
+      "core": "Unauthorized",
+      "observed_panic": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "case": "mallory signs relay.forward(dispatch id1)",
+      "result": "Ok, Active"
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-PRED",
+  "result": "pass",
+  "wasm_variant": "upstream"
+}

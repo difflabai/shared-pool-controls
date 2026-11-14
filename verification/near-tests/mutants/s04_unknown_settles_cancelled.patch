@@ -1,0 +1,14 @@
+Mutant s04_unknown_settles_cancelled: SH-3: an "unknown" status is treated as definitive non-execution.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -134,6 +134,7 @@
+         let update = match status.as_str() {
+             "completed" => self.pool.settle(&executor, id, true),
+             "cancelled" => self.pool.settle(&executor, id, false),
++            "unknown" => self.pool.settle(&executor, id, false),
+             "active" => self.pool.acknowledge(id, true),
+             _ => self.pool.acknowledge(id, false),
+         };

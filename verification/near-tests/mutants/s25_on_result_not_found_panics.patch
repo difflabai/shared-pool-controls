@@ -1,0 +1,21 @@
+Mutant s25_on_result_not_found_panics: SH-3/SH-5: on_result of a missing record panics NotFound again (NT-F4 reverted).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -123,13 +123,7 @@
+             None
+         }
+         .unwrap_or_else(|| "unknown".into());
+-        let Ok(c) = self.pool.record(id) else {
+-            // No such record: nothing to update, so log the result and return.
+-            return event(
+-                "reconciled",
+-                near_sdk::serde_json::json!({"id":id,"outcome":status,"error":"NotFound"}),
+-            );
+-        };
++        let c = must(self.pool.record(id));
+         let executor = self.pool.config.recipes[c.recipe as usize].executor.clone();
+         let update = match status.as_str() {
+             "completed" => self.pool.settle(&executor, id, true),

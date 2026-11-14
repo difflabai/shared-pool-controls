@@ -1,0 +1,15 @@
+Mutant s27_dispatch_indexes_records: SH-6: dispatch reads records[id], the index, not the record with that id.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -81,7 +81,7 @@
+     }
+     pub fn dispatch(&mut self, id: u32) {
+         must(self.pool.dispatch(&caller(), id, now()));
+-        let c = must(self.pool.record(id));
++        let c = &self.pool.records[id as usize];
+         let r = &self.pool.config.recipes[c.recipe as usize];
+         let args = near_sdk::serde_json::to_vec(
+             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),

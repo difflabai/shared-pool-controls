@@ -1,0 +1,24 @@
+Mutant s35_notify_returns_on_settled: EX-5/EX-8: notify returns on_settled's result instead of the lock's settle.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -189,7 +189,7 @@
+             zero,
+             Gas::from_tgas(SETTLE_TGAS),
+         );
+-        env::promise_then(
++        let then = env::promise_then(
+             settle,
+             env::current_account_id(),
+             "on_settled",
+@@ -197,7 +197,7 @@
+             zero,
+             Gas::from_tgas(ON_SETTLED_TGAS),
+         );
+-        env::promise_return(settle);
++        env::promise_return(then);
+     }
+ }
+ #[cfg(test)]

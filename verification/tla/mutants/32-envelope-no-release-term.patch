@@ -1,0 +1,16 @@
+# checks: safety-1 liveness-f2 trace
+# FR-2. v1.0's completion-only envelope: no release term (x = -reserve * u)
+# for open records or the extra. Must be killed by LIVE-ALL / NoWedge.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -180,8 +180,8 @@
+ \* d = complete * u (it completes) and x = -reserve * u (its reservation is
+ \* released by cancel or settle(false)); low adds min(d, x, 0), high adds
+ \* max(d, x, 0).
+-LoTerm(rc, u, m) == Min0(Min(rc.complete[m] * u, -(rc.reserve[m] * u)))
+-HiTerm(rc, u, m) == Max0(Max(rc.complete[m] * u, -(rc.reserve[m] * u)))
++LoTerm(rc, u, m) == Min0(rc.complete[m] * u)
++HiTerm(rc, u, m) == Max0(rc.complete[m] * u)
+ \* Sum of the low (neg) or high terms of the open records other than the one
+ \* with id skip (-1 for None; no id is negative).
+ OpenSum(m, skip, neg) ==

@@ -1,0 +1,195 @@
+{
+  "finding": "F-2 (fixed in v1.1.0)",
+  "fixture": "risk (upstream crates/core/src/fixtures.rs)",
+  "forms": [
+    {
+      "final": {
+        "by_status": {
+          "Cancelled": 1,
+          "Completed": 1
+        },
+        "completed_units": [
+          0,
+          0,
+          0,
+          6
+        ],
+        "first_id": 0,
+        "paused": false,
+        "records": 2,
+        "values": [
+          60,
+          40,
+          30,
+          40
+        ],
+        "version": 7
+      },
+      "form": "reserved",
+      "steps": [
+        {
+          "id": 0,
+          "step": "credit submit position (recipe 0) x 1",
+          "values": [
+            80,
+            45,
+            30,
+            35
+          ]
+        },
+        {
+          "result": {
+            "allowed": false,
+            "reason": "Bounds",
+            "recipe": 3,
+            "storage_unchanged": true,
+            "units": 8
+          },
+          "step": "macro submit selloff hedge (recipe 3) x 8"
+        },
+        {
+          "result": {
+            "allowed": false,
+            "reason": "Bounds",
+            "recipe": 3,
+            "storage_unchanged": true,
+            "units": 7
+          },
+          "step": "macro submit selloff hedge (recipe 3) x 7"
+        },
+        {
+          "id": 1,
+          "step": "macro submit selloff hedge x 6 (core best_quantity 6)",
+          "values": [
+            80,
+            45,
+            30,
+            23
+          ]
+        },
+        {
+          "status": "Completed",
+          "step": "macro dispatch hedge; operator finish(hedge, true)",
+          "values": [
+            20,
+            45,
+            30,
+            23
+          ]
+        },
+        {
+          "result": "Ok",
+          "step": "credit cancel(position)"
+        },
+        {
+          "result": "Ok",
+          "step": "owner observe [60, 40, 30, 40]"
+        }
+      ]
+    },
+    {
+      "final": {
+        "by_status": {
+          "Cancelled": 1,
+          "Completed": 1
+        },
+        "completed_units": [
+          0,
+          0,
+          0,
+          6
+        ],
+        "first_id": 0,
+        "paused": false,
+        "records": 2,
+        "values": [
+          60,
+          40,
+          30,
+          40
+        ],
+        "version": 9
+      },
+      "form": "dispatched",
+      "steps": [
+        {
+          "id": 0,
+          "step": "credit submit position (recipe 0) x 1",
+          "values": [
+            80,
+            45,
+            30,
+            35
+          ]
+        },
+        {
+          "result": {
+            "allowed": false,
+            "reason": "Bounds",
+            "recipe": 3,
+            "storage_unchanged": true,
+            "units": 8
+          },
+          "step": "macro submit selloff hedge (recipe 3) x 8"
+        },
+        {
+          "result": {
+            "allowed": false,
+            "reason": "Bounds",
+            "recipe": 3,
+            "storage_unchanged": true,
+            "units": 7
+          },
+          "step": "macro submit selloff hedge (recipe 3) x 7"
+        },
+        {
+          "id": 1,
+          "step": "macro submit selloff hedge x 6 (core best_quantity 6)",
+          "values": [
+            80,
+            45,
+            30,
+            23
+          ]
+        },
+        {
+          "status": "Unknown",
+          "step": "credit dispatch position (executor in panic mode)"
+        },
+        {
+          "status": "Completed",
+          "step": "macro dispatch hedge; operator finish(hedge, true)",
+          "values": [
+            20,
+            45,
+            30,
+            23
+          ]
+        },
+        {
+          "receipts_ok": {
+            "executor": [
+              true,
+              true
+            ],
+            "lock": [
+              true
+            ]
+          },
+          "result": "Ok",
+          "step": "operator confirm_not_executed(position)"
+        },
+        {
+          "result": "Ok",
+          "step": "owner observe [60, 40, 30, 40]"
+        }
+      ]
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-WEDGE",
+  "result": "pass: the hedge is sized as if the position were released, and the position's release is Ok in both forms",
+  "wasm_variant": "upstream"
+}

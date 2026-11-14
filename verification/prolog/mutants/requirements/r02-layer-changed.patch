@@ -1,0 +1,15 @@
+# mutant: r02-layer-changed
+# mutates: C-6: NUM-2's layer list gains tla, so it no longer equals its Layer(s) cell in strategy.md section 5
+# expect: test_requirements C-6 traceability
+# expect: test_requirements C-6 compares every catalogue ID
+--- a/prolog/requirements/traceability.pl
++++ b/prolog/requirements/traceability.pl
+@@ -38,7 +38,7 @@
+ property('CFG-1', [kani, lean], "new Ok <=> validate Ok; init satisfies INV").
+ property('CFG-2', [kani, lean], "validate => references in range, vectors length n, requires strictly earlier and distinct, values bounded").
+ property('NUM-1', [kani, lean], "valid cfg, bounded values => energy/energy_terms Ok and exact").
+-property('NUM-2', [kani, lean], "add fails closed exactly when the exact result leaves +-1e6").
++property('NUM-2', [kani, lean, tla], "add fails closed exactly when the exact result leaves +-1e6").
+ property('ROB-1', [kani], "no core panic from any INV state, any arguments").
+ % Transitions
+ property('TX-0', [kani, tla, lean, prolog], "every Err leaves the Pool unchanged").

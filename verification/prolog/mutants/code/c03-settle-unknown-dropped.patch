@@ -1,0 +1,14 @@
+# mutant: c03-settle-unknown-dropped
+# mutates: C-3: settle no longer accepts an Unknown record
+# expect: test_requirements C-3 lifecycle
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -502,7 +502,7 @@
+         }
+         if !matches!(
+             c.status,
+-            Status::Dispatched | Status::Active | Status::Unknown
++            Status::Dispatched | Status::Active
+         ) {
+             return Err(Error::InvalidState);
+         }

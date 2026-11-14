@@ -1,0 +1,19 @@
+# killed-by: h_step_cancel_post h_step_cancel_inv
+# release: the released units are also added to completed_units (cancelled
+# work counts for prerequisites). Re-targeted from the v1.0 mutant
+# 11-prerequisite-counts-non-completed (prerequisites counted from every
+# non-cancelled record), whose scan v1.1.0 replaced by completed_units.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -482,9 +482,11 @@
+         // so in a reachable state this check passes; no release is forced.
+         self.check_bounds(&next, None, Some(id))?;
+         let k = self.index(id)?;
++        let (recipe, units) = (c.recipe as usize, c.units);
+         self.bump()?;
+         self.values = next;
+         self.records[k].status = Status::Cancelled;
++        self.completed_units[recipe] = self.completed_units[recipe].saturating_add(units);
+         Ok(())
+     }
+     /// Authenticated executor attests completion or definitive nonexecution.

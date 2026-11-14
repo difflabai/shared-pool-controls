@@ -1,0 +1,15 @@
+Mutant s11_execute_sent_to_actor: SH-6: dispatch sends execute to the recipe's actor instead of its executor.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -87,7 +87,7 @@
+             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),
+         )
+         .unwrap();
+-        call_then_callback(&r.executor, "execute", &args, Gas::from_tgas(30), id);
++        call_then_callback(&r.actor, "execute", &args, Gas::from_tgas(30), id);
+     }
+     /// Any observer may request reconciliation; no authority is granted by this call.
+     pub fn reconcile(&self, id: u32) {

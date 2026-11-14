@@ -1,0 +1,15 @@
+Lean mutant 24-refresh-rejected
+FR-7 (X H15): v1.0.0's observe, Pending whenever a record is open, so the
+refresh (same values) is rejected too (lib.rs 538-540).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -494,7 +494,7 @@
+ record is open. -/
+ def observeGuards (cfg : Cfg A) (s : State) (caller : A) (vals : List Int) : List Guard :=
+   [(.err .unauthorized, decide (caller ≠ cfg.owner)),
+-   (.err .pending, decide (vals ≠ s.values) && anyOpen s.records),
++   (.err .pending, anyOpen s.records),
+    (.err .bounds, decide (vals.length ≠ s.values.length) || !decide (AllB vals)),
+    (.err .bounds, energyBad cfg vals)] ++
+   bumpNewGuards s

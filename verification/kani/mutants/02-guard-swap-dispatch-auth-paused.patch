@@ -1,0 +1,20 @@
+# killed-by: h_step_dispatch_tx
+# dispatch: Paused checked before Unauthorized
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -407,12 +407,12 @@
+     pub fn dispatch(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {
+         let c = self.record(id)?;
+         let r = &self.config.recipes[c.recipe as usize];
+-        if caller != r.actor {
+-            return Err(Error::Unauthorized);
+-        }
+         if self.paused {
+             return Err(Error::Paused);
+         }
++        if caller != r.actor {
++            return Err(Error::Unauthorized);
++        }
+         if c.status != Status::Reserved {
+             return Err(Error::InvalidState);
+         }

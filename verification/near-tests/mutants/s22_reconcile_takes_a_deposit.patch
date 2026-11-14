@@ -1,0 +1,18 @@
+Mutant s22_reconcile_takes_a_deposit: SH-10: reconcile's deposit check is removed (NT-F2 reverted).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -91,11 +91,6 @@
+     }
+     /// Any observer may request reconciliation; no authority is granted by this call.
+     pub fn reconcile(&self, id: u32) {
+-        // NT-F2: near-sdk generates the nonpayable check only for &mut self methods.
+-        require!(
+-            env::attached_deposit().is_zero(),
+-            "Method reconcile doesn't accept deposit"
+-        );
+         let c = must(self.pool.record(id));
+         assert!(
+             matches!(

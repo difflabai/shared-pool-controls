@@ -1,0 +1,17 @@
+# checks: WitStep_PrereqAfterPrune trace
+# FR-4. v1.0's prerequisite: Completed units among the retained records
+# (no completed_units), so a pruned completion no longer counts.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -270,7 +270,10 @@
+     ELSE IF c # Rcp(r).actor THEN "Unauthorized"
+     ELSE IF u = 0 \/ u > Rcp(r).maxUnits THEN "InvalidUnits"
+     ELSE IF \E q \in DOMAIN Rcp(r).requires :
+-                doneU[Rcp(r).requires[q][1] + 1] < Rcp(r).requires[q][2]
++                SumTo([k \in 1 .. NR |->
++                          IF records[k].recipe = Rcp(r).requires[q][1]
++                             /\ records[k].status = "Completed"
++                          THEN records[k].units ELSE 0], NR) < Rcp(r).requires[q][2]
+          THEN "Prerequisite"
+     ELSE IF AddFails(values, Rcp(r).reserve, u) THEN "Arithmetic"
+     ELSE LET next == AddVec(values, Rcp(r).reserve, u)

@@ -1,0 +1,17 @@
+Lean mutant 08-submit-id-ignores-first-id
+Re-target of v1.0.0 mutant 08 (submit-id-off-by-one) to the window: the new
+record's id is its window index `records.len()` instead of
+`first_id + records.len()` (lib.rs 363-366). Equal until the first prune.
+Not a fix revert (no FR id).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -529,7 +529,7 @@
+ /-- Each call's post-state, given that no guard fired. -/
+ def effect (cfg : Cfg A) (s : State) : Op A → State
+   | .submit _ r u _ exp _ =>
+-    { s with records := s.records ++ [⟨s.records.length, r, u, exp, .reserved⟩],
++    { s with records := s.records ++ [⟨s.records.length - s.firstId, r, u, exp, .reserved⟩],
+              firstId := if MAX_RECORDS ≤ s.records.length - s.firstId then s.firstId + 1
+                         else s.firstId,
+              values := addv s.values (cfg.recipe r).reserve u,

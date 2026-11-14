@@ -1,0 +1,15 @@
+# checks: safety-1 trace
+# FR-1. v1.0's comparator: the envelope's violation is compared with the
+# violation now only, not with the candidate's. Must be killed by
+# INV-RES / LIVE-ALL after a disturbing observe.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -211,7 +211,7 @@
+         hi == [m \in MIdx |-> High(cand, er, eu, skip, m)]
+     IN IF \E m \in MIdx : ~Bounded(lo[m]) \/ ~Bounded(hi[m]) THEN "Arithmetic"
+        ELSE IF \E m \in MIdx :
+-                 Max0(Mn(m) - lo[m]) + Max0(hi[m] - Mx(m)) > Min(PV(values, m), PV(cand, m))
++                 Max0(Mn(m) - lo[m]) + Max0(hi[m] - Mx(m)) > PV(values, m)
+             THEN "Bounds"
+        ELSE "Ok"
+ 

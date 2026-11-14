@@ -1,0 +1,14 @@
+Mutant s21_executor_payload_unbound: EX-2: a replayed id with another payload returns the recorded status.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -66,7 +66,6 @@
+             "only lock may execute"
+         );
+         if let Some(j) = self.jobs.iter().find(|j| j.id == id) {
+-            assert!(j.recipe == recipe && j.units == units, "payload mismatch");
+             return j.status.clone();
+         }
+         // A forgotten id belongs to a pruned record: never start it.

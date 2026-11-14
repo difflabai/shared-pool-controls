@@ -1,0 +1,15 @@
+# mutant: m14-status-change-no-bump
+# mutates: TX-VER: a status change does not advance version
+# expect: test_model acknowledge:
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -564,7 +564,7 @@
+     N1 is N + 1.
+ 
+ set_status(pool(C, V, N, O, P, R0, F, D), Id, St, pool(C, V, N1, O, P, R1, F, D)) :-
+-    N1 is N + 1, K is Id - F,
++    N1 is N, K is Id - F,
+     nth0(K, R0, c(RI, U, E, _), Rest),
+     nth0(K, R1, c(RI, U, E, St), Rest).
+ 

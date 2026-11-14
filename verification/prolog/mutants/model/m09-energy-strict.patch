@@ -1,0 +1,15 @@
+# mutant: m09-energy-strict
+# mutates: ADM-1: a reservation that keeps energy equal is rejected
+# expect: test_model F-1 fixed: from a healthy observe
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -402,7 +402,7 @@
+     hard_ok(C, V, Next, Low, High).
+ holds(submit, energy, S, Op) :-
+     submit_next(S, Op, Next), pool_config(S, C), pool_values(S, V),
+-    energy(C, Next, E1), energy(C, V, E0), E1 =< E0.
++    energy(C, Next, E1), energy(C, V, E0), E1 < E0.
+ holds(submit, recovery, S, Op) :-
+     pool_config(S, C), pool_values(S, V),
+     (   \+ violating(C, V) -> true

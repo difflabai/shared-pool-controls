@@ -1,0 +1,1420 @@
+# shared-pool CI: the layers of projects/shared-pool against the pinned
+# shared-pool-controls commit (status.toml pinned_commit, 57b3f02: the merge
+# commit of upstream PR #4 on main, shared-pool-controls v1.1.0). The pin
+# job fails unless PR #4's head 6fcbd56, where the fixes were reviewed,
+# holds the pin's code byte for byte (status.toml [project] identity).
+# Conformance, TLA+, Lean, Prolog, near-tests and the sandbox are re-done
+# for v1.1.0 (each layer's RESULTS.md). Kani: the kani, kani-large,
+# kani-mutants and kani-mutants-large matrices are split from the v1.1.0
+# measurement (kani/local/run-local.py --all;
+# tools/scripts/kani-matrices.py writes them), and kani-record and covers
+# check them with the local record (kani/local, kani/RESULTS.md): they
+# fail until the v1.1.0 record is committed. The v1.0.0 verification (pin
+# a4bb5c3) is on PR #31's branch, its layer results at commit a072a2d; it
+# is to be tagged shared-pool-v1.0.0 when #31 merges.
+# Each layer has its own runner, projects/shared-pool/<layer>/run.sh (exit 0 =
+# every check passes, vacuity guards included); the jobs below call them.
+# The Kani jobs (plain, mutants, kani, kani-large, kani-record, covers,
+# kani-mutants, kani-mutants-large) and their runners are described after
+# the conformance job.
+# shared-pool-controls is public; the jobs that read the source fetch its
+# submodule without a key. TLA+ and Lean read only the checked-in traces.
+# The pin and the identity commits are fetched by SHA; the pin is on
+# upstream main and 6fcbd56 is its second parent.
+name: shared-pool
+
+on:
+  pull_request:
+    paths:
+      - "projects/shared-pool/**"
+      - ".github/workflows/shared-pool.yml"
+      - "tools/scripts/check-covers.sh"
+      - "tools/scripts/check-kani-record.py"
+      - "tools/scripts/test-check-kani-record.sh"
+      - "tools/scripts/check-pin.sh"
+      - "tools/scripts/test-check-pin.sh"
+      - "tools/scripts/check-status.sh"
+      - "tools/scripts/test-check-status.sh"
+      - "tools/scripts/ci-submodule.sh"
+      - "tools/scripts/get-lean.sh"
+      - "tools/scripts/get-tla-tools.sh"
+      - "tools/versions.env"
+      - ".gitmodules"
+      # Cargo configuration above kani/ (an input of the Kani builds and of
+      # the local record's fingerprint; projects/shared-pool/** has its own).
+      - ".cargo/config"
+      - ".cargo/config.toml"
+      - "projects/.cargo/config"
+      - "projects/.cargo/config.toml"
+      - "!**/*.md"
+      - "!**/*.mdx"
+      - "!**/*.rst"
+      - "!**/*.adoc"
+      - "!**/docs/**"
+      # Re-included (a later positive pattern wins): the prolog job's C-6
+      # and status-lint read section 5 of this file. A change to it alone
+      # runs every job.
+      - "projects/shared-pool/strategy.md"
+  push:
+    branches: [main]
+    paths:
+      - "projects/shared-pool/**"
+      - ".github/workflows/shared-pool.yml"
+      - "tools/scripts/check-covers.sh"
+      - "tools/scripts/check-kani-record.py"
+      - "tools/scripts/test-check-kani-record.sh"
+      - "tools/scripts/check-pin.sh"
+      - "tools/scripts/test-check-pin.sh"
+      - "tools/scripts/check-status.sh"
+      - "tools/scripts/test-check-status.sh"
+      - "tools/scripts/ci-submodule.sh"
+      - "tools/scripts/get-lean.sh"
+      - "tools/scripts/get-tla-tools.sh"
+      - "tools/versions.env"
+      - ".gitmodules"
+      # Cargo configuration above kani/ (an input of the Kani builds and of
+      # the local record's fingerprint; projects/shared-pool/** has its own).
+      - ".cargo/config"
+      - ".cargo/config.toml"
+      - "projects/.cargo/config"
+      - "projects/.cargo/config.toml"
+      - "!**/*.md"
+      - "!**/*.mdx"
+      - "!**/*.rst"
+      - "!**/*.adoc"
+      - "!**/docs/**"
+      # Re-included (a later positive pattern wins): the prolog job's C-6
+      # and status-lint read section 5 of this file. A change to it alone
+      # runs every job.
+      - "projects/shared-pool/strategy.md"
+  workflow_dispatch:
+    inputs:
+      sandbox:
+        description: "Also run the sandbox job (real wasm on near-sandbox: RT-*, RES-1)"
+        type: boolean
+        default: false
+      kani:
+        description: "Run the kani matrix (the in-memory groups; the large groups only on KANI_RUNNER, otherwise their local record is checked)"
+        type: boolean
+        default: true
+      mutants:
+        description: "Also run the kani-mutants job (the in-memory mutants under Kani; the large ones only on KANI_RUNNER, otherwise from the local record)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: shared-pool-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+# Runner labels work as in near-approval.yml: each job takes CI_RUNNER and
+# falls back to ubuntu-latest; the jobs that run CBMC (kani, kani-large,
+# kani-mutants, kani-mutants-large) take KANI_RUNNER ahead of CI_RUNNER,
+# as near-approval's kani job does. The clause that opens each runs-on
+# sends Dependabot and automated-agent runs to ubuntu-latest. Keep every
+# copy byte-identical with near-approval.yml's.
+# A self-hosted runner keeps HOME between jobs and has no sudo: no step runs
+# `rustup default`, caches are for hosted runners only, and the swap step
+# runs on hosted Linux only.
+#
+# Two toolchains. Crates of this repository (conformance, the Scryer install)
+# use RUST_TOOLCHAIN from tools/versions.env. The shell layers
+# (near-tests, sandbox) build the upstream contracts with the upstream
+# toolchain that source-mirror/rust-toolchain.toml names; those jobs must not
+# set RUSTUP_TOOLCHAIN, or it would override the toolchain files.
+jobs:
+  pin:
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    outputs:
+      kani: ${{ steps.kani.outputs.kani }}
+      large: ${{ steps.kani.outputs.large }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+          # The PR merge commit and its first parent (the base tip), for the
+          # changed paths.
+          fetch-depth: 2
+      - name: Does this change reach the Kani layer? Where do the large groups run?
+        id: kani
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          KANI_INPUT: ${{ inputs.kani }}
+          KANI_RUNNER: ${{ vars.KANI_RUNNER }}
+          # The kani job's runner: its runs-on, byte for byte.
+          KANI_JOB_RUNNER: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.KANI_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+        run: |
+          # The kani matrix takes hours, so it runs only when a path its
+          # results depend on changed: the Kani crate (not its Markdown, not
+          # the local runner and recorder kani/local/*.py; the local record's
+          # data, which the covers job merges with the groups' covers), the
+          # pinned core (the gitlink, .gitmodules), the conformance traces
+          # (a mutant's plain mode replays them), the tool versions, the
+          # cargo configuration above kani/ (.cargo/config[.toml] at the
+          # root, projects/ and projects/shared-pool/, which cargo reads
+          # too), the scripts the Kani jobs call, or this workflow: every
+          # input of the local record's fingerprint among them. plain,
+          # mutants and kani-record (minutes) run on every change. A manual
+          # run follows the `kani` input; a base commit that cannot be read
+          # runs the matrix.
+          re='^(projects/shared-pool/kani/|projects/shared-pool/source-mirror$|projects/shared-pool/conformance/traces/core\.txt$|\.gitmodules$|tools/versions\.env$|(projects/(shared-pool/)?)?\.cargo/config(\.toml)?$|tools/scripts/(ci-submodule|check-covers)\.sh$|tools/scripts/check-kani-record\.py$|\.github/workflows/shared-pool\.yml$)'
+          kani=true
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            kani=${KANI_INPUT:-true}
+          elif [[ $BASE_SHA =~ ^[0-9a-f]{40}$ ]] && [ "$BASE_SHA" != 0000000000000000000000000000000000000000 ] &&
+               { git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null || git fetch --no-tags --depth 1 origin "$BASE_SHA"; }; then
+            hits=$(git diff --no-renames --name-only "$BASE_SHA" HEAD | grep -E "$re" | grep -vE '\.(md|mdx|rst|adoc)$' | grep -vE '^projects/shared-pool/kani/local/[^/]*\.py$' || true)
+            [ -n "$hits" ] || kani=false
+            { echo "### Kani paths changed since $BASE_SHA"
+              while IFS= read -r f; do echo "- $f"; done <<<"${hits:-none}"; } >>"$GITHUB_STEP_SUMMARY"
+          else
+            echo "::notice::no readable base commit: running the kani matrix"
+          fi
+          echo "kani=$kani" | tee -a "$GITHUB_OUTPUT"
+          # The large groups and mutants (peaks above 13 GB) run here only
+          # on KANI_RUNNER (kani-large when kani is true, kani-mutants-large
+          # with the `mutants` input): when it is set, is not ubuntu-latest
+          # (on whose swap they failed or crawled), and this run is not
+          # routed to ubuntu-latest. kani-record checks their local record
+          # (kani/local) on every run, and excuses a stale one only for what
+          # those jobs verify in the same run.
+          large=false
+          if [ -n "$KANI_RUNNER" ] && [ "$KANI_RUNNER" != ubuntu-latest ] && [ "$KANI_JOB_RUNNER" = "$KANI_RUNNER" ]; then large=true; fi
+          echo "large=$large" | tee -a "$GITHUB_OUTPUT"
+          echo "### Large Kani groups: $([ "$large" = true ] && [ "$kani" = true ] && echo "kani-large on KANI_RUNNER ($KANI_RUNNER)" || echo "from the local record (kani/local)")" >>"$GITHUB_STEP_SUMMARY"
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Python >= 3.11 (tomllib)
+        if: runner.os == 'macOS'
+        run: |
+          # macOS's /usr/bin/python3 is 3.9; Homebrew's newer ones exist
+          # under versioned names only.
+          python3 -c 'import tomllib' 2>/dev/null && exit 0
+          for py in python3.13 python3.12 python3.11; do
+            if p=$(command -v "$py"); then
+              mkdir -p "$RUNNER_TEMP/python-bin"
+              ln -sf "$p" "$RUNNER_TEMP/python-bin/python3"
+              echo "$RUNNER_TEMP/python-bin" >> "$GITHUB_PATH"
+              exit 0
+            fi
+          done
+          echo "::error::no python3 >= 3.11 on PATH"; exit 1
+      - name: Pin check self-test
+        # check-pin.sh's identity check on scratch repositories (no network).
+        run: tools/scripts/test-check-pin.sh
+      - name: Gitlink, source hashes and v1.1.0 identity match status.toml
+        # Also ASM-COMPILE: upstream [profile.release] keeps overflow-checks.
+        # And the identity: for each status.toml [project] identity entry,
+        # check-pin.sh fetches its commit by SHA if the mirror lacks it (PR
+        # #4's head 6fcbd56) and fails unless every listed path (Cargo.toml,
+        # Cargo.lock, rust-toolchain.toml, crates, scripts, scenarios, docs)
+        # is the same git tree or blob as at the pin (57b3f02).
+        run: tools/scripts/check-pin.sh shared-pool
+
+  status-lint:
+    # status.toml claims nothing the repository doesn't back (near-approval
+    # strategy.md sections 12 and 14): 103 properties, 15 assumptions and
+    # 14 [findings] tables (closes <-> closed_by, closed_in, a closer past
+    # unverified). With [project] catalogue it also agrees with strategy.md
+    # section 5 (strategy.md section 12, "Catalogue"): the 118 IDs, modules,
+    # layer and cross against Layer(s), each status against its Status cell.
+    # The self-test runs first, every case: its findings cases edit a
+    # scratch copy of near-approval's status.toml, which has no [findings];
+    # its catalogue cases edit scratch copies of this project's status.toml
+    # and strategy.md, and fail if status.toml loses the catalogue key.
+    # near-approval.yml runs only the near-approval cases.
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Python >= 3.11 (tomllib)
+        if: runner.os == 'macOS'
+        run: |
+          python3 -c 'import tomllib' 2>/dev/null && exit 0
+          for py in python3.13 python3.12 python3.11; do
+            if p=$(command -v "$py"); then
+              mkdir -p "$RUNNER_TEMP/python-bin"
+              ln -sf "$p" "$RUNNER_TEMP/python-bin/python3"
+              echo "$RUNNER_TEMP/python-bin" >> "$GITHUB_PATH"
+              exit 0
+            fi
+          done
+          echo "::error::no python3 >= 3.11 on PATH"; exit 1
+      - name: check-status self-test
+        run: tools/scripts/test-check-status.sh
+      - name: status-lint
+        run: tools/scripts/check-status.sh shared-pool
+
+  conformance:
+    # The shared link between the layers: traces/core.txt (216 traces, 8,865
+    # calls) must regenerate byte for byte from the pinned pool-core. TLA+,
+    # Lean, Prolog, Kani and the shell replay this file, so a stale one would
+    # make their replays evidence about other code. traces/reads.txt (COV-2:
+    # the core's preview and best_quantity at 1,300 states, 39,627 requests,
+    # compared with the Prolog model by prolog/tests/test_reads.pl) must
+    # regenerate too; that run also fails if preview and submit disagree on
+    # the real core or a read class is never reached. coverage.py then
+    # recomputes the call classes from the terms alone and fails if a
+    # required class is missing or a forbidden one (cancel or settle failing
+    # Bounds or Arithmetic) occurs. Seconds of work; pool-core has no
+    # dependencies.
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - name: traces/core.txt is current
+        working-directory: projects/shared-pool/conformance
+        run: cargo run --release --locked -- --check traces/core.txt
+      - name: traces/reads.txt is current
+        working-directory: projects/shared-pool/conformance
+        run: cargo run --release --locked -- --reads-check traces/reads.txt
+      - name: traces/core.txt coverage classes (coverage.py)
+        working-directory: projects/shared-pool/conformance
+        run: python3 coverage.py traces/core.txt
+
+  # The Kani layer on the real pool-core (strategy.md section 6,
+  # kani/RESULTS.md): plain, mutants and kani-record on every run; kani,
+  # kani-large and covers when the change reaches the Kani layer (the pin
+  # job's `kani` output, which a manual run sets with the `kani` input);
+  # kani-mutants and kani-mutants-large on manual runs with `mutants`.
+  #
+  # Runners. kani/local/run-local.py --all measures the harnesses and
+  # mutants of kani/run.sh list and kani/mutants (v1.1.0: 98 and 45), two
+  # or three at a time on a 10-core, 64 GB arm64 Mac: each job's time and
+  # peak (the largest 3 s sample of its process tree and of its cbmc).
+  # This repository is public, so ubuntu-latest has 4 CPUs and 16 GB
+  # (15.6 GB usable; near-approval's kani job reports it).
+  # tools/scripts/kani-matrices.py writes the four Kani matrices from the
+  # measurement (each matrix's comment has its counts and rules); a job
+  # not measured yet is sized from W7's measurement or v1.0.0's
+  # kani/RESULTS.md (peak times 1.25):
+  # - harnesses that peaked at 13 GB or less: the kani job. They fit that
+  #   runner in memory, with about 2.6 GB to spare for the difference
+  #   between the macOS measurement and Linux (and a swap file as a further
+  #   margin).
+  # - harnesses that peaked above 13 GB, h_full_256 and h_wedge: the
+  #   kani-large job. h_full_256 (0.6 GB in v1.0.0) filled ubuntu-latest's
+  #   memory and swap in v1.1.0 (CI runs 43600054037, 43618869922), so it
+  #   and mutant 21, which it kills, stay large whatever their local peak.
+  #   In v1.0.0, on ubuntu-latest the large harnesses ran on swap and
+  #   failed or crawled (strategy.md section 14): in CI run
+  #   43469880167 those on swap took up to 4.3 times their measured time,
+  #   h_energy_max, h_validate and h_bmc_from_init_s_submit ran out of time
+  #   and h_bmc_from_init_po's runner shut down; in run 43488691444
+  #   h_bmc_from_init_s_submit's runner lost contact after 52 minutes on
+  #   swap and h_bmc_from_init_po ran over 3 hours before it was cancelled.
+  #   So they run on a local machine instead: kani/local/run-local.py runs
+  #   kani-large's harnesses and kani-mutants-large's mutants with the same
+  #   run.sh (--record: under these timeouts; its --all measurement: under
+  #   limits no higher than them), and kani/local/record.py writes the record
+  #   to kani/local from those runs (kani/local/README.md): the runs' commit,
+  #   a fingerprint of the Kani inputs (every file under kani/ but kani/local
+  #   and the Markdown, with the git object ids of kani/src, Cargo.toml,
+  #   Cargo.lock, mutants, run.sh and .gitignore on their own lines; the
+  #   source-mirror gitlink and conformance/traces/core.txt; the repository's
+  #   .cargo/config[.toml] above kani/, which cargo also reads; versions.env's
+  #   KANI and CBMC), each harness's and mutant's result, time, peak and
+  #   limit, and the harnesses' covers. A kani-mutants-large mutant that no
+  #   local run finished may instead be declared in kani/local/not-run.tsv,
+  #   with its reason: kani-record warns for each on every run, and the
+  #   mutants job still checks its plain-mode kill.
+  # kani-large and kani-mutants-large run only when the KANI_RUNNER repository
+  # variable names a runner with at least 1.25 times the largest kani-large
+  # gb, not ubuntu-latest, and this run is not routed (see above `jobs:`): the
+  # pin job's `large` output. The kani-record job
+  # (tools/scripts/check-kani-record.py) checks the record on every run: it
+  # fails when the record's fingerprint is not this commit's ("re-run the
+  # local Kani record"), a recorded harness is not ok or a recorded mutant not
+  # as its patch expects, or the record and the kani groups do not cover
+  # `run.sh list` exactly once (kani-large's groups must be the recorded
+  # harnesses; the same for the mutants, but for those declared not run), or a
+  # kani-large or kani-mutants-large timeout is below the limit the record ran
+  # that job under (this workflow is not in the fingerprint). The covers job
+  # counts the recorded harnesses and their covers with the groups'. A stale
+  # record is only a warning when this run verifies everything it records:
+  # kani-large its harnesses and kani-mutants-large (manual, `mutants`) its
+  # mutants, both on KANI_RUNNER.
+  # The Kani jobs take KANI_RUNNER, then CI_RUNNER, then ubuntu-latest, as
+  # near-approval's do; routed runs always get ubuntu-latest (and the local
+  # record). A group that runs out of time fails (TIMEOUT in the job's
+  # output and logs). Nothing is skipped: a group passes only if every
+  # harness in it does. A runner whose memory plus swap is below a group's
+  # peak fails that group at once (the runner-size step), and so does, in
+  # kani-large and kani-mutants-large, a hosted runner whose memory is.
+  #
+  # Per group: gb is the largest measured peak, rounded up. KANI_MAX_GB is
+  # 1.5 times gb: a harness that needs half as much again as it did has
+  # changed, and is stopped (OUT-OF-MEMORY) instead of swapping for hours.
+  # run.sh compares resident memory, which cannot exceed the runner's RAM,
+  # so on ubuntu-latest a cap of 16 GB or more never fires; there the
+  # kernel's OOM killer stops a harness that exhausts memory and swap
+  # (FAILED). (The local run keeps run.sh's default cap, 40 GB.)
+  # KANI_TIMEOUT, per harness, is three times the slowest time in the group,
+  # and at least run.sh's 1800 s (it replaces run.sh's 7200 s for the
+  # _inv_3 parts and h_full_256_prune): in kani, the hosted time (CI's, else
+  # 2.5 times the local one); in kani-large, the local time, and at least
+  # the limit the measurement ran each harness under (the record's limit_s).
+  # Each kani group's harnesses times KANI_TIMEOUT fit 330 of the 360
+  # minutes. On swap (a runner with less memory than the group's peak) the
+  # kani step raises it to each harness's share of 330 minutes.
+  # A family's covers can be split across groups and the local record: each
+  # group only records its covers (KANI_DEFER_COVERS=1), and the covers job
+  # checks them all together, as near-approval's does. That job also fails
+  # if a harness of kani/run.sh is in no group (nor the record) or in two.
+  # No loop-bounds job: near-approval's U-1 (kani-loops.py) derives a bound
+  # for every loop for its cutoff argument. shared-pool claims no cutoff;
+  # run.sh sets per-loop bounds and keeps unwinding assertions on, so a
+  # bound that is too small fails the harness instead of hiding a path.
+  plain:
+    # The Kani harness bodies with a random source (kani/run.sh plain): 33
+    # tests, 2,000 to 2,000,000 samples each, and REF-1..3 over every call
+    # of the 216 conformance traces. Testing, not proof. 11 s of tests on
+    # the reference machine; the rest is the toolchain and a cold build.
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        # Hosted runners only: a self-hosted runner's CARGO_HOME persists and
+        # is shared by every repository's jobs.
+        if: runner.environment == 'github-hosted'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            projects/shared-pool/kani/target
+          key: sp-plain-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/versions.env', 'projects/shared-pool/kani/Cargo.lock') }}
+      - name: Plain mode (random source; testing, not proof)
+        run: projects/shared-pool/kani/run.sh plain
+
+  mutants:
+    # The 45 mutants of kani/mutants in plain mode (kani/run.sh mutants):
+    # each must-kill patch (44: 43 of the core, 1 of the TLA+ transcription
+    # tla.rs) must make a plain test fail, and the equivalent mutant 20
+    # (must-survive) must pass. About 13 minutes on ubuntu-latest (CI run
+    # 43618869922).
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - name: Core and tla.rs mutants, plain mode (run.sh mutants)
+        env:
+          KEEP_LOGS: ${{ runner.temp }}/kani-mutant-logs
+        run: |
+          # run.sh copies each mutant's log into KEEP_LOGS but does not
+          # create it.
+          mkdir -p "$KEEP_LOGS"
+          projects/shared-pool/kani/run.sh mutants
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kani-mutant-logs-plain
+          path: ${{ runner.temp }}/kani-mutant-logs
+          retention-days: 14
+
+  kani:
+    # The groups that peaked at 13 GB or less: every harness of them on the
+    # real pool-core (kani/run.sh kani <group>), with unwinding assertions
+    # on: each must verify, h_canary must FAIL on its own assertion only.
+    # Groups, runners and limits: see above `plain:`.
+    needs: pin
+    if: needs.pin.outputs.kani == 'true'
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.KANI_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+    # The hosted-runner cap. Each group's harnesses times KANI_TIMEOUT, plus
+    # setup and codegen, fits in it.
+    timeout-minutes: 360
+    env:
+      KANI_SWAP_GB: ${{ vars.KANI_SWAP_GB || '16' }}
+      GB: ${{ matrix.gb }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Written by tools/scripts/kani-matrices.py from the run-local.py
+        # --all measurement (Kani fingerprint 384dac67...; runs started
+        # 2026-11-14T14:30:33Z, 2026-11-14T18:12:53Z, 2026-11-14T21:13:56Z):
+        # do not edit by hand, re-run it.
+        #
+        # The 50 harnesses whose peak, rounded up, is 13 GB or less (in memory
+        # on ubuntu-latest), in 7 groups, run one at a time. gb: the group's
+        # largest peak, rounded up. timeout: KANI_TIMEOUT per harness, 3 times
+        # the group's slowest hosted time (CI run 43618869922's, else 2.5
+        # times the local time), at least 1800 s; the group's harnesses times
+        # it fit 330 of the job's 360 minutes. Peaks and local times: the
+        # local measurement (26 of them), else W7's, else v1.0.0's
+        # kani/RESULTS.md (peak times 1.25). These groups and kani-large's, or
+        # the local record's harnesses, are every harness of kani/run.sh once
+        # (tools/scripts/check-kani-record.py, the covers job).
+        include:
+          - { group: "h_init_inv h_init_inv_2 h_best h_canary h_version_cap_dispatch h_version_cap_ack", gb: 13, timeout: 1800 }
+          - { group: "h_version_cap_cancel h_version_cap_pause h_version_cap_observe h_version_max_ack h_version_max_cancel h_version_max_settle", gb: 12, timeout: 1800 }
+          - { group: "h_wf_dispatch h_wf_ack h_wf_cancel h_step_dispatch_tx h_step_dispatch_post h_step_dispatch_inv", gb: 13, timeout: 1800 }
+          - { group: "h_step_dispatch_cov h_step_ack_tx h_step_ack_post h_step_ack_inv h_step_ack_cov h_step_cancel_tx h_step_pause_tx h_step_pause_post", gb: 10, timeout: 1800 }
+          - { group: "h_step_pause_inv h_step_pause_cov h_step_observe_tx h_step_observe_inv h_step_observe_cov h_step_dispatch_inv_0 h_step_dispatch_inv_1 h_step_ack_inv_0", gb: 13, timeout: 1800 }
+          - { group: "h_step_ack_inv_1 h_step_ack_inv_3 h_step_cancel_inv_0 h_step_cancel_inv_1 h_step_settle_inv_0 h_step_pause_inv_0 h_step_pause_inv_1 h_step_pause_inv_3", gb: 13, timeout: 1800 }
+          - { group: "h_step_observe_inv_0 h_step_observe_inv_1 h_step_observe_inv_3 h_ref_dispatch h_ref_ack h_ref_cancel h_ref_pause h_ref_observe", gb: 12, timeout: 1980 }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Install Kani (and the CBMC it bundles)
+        run: |
+          . tools/versions.env
+          cargo install --locked kani-verifier --version "$KANI"
+          # `cargo kani setup` always re-downloads the bundle; on a persistent
+          # self-hosted HOME skip it once the bundle and its toolchain link
+          # (setup's last step) are in place.
+          kani_dir="${KANI_HOME:-$HOME/.kani}/kani-$KANI"
+          if [ ! -x "$kani_dir/bin/cbmc" ] || [ ! -d "$kani_dir/toolchain/bin" ]; then
+            cargo kani setup
+          fi
+      - name: Check CBMC version
+        run: |
+          . tools/versions.env
+          # The pinned version's own CBMC: a persistent HOME may hold others.
+          cbmc_bin="${KANI_HOME:-$HOME/.kani}/kani-$KANI/bin/cbmc"
+          "$cbmc_bin" --version | grep -q "^$CBMC" || { echo "CBMC is not $CBMC"; "$cbmc_bin" --version; exit 1; }
+      - name: Swap, a margin over the measured peak
+        # Hosted Linux only: it deletes SDKs and replaces the host's swap
+        # with sudo, which a self-hosted runner must not do (and macOS sizes
+        # its own swap). This job's entries peaked at 13 GB or less on
+        # macOS and run in memory on ubuntu-latest; the swap file
+        # (KANI_SWAP_GB, default 16; 0: none) is a margin for a Linux peak
+        # above the macOS one, which leaves out compressed pages. The large
+        # entries do not run on hosted swap (see above `plain:`).
+        if: env.KANI_SWAP_GB != '0' && runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          # Free preinstalled SDKs this job does not use, for the swap file;
+          # leave 6 GB of disk for the build and logs.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          avail=$(df --output=avail -BG / | tail -1 | tr -dc 0-9)
+          gb=$(( KANI_SWAP_GB < avail - 6 ? KANI_SWAP_GB : avail - 6 ))
+          if [ "$gb" -lt 1 ]; then echo "::warning::no disk for swap (${avail} GB free)"; exit 0; fi
+          sudo swapoff -a || true
+          sudo fallocate -l "${gb}G" /kani.swap
+          sudo chmod 600 /kani.swap
+          sudo mkswap /kani.swap >/dev/null
+          sudo swapon /kani.swap
+          echo "::notice::swap ${gb} GB, disk free $(df --output=avail -BG / | tail -1)"
+      - name: Runner size against the measured peak
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            ram=$(( $(sysctl -n hw.memsize) / 1073741824 )); swap=
+          else
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            swap=$(( $(awk '/^SwapTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+          fi
+          echo "::notice::runner has $(getconf _NPROCESSORS_ONLN) CPUs, $ram GB memory, ${swap:-dynamic} GB swap; this job's harnesses peaked at $GB GB (the matrix gb, from the local measurement)"
+          if [ "$ram" -lt "$GB" ]; then
+            if [ -n "$swap" ] && [ $(( ram + swap )) -lt "$GB" ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and the runner has $ram GB of memory and $swap GB of swap: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB (strategy.md section 14)"
+              exit 1
+            fi
+            echo "::warning::this job's harnesses peaked at $GB GB, above the runner's $ram GB: they run on swap, up to 4 times slower than measured or out of time (CI run 43469880167); KANI_RUNNER names a larger runner (strategy.md section 14)"
+          fi
+      - name: Kani ${{ matrix.group }}
+        env:
+          GROUP: ${{ matrix.group }}
+          KANI_TIMEOUT: ${{ matrix.timeout }}
+          KANI_LOG_DIR: ${{ runner.temp }}/kani-logs
+          KANI_DEFER_COVERS: "1"
+        run: |
+          # 1.5 times the group's measured peak (see above `plain:`).
+          export KANI_MAX_GB=$(( (GB * 3 + 1) / 2 ))
+          # run.sh reads each harness's loop ids with this CBMC (by default
+          # the last ~/.kani/kani-*; a persistent HOME may hold others). Not
+          # by sourcing versions.env: run.sh reads KANI as the Kani command.
+          v=$(sed -n 's/^KANI=//p' tools/versions.env)
+          export KANI_CBMC="${KANI_HOME:-$HOME/.kani}/kani-$v/bin/cbmc"
+          # GROUP: harness names separated by spaces.
+          read -ra harnesses <<<"$GROUP"
+          if [ -r /proc/meminfo ]; then
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            # On swap (memory below the group's peak: a KANI_RUNNER or
+            # CI_RUNNER smaller than the group, with swap of its own) the
+            # measured times do not hold: in CI run 43469880167 harnesses
+            # on swap took up to 4.3 times their macOS time, three ran out
+            # of time and h_step_submit_inv_3 used 3,586 of its 3,600 s.
+            # There each harness may use an equal share of 330 of the job's
+            # 360 minutes.
+            share=$(( 330 * 60 / ${#harnesses[@]} ))
+            if [ "$ram" -lt "$GB" ] && [ "$share" -gt "$KANI_TIMEOUT" ]; then
+              echo "::notice::on swap: KANI_TIMEOUT $KANI_TIMEOUT -> $share s per harness (330 minutes over ${#harnesses[@]})"
+              export KANI_TIMEOUT=$share
+            fi
+            # Memory and swap in use every 5 minutes, in the job's output,
+            # which survives a runner that goes down (the uploaded logs do
+            # not; CI runs 43469880167 and 43488691444 lost runners on
+            # swap).
+            (while sleep 300; do free -g | awk '/^Mem:/{m=$3} /^Swap:/{w=$3} END{print "memory in use " m " GB, swap in use " w " GB"}'; done) &
+            sampler=$!
+            trap 'pkill -P "$sampler" 2>/dev/null; kill "$sampler" 2>/dev/null || true' EXIT
+          fi
+          projects/shared-pool/kani/run.sh kani "${harnesses[@]}"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kani-logs-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/kani-logs
+          retention-days: 14
+
+  kani-large:
+    # The groups that peaked above 13 GB, with h_full_256 and h_wedge (see
+    # above `plain:`), run as the kani job runs its own, on KANI_RUNNER
+    # only: the pin job's `large` output is true when KANI_RUNNER is set,
+    # is not ubuntu-latest, and this run is not routed, so the runs-on
+    # below resolves to it. Without it kani-record checks these groups'
+    # local record instead (see above `plain:`). No swap step: on hosted
+    # swap these groups failed or crawled, so a hosted KANI_RUNNER must
+    # hold them in memory (the runner-size step).
+    needs: pin
+    if: needs.pin.outputs.kani == 'true' && needs.pin.outputs.large == 'true'
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.KANI_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 360
+    env:
+      GB: ${{ matrix.gb }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Written by tools/scripts/kani-matrices.py from the run-local.py
+        # --all measurement (Kani fingerprint 384dac67...; runs started
+        # 2026-11-14T14:30:33Z, 2026-11-14T18:12:53Z, 2026-11-14T21:13:56Z):
+        # do not edit by hand, re-run it.
+        #
+        # 48 harnesses in 17 groups: those whose peak, rounded up, is above 13
+        # GB; h_full_256, whatever its local peak, at gb 30 or more (in CI it
+        # filled ubuntu-latest's 15 GB of memory and about 15 GB of swap); and
+        # h_wedge, in a group of its own (the record's self-test samples it).
+        # gb: the group's largest peak, rounded up. timeout: the largest of
+        # 1800 s, 3 times the slowest local time and the limit the measurement
+        # ran each under (the record's limit_s: a timeout below it fails
+        # kani-record; raising one is fine). These are the local record's
+        # harnesses (check-kani-record.py), and kani/local/run-local.py
+        # --record runs them, with these timeouts, from this list. Measured
+        # locally: 48 of the 48; not yet (sized from estimates; the record
+        # needs a run of each): none.
+        include:
+          - { group: "h_init h_validate h_energy", gb: 37, timeout: 2580 }
+          - { group: "h_energy_exact h_energy_max h_preview", gb: 33, timeout: 6000 }
+          - { group: "h_preview_post h_live_all", gb: 24, timeout: 7200 }
+          - { group: "h_wedge_healthy h_bmc_from_init_po h_slot_cycle_0", gb: 38, timeout: 6120 }
+          - { group: "h_slot_cycle_2 h_full_255 h_full_256", gb: 40, timeout: 4500 }
+          - { group: "h_full_256_prune h_version_cap_submit", gb: 21, timeout: 7200 }
+          - { group: "h_version_cap_settle h_wf_submit", gb: 21, timeout: 7200 }
+          - { group: "h_wf_settle h_bmc_from_init_s_submit", gb: 40, timeout: 7200 }
+          - { group: "h_bmc_from_init_s_dispatch h_bmc_from_init_s_ack h_bmc_from_init_s_cancel h_bmc_from_init_s_settle h_bmc_from_init_s_pause h_bmc_from_init_s_observe h_step_submit_tx", gb: 22, timeout: 2340 }
+          - { group: "h_step_submit_post h_step_submit_inv h_step_submit_cov h_step_cancel_post h_step_cancel_inv", gb: 25, timeout: 3360 }
+          - { group: "h_step_cancel_cov h_step_settle_tx h_step_settle_post h_step_settle_inv h_step_settle_cov h_step_observe_post", gb: 21, timeout: 3060 }
+          - { group: "h_step_submit_inv_0 h_step_submit_inv_1", gb: 26, timeout: 2160 }
+          - { group: "h_step_submit_inv_3 h_step_dispatch_inv_3", gb: 27, timeout: 7200 }
+          - { group: "h_step_cancel_inv_3 h_step_settle_inv_1", gb: 21, timeout: 7200 }
+          - { group: "h_step_settle_inv_3 h_ref_submit", gb: 23, timeout: 8460 }
+          - { group: "h_ref_settle", gb: 15, timeout: 1800 }
+          - { group: "h_wedge", gb: 32, timeout: 2220 }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Install Kani (and the CBMC it bundles)
+        run: |
+          . tools/versions.env
+          cargo install --locked kani-verifier --version "$KANI"
+          # `cargo kani setup` always re-downloads the bundle; on a persistent
+          # self-hosted HOME skip it once the bundle and its toolchain link
+          # (setup's last step) are in place.
+          kani_dir="${KANI_HOME:-$HOME/.kani}/kani-$KANI"
+          if [ ! -x "$kani_dir/bin/cbmc" ] || [ ! -d "$kani_dir/toolchain/bin" ]; then
+            cargo kani setup
+          fi
+      - name: Check CBMC version
+        run: |
+          . tools/versions.env
+          # The pinned version's own CBMC: a persistent HOME may hold others.
+          cbmc_bin="${KANI_HOME:-$HOME/.kani}/kani-$KANI/bin/cbmc"
+          "$cbmc_bin" --version | grep -q "^$CBMC" || { echo "CBMC is not $CBMC"; "$cbmc_bin" --version; exit 1; }
+      - name: Runner size against the measured peak
+        env:
+          RUNNER_KIND: ${{ runner.environment }}
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            ram=$(( $(sysctl -n hw.memsize) / 1073741824 )); swap=
+          else
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            swap=$(( $(awk '/^SwapTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+          fi
+          echo "::notice::runner has $(getconf _NPROCESSORS_ONLN) CPUs, $ram GB memory, ${swap:-dynamic} GB swap; this job's harnesses peaked at $GB GB (the matrix gb, from the local measurement)"
+          if [ "$ram" -lt "$GB" ]; then
+            # The large entries do not run on a hosted runner's swap: there
+            # they failed or crawled (CI runs 43469880167, 43488691444).
+            if [ "$RUNNER_KIND" = github-hosted ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and this hosted runner has $ram GB of memory: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB, or unset it so that kani-record checks the local record (strategy.md section 14)"
+              exit 1
+            fi
+            if [ -n "$swap" ] && [ $(( ram + swap )) -lt "$GB" ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and the runner has $ram GB of memory and $swap GB of swap: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB (strategy.md section 14)"
+              exit 1
+            fi
+            echo "::warning::this job's harnesses peaked at $GB GB, above the runner's $ram GB: they run on swap, up to 4 times slower than measured or out of time (CI run 43469880167); KANI_RUNNER names a larger runner (strategy.md section 14)"
+          fi
+      - name: Kani ${{ matrix.group }}
+        env:
+          GROUP: ${{ matrix.group }}
+          KANI_TIMEOUT: ${{ matrix.timeout }}
+          KANI_LOG_DIR: ${{ runner.temp }}/kani-logs
+          KANI_DEFER_COVERS: "1"
+        run: |
+          # 1.5 times the group's measured peak (see above `plain:`).
+          export KANI_MAX_GB=$(( (GB * 3 + 1) / 2 ))
+          # run.sh reads each harness's loop ids with this CBMC (by default
+          # the last ~/.kani/kani-*; a persistent HOME may hold others). Not
+          # by sourcing versions.env: run.sh reads KANI as the Kani command.
+          v=$(sed -n 's/^KANI=//p' tools/versions.env)
+          export KANI_CBMC="${KANI_HOME:-$HOME/.kani}/kani-$v/bin/cbmc"
+          # GROUP: harness names separated by spaces.
+          read -ra harnesses <<<"$GROUP"
+          if [ -r /proc/meminfo ]; then
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            # On swap (memory below the group's peak: a KANI_RUNNER or
+            # CI_RUNNER smaller than the group, with swap of its own) the
+            # measured times do not hold: in CI run 43469880167 harnesses
+            # on swap took up to 4.3 times their macOS time, three ran out
+            # of time and h_step_submit_inv_3 used 3,586 of its 3,600 s.
+            # There each harness may use an equal share of 330 of the job's
+            # 360 minutes.
+            share=$(( 330 * 60 / ${#harnesses[@]} ))
+            if [ "$ram" -lt "$GB" ] && [ "$share" -gt "$KANI_TIMEOUT" ]; then
+              echo "::notice::on swap: KANI_TIMEOUT $KANI_TIMEOUT -> $share s per harness (330 minutes over ${#harnesses[@]})"
+              export KANI_TIMEOUT=$share
+            fi
+            # Memory and swap in use every 5 minutes, in the job's output,
+            # which survives a runner that goes down (the uploaded logs do
+            # not; CI runs 43469880167 and 43488691444 lost runners on
+            # swap).
+            (while sleep 300; do free -g | awk '/^Mem:/{m=$3} /^Swap:/{w=$3} END{print "memory in use " m " GB, swap in use " w " GB"}'; done) &
+            sampler=$!
+            trap 'pkill -P "$sampler" 2>/dev/null; kill "$sampler" 2>/dev/null || true' EXIT
+          fi
+          projects/shared-pool/kani/run.sh kani "${harnesses[@]}"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kani-logs-large-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/kani-logs
+          retention-days: 14
+
+  kani-record:
+    # The local record of the kani-large groups and kani-mutants-large
+    # mutants (kani/local; see above `plain:`), on every run:
+    # tools/scripts/check-kani-record.py after its self-test. Seconds; no
+    # submodule (the fingerprint reads git objects: the gitlink is the
+    # core's commit). A stale record fails, unless this run verifies all
+    # it records on KANI_RUNNER: kani-large its harnesses (the pin job's
+    # `kani` and `large`), kani-mutants-large its mutants (`mutants` and
+    # `large`). Then it is a warning. kani-mutants-large runs only on a
+    # manual run with `mutants`, so a pull request or push that changes a
+    # Kani input fails here until the record is re-made, KANI_RUNNER or
+    # not.
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Python >= 3.11 (tomllib)
+        # The self-test runs kani/local/run-local.py --dry-run, which parses
+        # cargo configuration with tomllib.
+        if: runner.os == 'macOS'
+        run: |
+          python3 -c 'import tomllib' 2>/dev/null && exit 0
+          for py in python3.13 python3.12 python3.11; do
+            if p=$(command -v "$py"); then
+              mkdir -p "$RUNNER_TEMP/python-bin"
+              ln -sf "$p" "$RUNNER_TEMP/python-bin/python3"
+              echo "$RUNNER_TEMP/python-bin" >> "$GITHUB_PATH"
+              exit 0
+            fi
+          done
+          echo "::error::no python3 >= 3.11 on PATH"; exit 1
+      - name: Record check self-test
+        run: tools/scripts/test-check-kani-record.sh
+      - name: The local record is this commit's, ok, and splits the harnesses and mutants with the groups
+        env:
+          # Whether kani-large and kani-mutants-large run (their `if:`).
+          LARGE_HARNESSES: ${{ needs.pin.outputs.kani == 'true' && needs.pin.outputs.large == 'true' }}
+          LARGE_MUTANTS: ${{ inputs.mutants == true && needs.pin.outputs.large == 'true' }}
+        run: |
+          args=()
+          if [ "$LARGE_HARNESSES" = true ]; then args+=(--stale-ok-harnesses); fi
+          if [ "$LARGE_MUTANTS" = true ]; then args+=(--stale-ok-mutants); fi
+          tools/scripts/check-kani-record.py ${args[@]+"${args[@]}"}
+
+  covers:
+    # Every harness of kani/run.sh in exactly one kani or kani-large group,
+    # or (without KANI_RUNNER) the local record, and every cover SATISFIED
+    # in at least one harness of its family across them (each group
+    # uploads its logs and covers.tsv; the record holds its harnesses'
+    # covers): the 98 harnesses of run.sh list at v1.1.0.
+    needs: [pin, kani, kani-large, kani-record]
+    if: ${{ !cancelled() && needs.kani.result != 'skipped' }}
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    env:
+      # Whether kani-large ran (its `if:`): then its logs hold the large
+      # groups' harnesses and covers, else the local record does.
+      LARGE: ${{ needs.pin.outputs.kani == 'true' && needs.pin.outputs.large == 'true' }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: kani-logs-*
+          path: ${{ runner.temp }}/kani-logs
+      - name: Every harness in one group or the local record
+        run: |
+          mkdir -p "$RUNNER_TEMP/kani-logs"
+          want=$(projects/shared-pool/kani/run.sh list | sort)
+          ran=$(cd "$RUNNER_TEMP/kani-logs" && find . -mindepth 2 -maxdepth 2 -name 'h_*.log' | sed 's|.*/||; s|\.log$||')
+          if [ "$LARGE" != true ]; then
+            # Without KANI_RUNNER the large groups' harnesses are the local
+            # record's (kani-record checks the record).
+            rec=$(tools/scripts/check-kani-record.py harnesses) || exit 1
+            ran=$(printf '%s\n%s\n' "$ran" "$rec")
+          fi
+          ran=$(echo "$ran" | sed '/^$/d' | sort)
+          missing=$(comm -23 <(echo "$want") <(echo "$ran" | sort -u))
+          extra=$(comm -13 <(echo "$want") <(echo "$ran" | sort -u))
+          twice=$(echo "$ran" | uniq -d)
+          if [ -n "$missing$extra$twice" ]; then
+            echo "::error::the kani groups and the local record must run every harness of kani/run.sh once"
+            [ -z "$missing" ] || echo "in no group or the record (or its job failed before it): $missing"
+            [ -z "$extra" ] || echo "not a harness of run.sh: $extra"
+            [ -z "$twice" ] || echo "in more than one group or the record: $twice"
+            exit 1
+          fi
+          echo "$(echo "$ran" | wc -l | tr -d ' ') harnesses, each in one group$([ "$LARGE" = true ] || echo ' or the local record')"
+      - name: Covers per family
+        run: |
+          files=("$RUNNER_TEMP"/kani-logs/*/covers.tsv)
+          if [ "$LARGE" != true ]; then
+            # The local record's harnesses' covers, in run.sh's format.
+            tools/scripts/check-kani-record.py covers >"$RUNNER_TEMP/local-record-covers.tsv"
+            files+=("$RUNNER_TEMP/local-record-covers.tsv")
+          fi
+          tools/scripts/check-covers.sh "${files[@]}"
+
+  kani-mutants:
+    # Each mutant of kani/mutants in plain mode and under Kani (kani/run.sh
+    # mutants --kani <NN>-*): a must-kill mutant must make plain mode fail
+    # and a `killed-by` harness FAIL (run.sh tries them in order and stops
+    # at the first that does; CBMC stops at the first violated check); the
+    # equivalent mutant 20 must pass plain mode and both its `checked-by`
+    # harnesses. Manual runs with `mutants` only, as near-approval's
+    # mutants job. Here those whose Kani leg (the first killed-by, or every
+    # checked-by) peaked at 13 GB or less, but for mutant 21 (h_full_256's);
+    # the others are kani-mutants-large's on KANI_RUNNER, or the local
+    # record's (see above `plain:`). Runner and swap as in the kani job.
+    needs: pin
+    if: inputs.mutants
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.KANI_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+    # The hosted-runner cap: a plain run, codegen and at most two harnesses
+    # of KANI_TIMEOUT.
+    timeout-minutes: 360
+    env:
+      KANI_SWAP_GB: ${{ vars.KANI_SWAP_GB || '16' }}
+      GB: ${{ matrix.gb }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Written by tools/scripts/kani-matrices.py from the run-local.py
+        # --all measurement (Kani fingerprint 384dac67...; runs started
+        # 2026-11-14T14:30:33Z, 2026-11-14T18:12:53Z, 2026-11-14T21:13:56Z):
+        # do not edit by hand, re-run it.
+        #
+        # The 17 mutants whose Kani leg (the first killed-by; every checked-by
+        # of a must-survive patch) peaked at 13 GB or less, rounded up, and
+        # runs no harness kept in kani-large for ubuntu-latest's memory
+        # (h_full_256). gb: the leg's largest peak (or the mutant's own, if
+        # larger), rounded up; timeout: the leg harnesses' KANI_TIMEOUT as in
+        # the kani matrix, at least 1800 s. These, and kani-mutants-large's,
+        # are every mutants/*.patch once (check-kani-record.py).
+        include:
+          - { mutant: "02", gb: 6, timeout: 1800 }
+          - { mutant: "04", gb: 6, timeout: 1800 }
+          - { mutant: "07", gb: 13, timeout: 1800 }
+          - { mutant: "08", gb: 6, timeout: 1800 }
+          - { mutant: "09", gb: 4, timeout: 1800 }
+          - { mutant: "13", gb: 8, timeout: 1800 }
+          - { mutant: "14", gb: 13, timeout: 1800 }
+          - { mutant: "17", gb: 8, timeout: 1800 }
+          - { mutant: "22", gb: 4, timeout: 1800 }
+          - { mutant: "24", gb: 4, timeout: 1800 }
+          - { mutant: "26", gb: 4, timeout: 1800 }
+          - { mutant: "27", gb: 13, timeout: 1800 }
+          - { mutant: "31", gb: 12, timeout: 1800 }
+          - { mutant: "34", gb: 5, timeout: 1800 }
+          - { mutant: "38", gb: 13, timeout: 1800 }
+          - { mutant: "39", gb: 8, timeout: 1800 }
+          - { mutant: "43", gb: 6, timeout: 1800 }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - name: Install Kani (and the CBMC it bundles)
+        run: |
+          . tools/versions.env
+          cargo install --locked kani-verifier --version "$KANI"
+          # `cargo kani setup` always re-downloads the bundle; on a persistent
+          # self-hosted HOME skip it once the bundle and its toolchain link
+          # (setup's last step) are in place.
+          kani_dir="${KANI_HOME:-$HOME/.kani}/kani-$KANI"
+          if [ ! -x "$kani_dir/bin/cbmc" ] || [ ! -d "$kani_dir/toolchain/bin" ]; then
+            cargo kani setup
+          fi
+      - name: Check CBMC version
+        run: |
+          . tools/versions.env
+          # The pinned version's own CBMC: a persistent HOME may hold others.
+          cbmc_bin="${KANI_HOME:-$HOME/.kani}/kani-$KANI/bin/cbmc"
+          "$cbmc_bin" --version | grep -q "^$CBMC" || { echo "CBMC is not $CBMC"; "$cbmc_bin" --version; exit 1; }
+      - name: Swap, a margin over the measured peak
+        # Hosted Linux only: it deletes SDKs and replaces the host's swap
+        # with sudo, which a self-hosted runner must not do (and macOS sizes
+        # its own swap). This job's entries peaked at 13 GB or less on
+        # macOS and run in memory on ubuntu-latest; the swap file
+        # (KANI_SWAP_GB, default 16; 0: none) is a margin for a Linux peak
+        # above the macOS one, which leaves out compressed pages. The large
+        # entries do not run on hosted swap (see above `plain:`).
+        if: env.KANI_SWAP_GB != '0' && runner.environment == 'github-hosted' && runner.os == 'Linux'
+        run: |
+          # Free preinstalled SDKs this job does not use, for the swap file;
+          # leave 6 GB of disk for the build and logs.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/.ghcup /opt/hostedtoolcache/CodeQL
+          avail=$(df --output=avail -BG / | tail -1 | tr -dc 0-9)
+          gb=$(( KANI_SWAP_GB < avail - 6 ? KANI_SWAP_GB : avail - 6 ))
+          if [ "$gb" -lt 1 ]; then echo "::warning::no disk for swap (${avail} GB free)"; exit 0; fi
+          sudo swapoff -a || true
+          sudo fallocate -l "${gb}G" /kani.swap
+          sudo chmod 600 /kani.swap
+          sudo mkswap /kani.swap >/dev/null
+          sudo swapon /kani.swap
+          echo "::notice::swap ${gb} GB, disk free $(df --output=avail -BG / | tail -1)"
+      - name: Runner size against the measured peak
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            ram=$(( $(sysctl -n hw.memsize) / 1073741824 )); swap=
+          else
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            swap=$(( $(awk '/^SwapTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+          fi
+          echo "::notice::runner has $(getconf _NPROCESSORS_ONLN) CPUs, $ram GB memory, ${swap:-dynamic} GB swap; this job's harnesses peaked at $GB GB (the matrix gb, from the local measurement)"
+          if [ "$ram" -lt "$GB" ]; then
+            if [ -n "$swap" ] && [ $(( ram + swap )) -lt "$GB" ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and the runner has $ram GB of memory and $swap GB of swap: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB (strategy.md section 14)"
+              exit 1
+            fi
+            echo "::warning::this job's harnesses peaked at $GB GB, above the runner's $ram GB: they run on swap, up to 4 times slower than measured or out of time (CI run 43469880167); KANI_RUNNER names a larger runner (strategy.md section 14)"
+          fi
+      - name: Mutant ${{ matrix.mutant }} (plain mode and Kani)
+        env:
+          KANI_TIMEOUT: ${{ matrix.timeout }}
+          KEEP_LOGS: ${{ runner.temp }}/kani-mutant-logs
+          MUTANT: ${{ matrix.mutant }}
+        run: |
+          # As in the kani job (on swap: a share of 300 minutes for each of
+          # at most two harnesses, after the plain run).
+          export KANI_MAX_GB=$(( (GB * 3 + 1) / 2 ))
+          v=$(sed -n 's/^KANI=//p' tools/versions.env)
+          export KANI_CBMC="${KANI_HOME:-$HOME/.kani}/kani-$v/bin/cbmc"
+          if [ -r /proc/meminfo ] && [ $(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 )) -lt "$GB" ] && [ $(( 300 * 60 / 2 )) -gt "$KANI_TIMEOUT" ]; then
+            export KANI_TIMEOUT=$(( 300 * 60 / 2 ))
+            echo "::notice::on swap: KANI_TIMEOUT $KANI_TIMEOUT s per harness"
+          fi
+          mkdir -p "$KEEP_LOGS"
+          projects/shared-pool/kani/run.sh mutants --kani "$MUTANT-*"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kani-mutant-logs-${{ matrix.mutant }}
+          path: ${{ runner.temp }}/kani-mutant-logs
+          retention-days: 14
+
+  kani-mutants-large:
+    # The mutants whose Kani leg (the first killed-by, or every checked-by)
+    # peaked above 13 GB, and mutant 21 (h_full_256's), run as kani-mutants
+    # runs its own, on KANI_RUNNER only (the pin job's `large`; see
+    # kani-large); without it kani-record checks their local record (or
+    # warns for those declared not run). Manual runs with `mutants` only.
+    # No swap step, and a hosted runner must hold them in memory (the
+    # runner-size step).
+    needs: pin
+    if: inputs.mutants && needs.pin.outputs.large == 'true'
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.KANI_RUNNER || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 360
+    env:
+      GB: ${{ matrix.gb }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Written by tools/scripts/kani-matrices.py from the run-local.py
+        # --all measurement (Kani fingerprint 384dac67...; runs started
+        # 2026-11-14T14:30:33Z, 2026-11-14T18:12:53Z, 2026-11-14T21:13:56Z):
+        # do not edit by hand, re-run it.
+        #
+        # The 28 mutants whose Kani leg peaked above 13 GB, or runs h_full_256
+        # (21). gb: the leg harnesses' largest gb as in kani-large (or the
+        # mutant's own peak, if larger, rounded up); timeout: the leg
+        # harnesses' as in kani-large, and at least the limit the mutant's
+        # local run used (a timeout below the record's limit_s fails
+        # kani-record). These are the local record's mutants and those it
+        # declares not run in kani/local/not-run.tsv, for each of which
+        # kani-record warns and the mutants job still checks the plain-mode
+        # kill (check-kani-record.py); kani/local/run-local.py --record runs
+        # this list. Measured locally: 1 of the 28; not: 01 03 05 06 10 11 12
+        # 15 16 18 19 21 23 25 28 29 30 32 33 35 36 37 40 41 42 44 45.
+        include:
+          - { mutant: "01", gb: 20, timeout: 2340 }
+          - { mutant: "03", gb: 20, timeout: 2340 }
+          - { mutant: "05", gb: 16, timeout: 7200 }
+          - { mutant: "06", gb: 20, timeout: 2340 }
+          - { mutant: "10", gb: 16, timeout: 1800 }
+          - { mutant: "11", gb: 17, timeout: 1800 }
+          - { mutant: "12", gb: 20, timeout: 2340 }
+          - { mutant: "15", gb: 20, timeout: 2340 }
+          - { mutant: "16", gb: 16, timeout: 1800 }
+          - { mutant: "18", gb: 30, timeout: 6000 }
+          - { mutant: "19", gb: 20, timeout: 2340 }
+          - { mutant: "20", gb: 14, timeout: 1800 }
+          - { mutant: "21", gb: 40, timeout: 4500 }
+          - { mutant: "23", gb: 20, timeout: 2340 }
+          - { mutant: "25", gb: 18, timeout: 5040 }
+          - { mutant: "28", gb: 20, timeout: 2340 }
+          - { mutant: "29", gb: 14, timeout: 1800 }
+          - { mutant: "30", gb: 28, timeout: 3240 }
+          - { mutant: "32", gb: 25, timeout: 3360 }
+          - { mutant: "33", gb: 25, timeout: 3360 }
+          - { mutant: "35", gb: 18, timeout: 7200 }
+          - { mutant: "36", gb: 21, timeout: 7200 }
+          - { mutant: "37", gb: 37, timeout: 2580 }
+          - { mutant: "40", gb: 21, timeout: 3060 }
+          - { mutant: "41", gb: 16, timeout: 7200 }
+          - { mutant: "42", gb: 21, timeout: 7200 }
+          - { mutant: "44", gb: 21, timeout: 7200 }
+          - { mutant: "45", gb: 30, timeout: 6000 }
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - name: Install Kani (and the CBMC it bundles)
+        run: |
+          . tools/versions.env
+          cargo install --locked kani-verifier --version "$KANI"
+          # `cargo kani setup` always re-downloads the bundle; on a persistent
+          # self-hosted HOME skip it once the bundle and its toolchain link
+          # (setup's last step) are in place.
+          kani_dir="${KANI_HOME:-$HOME/.kani}/kani-$KANI"
+          if [ ! -x "$kani_dir/bin/cbmc" ] || [ ! -d "$kani_dir/toolchain/bin" ]; then
+            cargo kani setup
+          fi
+      - name: Check CBMC version
+        run: |
+          . tools/versions.env
+          # The pinned version's own CBMC: a persistent HOME may hold others.
+          cbmc_bin="${KANI_HOME:-$HOME/.kani}/kani-$KANI/bin/cbmc"
+          "$cbmc_bin" --version | grep -q "^$CBMC" || { echo "CBMC is not $CBMC"; "$cbmc_bin" --version; exit 1; }
+      - name: Runner size against the measured peak
+        env:
+          RUNNER_KIND: ${{ runner.environment }}
+        run: |
+          if [ "$RUNNER_OS" = macOS ]; then
+            ram=$(( $(sysctl -n hw.memsize) / 1073741824 )); swap=
+          else
+            ram=$(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+            swap=$(( $(awk '/^SwapTotal:/{print $2}' /proc/meminfo) / 1048576 ))
+          fi
+          echo "::notice::runner has $(getconf _NPROCESSORS_ONLN) CPUs, $ram GB memory, ${swap:-dynamic} GB swap; this job's harnesses peaked at $GB GB (the matrix gb, from the local measurement)"
+          if [ "$ram" -lt "$GB" ]; then
+            # The large entries do not run on a hosted runner's swap: there
+            # they failed or crawled (CI runs 43469880167, 43488691444).
+            if [ "$RUNNER_KIND" = github-hosted ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and this hosted runner has $ram GB of memory: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB, or unset it so that kani-record checks the local record (strategy.md section 14)"
+              exit 1
+            fi
+            if [ -n "$swap" ] && [ $(( ram + swap )) -lt "$GB" ]; then
+              echo "::error::this job's harnesses peaked at $GB GB and the runner has $ram GB of memory and $swap GB of swap: set KANI_RUNNER to a runner with at least $(( (GB * 5 + 3) / 4 )) GB (strategy.md section 14)"
+              exit 1
+            fi
+            echo "::warning::this job's harnesses peaked at $GB GB, above the runner's $ram GB: they run on swap, up to 4 times slower than measured or out of time (CI run 43469880167); KANI_RUNNER names a larger runner (strategy.md section 14)"
+          fi
+      - name: Mutant ${{ matrix.mutant }} (plain mode and Kani)
+        env:
+          KANI_TIMEOUT: ${{ matrix.timeout }}
+          KEEP_LOGS: ${{ runner.temp }}/kani-mutant-logs
+          MUTANT: ${{ matrix.mutant }}
+        run: |
+          # As in the kani job (on swap: a share of 300 minutes for each of
+          # at most two harnesses, after the plain run).
+          export KANI_MAX_GB=$(( (GB * 3 + 1) / 2 ))
+          v=$(sed -n 's/^KANI=//p' tools/versions.env)
+          export KANI_CBMC="${KANI_HOME:-$HOME/.kani}/kani-$v/bin/cbmc"
+          if [ -r /proc/meminfo ] && [ $(( $(awk '/^MemTotal:/{print $2}' /proc/meminfo) / 1048576 )) -lt "$GB" ] && [ $(( 300 * 60 / 2 )) -gt "$KANI_TIMEOUT" ]; then
+            export KANI_TIMEOUT=$(( 300 * 60 / 2 ))
+            echo "::notice::on swap: KANI_TIMEOUT $KANI_TIMEOUT s per harness"
+          fi
+          mkdir -p "$KEEP_LOGS"
+          projects/shared-pool/kani/run.sh mutants --kani "$MUTANT-*"
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: kani-mutant-logs-${{ matrix.mutant }}
+          path: ${{ runner.temp }}/kani-mutant-logs
+          retention-days: 14
+
+  tla:
+    # TLA-SAFE (MC_Safety, MC_Recovery, MC_F2b), TLA-CAP (MC_Cap) and the 20
+    # TLA-WIT witnesses; LIVE-2 and WIN-LIVE in seven liveness configs
+    # (TLA-LIVE-1, TLA-LIVE-F1 and TLA-LIVE-F2 now hold, and LIVE-2 without
+    # fairness must fail); REF-5 (TraceCheck replays the 216 conformance
+    # traces). Then TLA-EXEC (Executor.tla) and the 52 spec mutants (46 core,
+    # 6 executor). TLA-IND (Apalache) is not implemented; run.sh would print
+    # skip. On a 10-core Mac shared with other jobs, 4 workers
+    # (tla/RESULTS.md): 5 min 8 s for safety liveness trace (MC_Safety
+    # 181 s, trace 9 s), 6 min 57 s (417 s) for mutants; the executor step
+    # below. About 17 to 18 minutes in all; the timeout leaves room for a
+    # slower hosted runner. On a hosted runner at TLA_HEAP 5g the job took
+    # 22 min (PR #32 run 43600054037 at 5cf571e; executor-w3, 7,323,777
+    # distinct states, 214 s).
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        # Hosted runners only; a self-hosted runner keeps the TLA+ tools in
+        # its tool cache (TLA_CACHE below).
+        if: runner.environment == 'github-hosted'
+        with:
+          path: tools/.cache
+          key: sp-tla-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/versions.env') }}
+      - name: TLC safety, liveness and trace replay
+        env:
+          TLA_HEAP: ${{ runner.environment == 'github-hosted' && '5g' || '12g' }}
+          TLA_LOG_DIR: ${{ runner.temp }}/tla-logs
+          TLA_CACHE: ${{ runner.environment != 'github-hosted' && format('{0}/formalver-tla', runner.tool_cache) || '' }}
+        run: projects/shared-pool/tla/run.sh safety liveness trace
+      - name: Executor model (TLA-EXEC)
+        # The unmutated Executor.tla must hold before its mutants (49-54)
+        # count as killed. WINDOW 2 (86 s) and WINDOW 3 (184 s) on a 10-core
+        # Mac (tla/RESULTS.md), then its 12 witnesses: about 5 to 6 minutes.
+        env:
+          TLA_HEAP: ${{ runner.environment == 'github-hosted' && '5g' || '12g' }}
+          TLA_LOG_DIR: ${{ runner.temp }}/tla-logs
+          TLA_CACHE: ${{ runner.environment != 'github-hosted' && format('{0}/formalver-tla', runner.tool_cache) || '' }}
+        run: projects/shared-pool/tla/run.sh executor
+      - name: Spec mutants
+        env:
+          TLA_HEAP: ${{ runner.environment == 'github-hosted' && '5g' || '12g' }}
+          TLA_LOG_DIR: ${{ runner.temp }}/tla-logs
+          TLA_CACHE: ${{ runner.environment != 'github-hosted' && format('{0}/formalver-tla', runner.tool_cache) || '' }}
+        run: projects/shared-pool/tla/run.sh mutants
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: tla-logs
+          path: ${{ runner.temp }}/tla-logs
+          retention-days: 14
+
+  lean:
+    # LEAN-IND (Inv with INV-RES, INV-VERCAP, WIN-1 and WIN-2), LEAN-STEP,
+    # LEAN-LIVE-ALL, LEAN-LIVE1 and LEAN-GUARD for states of every size,
+    # LEAN-WIT, the axiom audit (65 headline theorems), the canaries (False,
+    # NotInv and LiveAllNoRes must fail to compile), the F-5 regression
+    # (Live1NoPremise must compile), REF-5L (every conformance trace on the
+    # Lean machine) and the 26 mutants (16 re-anchored from v1.0.0, 10 that
+    # each restore a v1.0.0 behaviour). 185 s on a 10-core Mac
+    # (lean/RESULTS.md), most of it the mutants.
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        # Hosted runners only; a self-hosted runner keeps Lean in its tool
+        # cache (LEAN_CACHE below).
+        if: runner.environment == 'github-hosted'
+        with:
+          path: tools/.cache
+          key: sp-lean-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/versions.env') }}
+      - name: Lean toolchain from versions.env
+        env:
+          LEAN_CACHE: ${{ runner.environment != 'github-hosted' && format('{0}/formalver-lean', runner.tool_cache) || '' }}
+        run: tools/scripts/get-lean.sh >> "$GITHUB_PATH"
+      - name: Build, hygiene, audit, canaries, REF-5L, mutants
+        env:
+          LEAN_LOG_DIR: ${{ runner.temp }}/lean-logs
+        run: projects/shared-pool/lean/run.sh
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: lean-logs
+          path: ${{ runner.temp }}/lean-logs
+          retention-days: 14
+
+  prolog:
+    # Requirement checks C-1..C-6, MC-1 (seven small universes), MC-2 (every
+    # conformance trace through step/4), COV-2 (test_reads: the core's
+    # preview and best_quantity in traces/reads.txt against the model), the
+    # canaries, the PROP tags and the 47 mutants (32 model, 2 requirements,
+    # 11 code and 2 reads; the reads mutants patch the core and rebuild the
+    # conformance generator with cargo).
+    # extract.py reads the pinned sources, so this job needs the submodule.
+    # C-6 compares the catalogue in traceability.pl with section 5 of
+    # projects/shared-pool/strategy.md (the path filters include that file
+    # again); a missing file or section fails it. 1,777 s, about 30 minutes,
+    # on a 10-core Mac shared with other jobs (prolog/RESULTS.md; v1.0.0:
+    # 511 s), most of it the MC-1 mutants; the timeout leaves room for
+    # slower hosted runners.
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Scryer install root
+        # The runner context is not available in job-level env.
+        run: echo "SCRYER_ROOT=$RUNNER_TOOL_CACHE/formalver-scryer" >> "$GITHUB_ENV"
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Toolchain from versions.env
+        run: |
+          . tools/versions.env
+          rustup toolchain install "$RUST_TOOLCHAIN" --profile minimal
+          # For this job only: `rustup default` would outlive it on a
+          # self-hosted runner.
+          echo "RUSTUP_TOOLCHAIN=$RUST_TOOLCHAIN" >> "$GITHUB_ENV"
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        if: runner.environment == 'github-hosted'
+        with:
+          path: ${{ env.SCRYER_ROOT }}
+          key: scryer-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('tools/versions.env') }}
+      - name: Scryer Prolog from versions.env
+        # Installed under the tool cache, not the shared CARGO_HOME, so a
+        # self-hosted runner keeps one copy per version for this repository.
+        run: |
+          . tools/versions.env
+          root="$SCRYER_ROOT/$SCRYER"
+          if ! "$root/bin/scryer-prolog" --version 2>/dev/null | grep -q "$SCRYER"; then
+            cargo install --locked scryer-prolog --version "$SCRYER" --root "$root"
+          fi
+          echo "$root/bin" >> "$GITHUB_PATH"
+      - name: Extraction, suites, canaries, PROP tags, mutants (run.sh)
+        env:
+          PROLOG_LOGS: ${{ runner.temp }}/prolog-logs
+        run: projects/shared-pool/prolog/run.sh
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: prolog-logs
+          path: ${{ runner.temp }}/prolog-logs
+          retention-days: 14
+
+  near-unit:
+    # The near-sdk shell on near-sdk's mocked runtime (near-tests/run.sh all):
+    # the PROP tag check (check-tags.py), then 38 tests on the host path and
+    # on the documented wasm build run by wasmi (upstream scripts/build.sh,
+    # RUSTFLAGS="--cfg near"), every conformance trace through the shell
+    # included; the wasm surface (SURF-1, SURF-2 and SURF-3 must all pass:
+    # NT-F3 is fixed in v1.1.0); the 41 shell mutants (s01-s38 with s32a and
+    # s32b, and s00a/s00b, the v1.0.0 contract and executor). A second wasm
+    # build without --cfg near is only the NT-F1 negative control
+    # (nt_f1_* and SURF-3(b)). Both are plain cargo builds: no cargo-near.
+    # On a 10-core Mac: about 22 minutes, 21 of them the mutants
+    # (near-tests/RESULTS.md).
+    needs: pin
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Upstream toolchain, with the wasm target
+        # The channel of source-mirror/rust-toolchain.toml (near-tests' own
+        # file names the same), with that file's components, so rustup has
+        # nothing left to fetch when cargo runs inside the mirror.
+        run: |
+          ch=$(sed -n 's/^channel *= *"\(.*\)"$/\1/p' projects/shared-pool/source-mirror/rust-toolchain.toml)
+          rustup toolchain install "$ch" --profile minimal --component rustfmt,clippy --target wasm32-unknown-unknown
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        if: runner.environment == 'github-hosted'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            projects/shared-pool/near-tests/target
+          key: sp-near-unit-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('projects/shared-pool/near-tests/rust-toolchain.toml', 'projects/shared-pool/near-tests/Cargo.lock') }}
+      - name: Shell tests, wasm surface, shell mutants (run.sh all)
+        env:
+          KEEP_LOGS: ${{ runner.temp }}/near-tests-mutants
+        run: |
+          # run-mutants.sh copies each mutant's log into KEEP_LOGS but does
+          # not create it.
+          mkdir -p "$KEEP_LOGS"
+          projects/shared-pool/near-tests/run.sh all
+      - name: Upload mutant logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: near-tests-mutants
+          path: ${{ runner.temp }}/near-tests-mutants
+          retention-days: 14
+
+  sandbox:
+    # The real wasm on a local near-sandbox 2.13.4 (sandbox/run.sh): the
+    # lockfile rule, the documented build (upstream scripts/build.sh, which
+    # sets --cfg near; one variant, its artifacts/build.json checked),
+    # RT-PRED, RT-PRIVATE, RT-CALLBACK, RT-REVERT, RT-RACE, RT-WEDGE (F-1 and
+    # F-2 fixed), RT-WINDOW, RT-D1, SB-1 (fixed), and RES-1 at the
+    # 256-record state and at 512 executor jobs. Manual dispatch only, with
+    # the `sandbox` input. 1041 s warm on a 10-core Mac (sandbox/RESULTS.md,
+    # Run times): tests/runtime.rs 509.5 s with 3 test threads, RES-1 523.4 s.
+    # Here a hosted runner runs the runtime tests one at a time, RT-D1
+    # (about 500 s) and RT-WINDOW (about 320 s) among them: an estimated
+    # 17 minutes, then RES-1; a cold build of near-workspaces and the wasm
+    # adds more.
+    needs: pin
+    if: github.event_name == 'workflow_dispatch' && inputs.sandbox
+    runs-on: ${{ (startsWith(github.head_ref || github.ref_name, 'dependabot/') || github.actor == 'dependabot[bot]' || github.triggering_actor == 'dependabot[bot]' || startsWith(github.head_ref || github.ref_name, 'claude/') || contains(github.event.pull_request.body, 'claude.ai/code/session_') || github.event.head_commit.committer.email == 'noreply@anthropic.com') && 'ubuntu-latest' || vars.CI_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Python >= 3.11 (tomllib)
+        if: runner.os == 'macOS'
+        run: |
+          python3 -c 'import tomllib' 2>/dev/null && exit 0
+          for py in python3.13 python3.12 python3.11; do
+            if p=$(command -v "$py"); then
+              mkdir -p "$RUNNER_TEMP/python-bin"
+              ln -sf "$p" "$RUNNER_TEMP/python-bin/python3"
+              echo "$RUNNER_TEMP/python-bin" >> "$GITHUB_PATH"
+              exit 0
+            fi
+          done
+          echo "::error::no python3 >= 3.11 on PATH"; exit 1
+      - name: Check out shared-pool-controls at the pin
+        run: tools/scripts/ci-submodule.sh projects/shared-pool/source-mirror
+      - name: Upstream toolchain, with the wasm target
+        # As in near-unit; the sandbox scripts call `cargo +<channel>`.
+        run: |
+          ch=$(sed -n 's/^channel *= *"\(.*\)"$/\1/p' projects/shared-pool/source-mirror/rust-toolchain.toml)
+          rustup toolchain install "$ch" --profile minimal --component rustfmt,clippy --target wasm32-unknown-unknown
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        # Hosted runners only. The near-sandbox binary (sha256-checked by
+        # scripts/sandbox-bin.sh) is cached with the crates.
+        if: runner.environment == 'github-hosted'
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cache/formalver/near-sandbox
+            projects/shared-pool/sandbox/target
+          key: sp-sandbox-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('projects/shared-pool/sandbox/rust-toolchain.toml', 'projects/shared-pool/sandbox/Cargo.lock') }}
+      - name: Lockfile, wasm builds, runtime tests, RES-1 (run.sh)
+        env:
+          # One sandbox at a time on a 2-CPU hosted runner: RT-RACE times
+          # its calls (0 to 400 ms), and parallel sandboxes would shift them.
+          SANDBOX_TEST_THREADS: ${{ runner.environment == 'github-hosted' && '1' || '3' }}
+        run: projects/shared-pool/sandbox/run.sh
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sandbox-results
+          path: projects/shared-pool/sandbox/results/
+          retention-days: 14

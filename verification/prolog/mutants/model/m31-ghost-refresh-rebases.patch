@@ -1,0 +1,21 @@
+# mutant: m31-ghost-refresh-rebases
+# mutates: INV-LEDGER ghost: every Ok observe re-bases, a refresh with records open included (v1.0.0 ghost) (FR-7; F-6)
+# expect: test_model ghost: fold-on-prune
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 wedge
+--- a/prolog/verification/props.pl
++++ b/prolog/verification/props.pl
+@@ -55,11 +55,8 @@
+ ghost_step(g(B, K, E), S0, Op, R, S1, G1) :-
+     (   R \= err(_), S1 \== S0
+     ->  E1 is E + 1,
+-        (   Op = observe(_, Vs, _)
+-        ->  (   pool_values(S0, V0), Vs == V0, has_open(S0)
+-            ->  G1 = g(B, K, E1)                                  % refresh (OBS-2)
+-            ;   pool_values(S1, B1), pool_next_id(S1, K1), G1 = g(B1, K1, E1)
+-            )
++        (   Op = observe(_, _, _)
++        ->  pool_values(S1, B1), pool_next_id(S1, K1), G1 = g(B1, K1, E1)
+         ;   Op = submit(_, _, _, _, _, _)
+         ->  pool_first_id(S1, F1),
+             (   K < F1

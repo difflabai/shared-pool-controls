@@ -1,0 +1,16 @@
+Mutant s28_promise_return_is_the_call: SH-6/SH-7: dispatch and reconcile return the executor call, not the on_result callback.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -182,7 +182,8 @@
+         zero,
+         Gas::from_tgas(30),
+     );
+-    env::promise_return(callback);
++    let _ = callback;
++    env::promise_return(call);
+ }
+ #[cfg(test)]
+ mod tests {

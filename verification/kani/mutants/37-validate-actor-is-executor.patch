@@ -1,0 +1,13 @@
+# killed-by: h_validate
+# fix-revert: FR-5 (N6; F-4; upstream dc774f8)
+# validate: a recipe whose actor is its executor is accepted (CFG-2).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -127,7 +127,6 @@
+             if !short(&r.name)
+                 || !short(&r.actor)
+                 || !short(&r.executor)
+-                || r.actor == r.executor
+                 || r.reserve.len() != n
+                 || r.complete.len() != n
+                 || r.max_units == 0

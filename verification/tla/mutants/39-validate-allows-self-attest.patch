@@ -1,0 +1,13 @@
+# checks: trace
+# FR-5. v1.0's Config::validate: a recipe's actor may be its executor.
+# Must be killed by TraceCheck's init_error trace (210, f4-self).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -154,7 +154,6 @@
+         /\ t.weight \in 1 .. MaxWeight /\ t.shape \in Shapes
+     /\ \A k \in 1 .. Len(c.recipes):
+         LET r == c.recipes[k] IN
+-        /\ r.actor # r.executor
+         /\ Len(r.reserve) = n /\ Len(r.complete) = n
+         /\ r.maxUnits \in 1 .. MaxUnit
+         /\ Len(r.requires) <= MaxRecipe

@@ -1,0 +1,13 @@
+# killed-by: h_energy_exact
+# energy_terms: Excess measured below the target (sign flip)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -177,7 +177,7 @@
+                 let d = values[t.metric as usize] - t.target;
+                 let r = match t.shape {
+                     Shape::Target => d.unsigned_abs(),
+-                    Shape::Excess => d.max(0) as u64,
++                    Shape::Excess => (-d).max(0) as u64,
+                     Shape::Deficit => (-d).max(0) as u64,
+                 };
+                 r.checked_mul(r)

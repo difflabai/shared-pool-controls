@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# dispatch accepts now = expires_at.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -291,7 +291,7 @@
+     ELSE IF c # RecRcp(id).actor THEN "Unauthorized"
+     ELSE IF paused THEN "Paused"
+     ELSE IF Rec(id).status # "Reserved" THEN "InvalidState"
+-    ELSE IF now >= Rec(id).exp THEN "Expired"
++    ELSE IF now > Rec(id).exp THEN "Expired"
+     ELSE IF SnapExpired(now) THEN "SnapshotExpired"
+     ELSE CapErr
+ 

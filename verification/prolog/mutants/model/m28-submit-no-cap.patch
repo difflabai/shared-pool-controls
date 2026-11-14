@@ -1,0 +1,16 @@
+# mutant: m28-submit-no-cap
+# mutates: VER-CAP/INV-VERCAP: submit, and so preview, is not gated by VERSION_CAP (FR-6; F-5)
+# expect: test_model F-5 fixed
+# expect: test_mc1 MC-1 cap
+# expect: test_reads RD-PREVIEW/RD-BEST differential
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -368,7 +368,7 @@
+ % spec:50: ack, cancel and settle keep the plain checked increment (bump).
+ holds(_, version_overflow, S, _) :- pool_version(S, N), u32_max(M), N < M.
+ % spec:50: submit (last), dispatch, set_paused, observe stop at VERSION_CAP (bump_new).
+-holds(_, version_cap, S, _) :- pool_version(S, N), version_cap(Cap), N < Cap.
++holds(Kind, version_cap, S, _) :- ( Kind == submit -> true ; pool_version(S, N), version_cap(Cap), N < Cap ).
+ % spec:27 "A pruned id is NotFound for every call"; api:28.
+ holds(_, found, S, Op) :- op_id(Op, Id), record_of(S, Id, _).
+ 

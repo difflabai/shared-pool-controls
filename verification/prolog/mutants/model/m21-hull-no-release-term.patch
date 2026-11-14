@@ -1,0 +1,16 @@
+# mutant: m21-hull-no-release-term
+# mutates: INV-RES/LIVE-ALL: the envelope has no release term (v1.0.0 completion-only hull) (FR-2; F-1, F-2)
+# expect: test_model F-2 fixed
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 reliance
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -289,7 +289,7 @@
+     add_hull(D, X, L0, H0, Low, High).
+ add_hull([], [], [], [], [], []).
+ add_hull([D | Ds], [X | Xs], [L | Ls], [H | Hs], [L1 | Ls1], [H1 | Hs1]) :-
+-    L1 is L + min(0, min(D, X)), H1 is H + max(0, max(D, X)),
++    L1 is L + min(0, D), H1 is H + max(0, D),
+     add_hull(Ds, Xs, Ls, Hs, Ls1, Hs1).
+ 
+ %% hard_ok(+Cfg, +Current, +Candidate, +Low, +High): spec:23 "No metric's

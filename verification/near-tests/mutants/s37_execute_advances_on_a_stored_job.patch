@@ -1,0 +1,17 @@
+Mutant s37_execute_advances_on_a_stored_job: EX-6: an execute of an id that has a job raises newest (D-9).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -67,7 +67,9 @@
+         );
+         if let Some(j) = self.jobs.iter().find(|j| j.id == id) {
+             assert!(j.recipe == recipe && j.units == units, "payload mismatch");
+-            return j.status.clone();
++            let status = j.status.clone();
++            self.advance(id);
++            return status;
+         }
+         // A forgotten id belongs to a pruned record: never start it.
+         if u64::from(id) + WINDOW <= u64::from(self.newest) {

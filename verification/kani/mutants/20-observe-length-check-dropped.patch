@@ -1,0 +1,20 @@
+# must-survive
+# checked-by: h_step_observe_tx h_step_observe_post
+# observe: vector length not checked. Equivalent mutant: a vector of the
+# wrong length differs from the values, so with a record open it is Pending
+# as in the original; otherwise it reaches `self.energy(&values)?`, whose
+# `energy_terms` checks the length first and returns the same `Err(Bounds)`,
+# before any write. The result and the state are those of the original, so
+# no harness can kill it; the plain tests and the named harnesses must still
+# pass on it.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -538,7 +538,7 @@
+         if values != self.values && self.records.iter().any(|c| open(&c.status)) {
+             return Err(Error::Pending);
+         }
+-        if values.len() != self.values.len() || values.iter().any(|v| !bounded(*v)) {
++        if values.iter().any(|v| !bounded(*v)) {
+             return Err(Error::Bounds);
+         }
+         self.energy(&values)?;

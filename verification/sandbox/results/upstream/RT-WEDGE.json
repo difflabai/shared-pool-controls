@@ -1,0 +1,94 @@
+{
+  "cure_config": "m(0,10,5), m(-100,100,5); t(1,0,1,target); r(actor, exec, [0,-1], [-3,0], 1, []) (upstream findings.rs:175)",
+  "cure_steps": [
+    {
+      "id": 0,
+      "result": "Ok (allowed)",
+      "step": "observe [12, 5]; actor submit the cure hedge x 1",
+      "values": [
+        12,
+        4
+      ]
+    },
+    {
+      "result": "execute -> active -> Active",
+      "step": "actor dispatch"
+    },
+    {
+      "executor_job": "completed",
+      "receipts_ok": {
+        "executor": [
+          true,
+          true
+        ],
+        "lock": [
+          true
+        ]
+      },
+      "status": "Completed",
+      "step": "operator finish(id, true)",
+      "values": [
+        9,
+        4
+      ]
+    },
+    {
+      "observed_panic": "panicked at crates/executor/src/lib.rs:116:9:\nterminal outcome conflict",
+      "step": "operator finish(id, false)",
+      "storage_unchanged": true
+    },
+    {
+      "result": "Ok",
+      "step": "owner observe [5, 5]"
+    }
+  ],
+  "f1_config": "m(0,10,5), m(-100,100,5); t(1,0,1,target); r(actor, exec, [-2,0], [2,-5], 1, [])",
+  "f1_steps": [
+    {
+      "result": "Ok",
+      "step": "owner observe [12, 5] (metric 0 above its max 10)"
+    },
+    {
+      "result": {
+        "allowed": false,
+        "reason": "Bounds",
+        "recipe": 0,
+        "storage_unchanged": true,
+        "units": 1
+      },
+      "step": "actor submit the F-1 hedge x 1"
+    },
+    {
+      "executor_jobs": 0,
+      "observed_panic": "NotFound",
+      "step": "actor dispatch(0)"
+    },
+    {
+      "result": "Ok",
+      "step": "owner observe [5, 5]: nothing is open"
+    }
+  ],
+  "final": {
+    "by_status": {
+      "Completed": 1
+    },
+    "completed_units": [
+      1
+    ],
+    "first_id": 0,
+    "paused": false,
+    "records": 1,
+    "values": [
+      5,
+      5
+    ],
+    "version": 6
+  },
+  "finding": "F-1 (fixed in v1.1.0)",
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-WEDGE",
+  "result": "pass: the wedge hedge is refused (Bounds), the cure hedge settles; LIVE-2 holds on the wasm",
+  "wasm_variant": "upstream"
+}

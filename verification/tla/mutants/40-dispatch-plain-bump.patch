@@ -1,0 +1,13 @@
+# checks: cap
+# FR-6. dispatch uses the plain bump, not bump_new (no cap).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -293,7 +293,7 @@
+     ELSE IF Rec(id).status # "Reserved" THEN "InvalidState"
+     ELSE IF now >= Rec(id).exp THEN "Expired"
+     ELSE IF SnapExpired(now) THEN "SnapshotExpired"
+-    ELSE CapErr
++    ELSE VerErr
+ 
+ AckTo(acc) == IF acc THEN "Active" ELSE "Unknown"
+ 

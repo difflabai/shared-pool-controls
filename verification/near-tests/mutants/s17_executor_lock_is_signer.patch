@@ -1,0 +1,15 @@
+Mutant s17_executor_lock_is_signer: EX-1: execute checks the signer, not the predecessor.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -61,7 +61,7 @@
+     /// the lock pruned its record, so it is terminal and never dispatched again.
+     pub fn execute(&mut self, id: u32, recipe: u32, units: u32) -> String {
+         assert_eq!(
+-            env::predecessor_account_id(),
++            env::signer_account_id(),
+             self.lock,
+             "only lock may execute"
+         );

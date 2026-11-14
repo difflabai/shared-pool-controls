@@ -1,0 +1,12 @@
+# checks: cap trace
+# acknowledge(id, false) of an Unknown record bumps the version again.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -302,7 +302,6 @@
+ AckErr(id, acc) ==
+     IF ~Found(id) THEN "NotFound"
+     ELSE IF Rec(id).status \notin {"Dispatched", "Unknown"} THEN "Noop"
+-    ELSE IF Rec(id).status = AckTo(acc) THEN "Noop"
+     ELSE VerErr
+ 
+ \* release(id) (U:476-489): undo the reservation; the envelope skips the

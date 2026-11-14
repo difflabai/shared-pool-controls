@@ -1,0 +1,14 @@
+# killed-by: h_step_dispatch_tx
+# fix-revert: FR-3 (N12; F-3; upstream 1f01d43)
+# index: an id at or past first_id + len is not NotFound: record() indexes
+# past the end of records and panics (ROB-1).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -385,7 +385,6 @@
+     fn index(&self, id: u32) -> Result<usize, Error> {
+         id.checked_sub(self.first_id)
+             .map(|k| k as usize)
+-            .filter(|k| *k < self.records.len())
+             .ok_or(Error::NotFound)
+     }
+     /// The retained record with this id, or `NotFound`.

@@ -1,0 +1,22 @@
+{
+  "build": "upstream scripts/build.sh (results/wasm.json)",
+  "finding": "SB-1 (v1.0.0; upstream NT-F1)",
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "observed": {
+    "exec.finish by mallory": "panicked at crates/executor/src/lib.rs:164:9:\nassertion `left == right` failed: only independent operator\n  left: AccountId(\\",
+    "exec.on_settled by mallory": "Method on_settled is private",
+    "pool.cancel of an Active record (core Pending)": "Pending",
+    "pool.dispatch(99) (core NotFound)": "NotFound",
+    "pool.new by mallory": "Method new is private",
+    "pool.observe [50, 1000001] (core Bounds)": "Bounds",
+    "pool.observe [50, 1] with a record open (core Pending)": "Pending",
+    "pool.on_result by mallory": "Method on_result is private",
+    "pool.reconcile with 1 yoctoNEAR (NT-F2)": "Method reconcile doesn't accept deposit",
+    "pool.set_paused by mallory (core Unauthorized)": "Unauthorized"
+  },
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "result": "fixed: no bare trap; every failure reads Smart contract panicked: <msg>",
+  "summary": "v1.1.0's scripts/build.sh sets RUSTFLAGS=\"--cfg near\", so near-sdk's panic_str calls panic_utf8 and every on-chain failure carries its message",
+  "wasm_variant": "upstream"
+}

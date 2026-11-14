@@ -1,0 +1,15 @@
+Mutant s06_get_commitments_limit_100: SH-9: get_commitments pages up to 100 records.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -59,7 +59,7 @@
+             .records
+             .iter()
+             .skip(from.saturating_sub(self.pool.first_id) as usize)
+-            .take(limit.min(50) as usize)
++            .take(limit.min(100) as usize)
+             .cloned()
+             .collect()
+     }

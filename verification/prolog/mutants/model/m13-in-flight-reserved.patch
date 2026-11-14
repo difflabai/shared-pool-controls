@@ -1,0 +1,14 @@
+# mutant: m13-in-flight-reserved
+# mutates: LIFE-1: settle accepts a Reserved record
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -477,7 +477,7 @@
+     \+ ( Done == false, St == cancelled ).
+ holds(Kind, in_flight, S, settle(_, Id, _)) :-
+     settle_kind(Kind),
+-    record_of(S, Id, c(_, _, _, St)), memberchk(St, [dispatched, active, unknown]).
++    record_of(S, Id, c(_, _, _, St)), memberchk(St, [reserved, dispatched, active, unknown]).
+ holds(settle_completed, complete_arith, S, settle(_, Id, _)) :- complete_next(S, Id, _).
+ 
+ % --- set_paused (spec:58)

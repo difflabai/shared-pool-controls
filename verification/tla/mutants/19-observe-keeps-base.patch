@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# A re-basing observe keeps the old ghost base.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -462,7 +462,7 @@
+     /\ version' = version + 1
+     /\ IF vals = values /\ AnyOpen
+        THEN UNCHANGED <<base, k0>>
+-       ELSE base' = vals /\ k0' = firstId + NR
++       ELSE base' = base /\ k0' = firstId + NR
+     /\ UNCHANGED <<cfg, paused, records, firstId, doneU>>
+     /\ Step("observe", c, 0, 0, 0, 0, FALSE, now, 0)
+ 

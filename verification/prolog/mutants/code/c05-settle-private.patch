@@ -1,0 +1,13 @@
+# mutant: c05-settle-private
+# mutates: C-1: settle becomes #[private] (the executor can no longer call it)
+# expect: test_requirements C-1 authority
+--- a/source-mirror/crates/contract/src/lib.rs
++++ b/source-mirror/crates/contract/src/lib.rs
+@@ -143,6 +143,7 @@
+             near_sdk::serde_json::json!({"id":id,"outcome":status,"error":update.err().map(|e|e.to_string())}),
+         );
+     }
++    #[private]
+     pub fn settle(&mut self, id: u32, completed: bool) {
+         must(self.pool.settle(&caller(), id, completed));
+         event(

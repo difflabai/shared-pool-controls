@@ -1,0 +1,13 @@
+# killed-by: h_step_submit_tx
+# envelope: Reserved records are left out (pending hedges ignored)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -233,7 +233,7 @@
+             Ok(())
+         };
+         for c in &self.records {
+-            if open(&c.status) && Some(c.id) != skip {
++            if open(&c.status) && c.status != Status::Reserved && Some(c.id) != skip {
+                 apply(&self.config.recipes[c.recipe as usize], c.units)?;
+             }
+         }

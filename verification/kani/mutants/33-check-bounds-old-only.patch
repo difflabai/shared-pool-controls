@@ -1,0 +1,20 @@
+# killed-by: h_step_submit_inv h_step_submit_tx
+# fix-revert: FR-1 (N2; F-1; upstream 59e404f)
+# check_bounds: the envelope's violation is compared with the current
+# violation only (the v1.0.0 rule `v > old[i]`), not min(old, new): a
+# submit whose candidate is worse than the current values passes as long as
+# the envelope is no worse than now (INV-RES).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -255,10 +255,9 @@
+     ) -> Result<(), Error> {
+         let (low, high) = self.envelope(candidate, extra, skip)?;
+         let old = self.violations(&self.values);
+-        let new = self.violations(candidate);
+         for (i, m) in self.config.metrics.iter().enumerate() {
+             let v = (m.min - low[i]).max(0) as u64 + (high[i] - m.max).max(0) as u64;
+-            if v > old[i].min(new[i]) {
++            if v > old[i] {
+                 return Err(Error::Bounds);
+             }
+         }

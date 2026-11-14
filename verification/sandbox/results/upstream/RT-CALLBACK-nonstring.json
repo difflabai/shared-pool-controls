@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "call": "dispatch",
+      "event": {
+        "error": null,
+        "id": 0,
+        "outcome": "unknown"
+      },
+      "executor_returns": "5 (a JSON number)",
+      "status": "Unknown",
+      "tx": "success"
+    },
+    {
+      "call": "reconcile",
+      "event": {
+        "error": null,
+        "id": 0,
+        "outcome": "unknown"
+      },
+      "executor_returns": "a 70-byte JSON string",
+      "status": "Unknown",
+      "storage_unchanged": true
+    },
+    {
+      "call": "settle(0, false) signed by the executor account",
+      "status": "Cancelled",
+      "values": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "executor": "upstream integration.rs non_string_executor (hand-assembled wasm)",
+  "executor_sha256": "7608bb674fcf15dce42aaf884e5813c50b5f0e0eb9dbc2ea675cda1cec876ec2",
+  "finding": "NT-F4 (fixed in v1.1.0)",
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-CALLBACK",
+  "result": "pass",
+  "wasm_variant": "upstream"
+}

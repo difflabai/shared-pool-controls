@@ -1,0 +1,15 @@
+# killed-by: h_version_cap_pause
+# fix-revert: FR-6 (N3; F-5; upstream da43188)
+# set_paused: the plain increment (bump), not bump_new: pausing at the cap
+# succeeds and eats the reserve of the open records (VER-CAP, INV-VERCAP).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -523,7 +523,7 @@
+         if caller != self.config.owner {
+             return Err(Error::Unauthorized);
+         }
+-        self.bump_new()?;
++        self.bump()?;
+         self.paused = paused;
+         Ok(())
+     }

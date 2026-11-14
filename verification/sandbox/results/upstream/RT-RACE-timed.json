@@ -1,0 +1,85 @@
+{
+  "attempts": [
+    {
+      "attempt": 0,
+      "blocks": {
+        "callback": 34,
+        "dispatch": 32,
+        "execute": 33,
+        "settle": 32
+      },
+      "delay_ms": 0,
+      "observed_panic": "InvalidState",
+      "order": "settle before dispatch: rejected",
+      "version_delta": 2
+    },
+    {
+      "attempt": 1,
+      "blocks": {
+        "callback": 43,
+        "dispatch": 41,
+        "execute": 42,
+        "settle": 41
+      },
+      "delay_ms": 100,
+      "observed_panic": "InvalidState",
+      "order": "settle before dispatch: rejected",
+      "version_delta": 2
+    },
+    {
+      "attempt": 2,
+      "blocks": {
+        "callback": 52,
+        "dispatch": 50,
+        "execute": 51,
+        "settle": 51
+      },
+      "delay_ms": 200,
+      "order": "dispatch, settle, callback: late ack ignored",
+      "version_delta": 2
+    },
+    {
+      "attempt": 3,
+      "blocks": {
+        "callback": 61,
+        "dispatch": 59,
+        "execute": 60,
+        "settle": 61
+      },
+      "delay_ms": 300,
+      "order": "dispatch, settle, callback: late ack ignored",
+      "version_delta": 2
+    },
+    {
+      "attempt": 4,
+      "blocks": {
+        "callback": 71,
+        "dispatch": 69,
+        "execute": 70,
+        "settle": 72
+      },
+      "delay_ms": 400,
+      "order": "dispatch, callback, settle",
+      "version_delta": 3
+    },
+    {
+      "attempt": 5,
+      "blocks": {
+        "callback": 82,
+        "dispatch": 80,
+        "execute": 81,
+        "settle": 81
+      },
+      "delay_ms": 150,
+      "order": "dispatch, settle, callback: late ack ignored",
+      "version_delta": 2
+    }
+  ],
+  "executor": "upstream pool_executor, its account key signing settle",
+  "late_ack_hits": 3,
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-RACE",
+  "wasm_variant": "upstream"
+}

@@ -1,0 +1,77 @@
+{
+  "source_commit": "57b3f02d18e85149db3c1035431368c4e07a4d8a",
+  "source_dirty": false,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "build": "upstream scripts/build.sh (RUSTFLAGS=\"--cfg near\"; cargo build -p pool-contract -p pool-executor --target wasm32-unknown-unknown --release --locked)",
+  "profile": "mirror [profile.release]: codegen-units=1, opt-level=z, lto, panic=abort, overflow-checks=true",
+  "variant": "upstream",
+  "wasm": {
+    "pool_contract": {
+      "path": "target/pool/wasm32-unknown-unknown/release/pool_contract.wasm",
+      "sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+      "code_hash": "GVgVzY6yh26Ut22AavEu7pSpPm7B11oEsLoMUXckRr8Z",
+      "bytes": 377358
+    },
+    "pool_executor": {
+      "path": "target/pool/wasm32-unknown-unknown/release/pool_executor.wasm",
+      "sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+      "code_hash": "DTt4aM2wPfNuNie9kqTSHmnL4K8CVxnLGhQfuWvB3Ypr",
+      "bytes": 223068
+    }
+  },
+  "build_json": {
+    "source_commit": "57b3f02d18e85149db3c1035431368c4e07a4d8a",
+    "dirty": false,
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+    "rustflags": "--cfg near",
+    "cargo_lock_sha256": "09a1439436039ddeaf4129577fd4de5c21c84c42b0651ddb493079922754e83e",
+    "wasm": {
+      "target/wasm32-unknown-unknown/release/pool_contract.wasm": {
+        "sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+        "bytes": 377358,
+        "imports": [
+          "env.attached_deposit",
+          "env.block_timestamp",
+          "env.current_account_id",
+          "env.input",
+          "env.log_utf8",
+          "env.panic_utf8",
+          "env.predecessor_account_id",
+          "env.promise_create",
+          "env.promise_result",
+          "env.promise_results_count",
+          "env.promise_return",
+          "env.promise_then",
+          "env.read_register",
+          "env.register_len",
+          "env.storage_has_key",
+          "env.storage_read",
+          "env.storage_write",
+          "env.value_return"
+        ]
+      },
+      "target/wasm32-unknown-unknown/release/pool_executor.wasm": {
+        "sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+        "bytes": 223068,
+        "imports": [
+          "env.attached_deposit",
+          "env.current_account_id",
+          "env.input",
+          "env.panic_utf8",
+          "env.predecessor_account_id",
+          "env.promise_create",
+          "env.promise_result",
+          "env.promise_results_count",
+          "env.promise_return",
+          "env.promise_then",
+          "env.read_register",
+          "env.register_len",
+          "env.storage_has_key",
+          "env.storage_read",
+          "env.storage_write",
+          "env.value_return"
+        ]
+      }
+    }
+  }
+}

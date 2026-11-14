@@ -1,0 +1,14 @@
+# checks: safety-1 trace
+# Full only above MaxRecords: a submit at a full window with an open
+# oldest record prunes it.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -134,7 +134,7 @@
+ AnyOpen     == \E k \in 1 .. NR : Open(records[k].status)
+ \* candidate()'s Full (U:287-289): the window is full and its oldest
+ \* record, which a submit would prune, is open.
+-WinFull == NR >= MaxRecords /\ Open(records[1].status)
++WinFull == NR > MaxRecords /\ Open(records[1].status)
+ 
+ \* Config::validate (CFG-2), names omitted. requires is a sequence of
+ \* <<prerequisite recipe, units>>. v1.1 adds actor # executor (U:130).

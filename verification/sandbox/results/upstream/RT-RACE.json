@@ -1,0 +1,47 @@
+{
+  "assumption": "ASM-INTERLEAVE",
+  "cases": [
+    {
+      "callback_block": 39,
+      "callback_first_would_give": 3,
+      "completed": true,
+      "late_ack_event": {
+        "error": null,
+        "id": 0,
+        "outcome": "active"
+      },
+      "path": "dispatch: execute settles, then returns active",
+      "settle_block": 39,
+      "status": "Completed",
+      "version_delta": 2
+    },
+    {
+      "callback_block": 50,
+      "callback_first_would_give": 3,
+      "completed": false,
+      "late_ack_event": {
+        "error": null,
+        "id": 1,
+        "outcome": "active"
+      },
+      "path": "dispatch: execute settles, then returns active",
+      "settle_block": 50,
+      "status": "Cancelled",
+      "version_delta": 2
+    },
+    {
+      "completed": true,
+      "path": "reconcile: status settles, then returns active",
+      "reconcile_after_terminal": "panicked at crates/contract/src/lib.rs:100:9:\nInvalidState",
+      "status": "Completed",
+      "version_delta": 1
+    }
+  ],
+  "executor": "helper (relay/ deployed as racer)",
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-RACE",
+  "result": "pass",
+  "wasm_variant": "upstream"
+}

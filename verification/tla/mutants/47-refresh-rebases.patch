@@ -1,0 +1,16 @@
+# checks: safety-1 trace
+# FR-7. A refresh re-bases the ghost (base = values, k0 = the next id)
+# with records open. Must be killed by INV-LEDGER.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -460,9 +460,7 @@
+     /\ values' = vals
+     /\ observedAt' = now
+     /\ version' = version + 1
+-    /\ IF vals = values /\ AnyOpen
+-       THEN UNCHANGED <<base, k0>>
+-       ELSE base' = vals /\ k0' = firstId + NR
++    /\ base' = vals /\ k0' = firstId + NR
+     /\ UNCHANGED <<cfg, paused, records, firstId, doneU>>
+     /\ Step("observe", c, 0, 0, 0, 0, FALSE, now, 0)
+ 

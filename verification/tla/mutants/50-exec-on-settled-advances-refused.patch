@@ -1,0 +1,16 @@
+# checks: executor-w2-noview
+# TLA-EXEC, EX-8: on_settled advances whatever settle returned (E:157
+# dropped). A refused confirmation of an id the lock never issued raises
+# newest past first_id + WINDOW. Must be killed by NewestOnVouch
+# (StepExec, at the refused settle) and by InvNewest.
+--- a/Executor.tla
++++ b/Executor.tla
+@@ -131,7 +131,7 @@
+ (* E:153-160 on_settled(id): private, needs one promise result (E:155),   *)
+ (* advance(id) unless the settle failed (E:157-159). As <<newest, jobs>>. *)
+ Settled(i, ok) ==
+-    IF ok THEN <<Max(newest, i), Keep(Max(newest, i))>> ELSE <<newest, jobs>>
++    IF TRUE THEN <<Max(newest, i), Keep(Max(newest, i))>> ELSE <<newest, jobs>>
+ 
+ (* The ghost made keeps only ids at or above firstId.                     *)
+ Made(i) == IF i >= firstId THEN made \cup {i} ELSE made

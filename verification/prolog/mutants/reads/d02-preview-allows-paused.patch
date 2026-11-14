@@ -1,0 +1,14 @@
+# mutant: d02-preview-allows-paused
+# mutates: RD-PREVIEW (code side): the real core's preview allows a request that candidate rejects as Paused; submit still rejects it
+# expect: generator preview and submit disagree
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -295,7 +295,7 @@
+         });
+         let result = self.candidate(caller, req, now);
+         Decision {
+-            allowed: result.is_ok(),
++            allowed: result.is_ok() || matches!(result, Err(Error::Paused)),
+             reason: result
+                 .err()
+                 .map(|e| e.to_string())

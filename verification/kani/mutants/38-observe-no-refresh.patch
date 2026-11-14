@@ -1,0 +1,15 @@
+# killed-by: h_step_observe_tx h_wedge
+# fix-revert: FR-7 (N7; F-6; upstream 3eaf1cb)
+# observe: Pending whenever a record is open, even when the values are the
+# current ones (no snapshot refresh with records open; OBS-2).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -535,7 +535,7 @@
+         if caller != self.config.owner {
+             return Err(Error::Unauthorized);
+         }
+-        if values != self.values && self.records.iter().any(|c| open(&c.status)) {
++        if self.records.iter().any(|c| open(&c.status)) {
+             return Err(Error::Pending);
+         }
+         if values.len() != self.values.len() || values.iter().any(|v| !bounded(*v)) {

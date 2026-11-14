@@ -1,0 +1,253 @@
+{
+  "assumption": "ASM-ATOMIC",
+  "cases": [
+    {
+      "args": {
+        "id": 0
+      },
+      "call": "dispatch",
+      "core_error": "Unauthorized",
+      "events": 0,
+      "observed_panic": "Unauthorized",
+      "signer": "mallory.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "id": 99
+      },
+      "call": "dispatch",
+      "core_error": "NotFound",
+      "events": 0,
+      "observed_panic": "NotFound",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "id": 1
+      },
+      "call": "dispatch",
+      "core_error": "InvalidState",
+      "events": 0,
+      "observed_panic": "InvalidState",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 1
+      },
+      "call": "settle",
+      "core_error": "Unauthorized",
+      "events": 0,
+      "observed_panic": "Unauthorized",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 0
+      },
+      "call": "settle",
+      "core_error": "InvalidState",
+      "events": 0,
+      "observed_panic": "InvalidState",
+      "signer": "exec.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "completed": false,
+        "id": 99
+      },
+      "call": "settle",
+      "core_error": "NotFound",
+      "events": 0,
+      "observed_panic": "NotFound",
+      "signer": "exec.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "id": 0
+      },
+      "call": "cancel",
+      "core_error": "Unauthorized",
+      "events": 0,
+      "observed_panic": "Unauthorized",
+      "signer": "mallory.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "id": 1
+      },
+      "call": "cancel",
+      "core_error": "Pending",
+      "events": 0,
+      "observed_panic": "Pending",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "paused": true
+      },
+      "call": "set_paused",
+      "core_error": "Unauthorized",
+      "events": 0,
+      "observed_panic": "Unauthorized",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "args": {
+        "values": [
+          50,
+          0
+        ]
+      },
+      "call": "observe",
+      "core_error": "Pending",
+      "events": 0,
+      "observed_panic": "Pending",
+      "signer": "owner.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "dispatch",
+      "core_error": "Paused",
+      "observed_panic": "Paused",
+      "state": "paused",
+      "storage_unchanged": true
+    },
+    {
+      "call": "submit",
+      "panic": false,
+      "rejected": "Paused",
+      "state": "paused",
+      "storage_unchanged": true
+    },
+    {
+      "call": "submit",
+      "panic": false,
+      "rejected": "Stale",
+      "storage_unchanged": true
+    },
+    {
+      "call": "submit",
+      "panic": false,
+      "rejected": "InvalidUnits",
+      "storage_unchanged": true
+    },
+    {
+      "call": "submit",
+      "panic": false,
+      "rejected": "Unauthorized",
+      "storage_unchanged": true
+    },
+    {
+      "call": "observe",
+      "core_error": "Bounds",
+      "observed_panic": "Bounds",
+      "storage_unchanged": true,
+      "values": [
+        50
+      ]
+    },
+    {
+      "call": "observe",
+      "core_error": "Bounds",
+      "observed_panic": "Bounds",
+      "storage_unchanged": true,
+      "values": [
+        50,
+        1000001
+      ]
+    },
+    {
+      "call": "observe",
+      "core_error": "Bounds",
+      "observed_panic": "Bounds",
+      "storage_unchanged": true,
+      "values": [
+        -1000001,
+        0
+      ]
+    },
+    {
+      "call": "cancel",
+      "core_error": "InvalidState",
+      "observed_panic": "InvalidState",
+      "state": "record Completed",
+      "storage_unchanged": true
+    },
+    {
+      "call": "reconcile",
+      "deposit_yocto": 1,
+      "executor_called": false,
+      "finding": "NT-F2 (fixed)",
+      "observed_panic": "Method reconcile doesn't accept deposit",
+      "storage_unchanged": true
+    },
+    {
+      "call": "set_paused",
+      "core_error": "Arithmetic",
+      "observed_panic": "Arithmetic",
+      "state": "version = VERSION_CAP = 4294966527 (patched); record 2 Reserved, record 3 Active, the rest terminal",
+      "storage_unchanged": true
+    },
+    {
+      "call": "observe (restating the current values)",
+      "core_error": "Arithmetic",
+      "observed_panic": "Arithmetic",
+      "state": "version = VERSION_CAP = 4294966527 (patched); record 2 Reserved, record 3 Active, the rest terminal",
+      "storage_unchanged": true
+    },
+    {
+      "call": "dispatch",
+      "core_error": "Arithmetic",
+      "observed_panic": "Arithmetic",
+      "state": "version = VERSION_CAP = 4294966527 (patched); record 2 Reserved, record 3 Active, the rest terminal",
+      "storage_unchanged": true
+    },
+    {
+      "call": "submit",
+      "panic": false,
+      "preview": {
+        "allowed": false,
+        "reason": "Arithmetic"
+      },
+      "rejected": "Arithmetic",
+      "state": "version = VERSION_CAP = 4294966527 (patched); record 2 Reserved, record 3 Active, the rest terminal",
+      "storage_unchanged": true
+    },
+    {
+      "call": "cancel (Reserved), then operator finish(true) (Active)",
+      "result": "Ok, Ok",
+      "state": "version = VERSION_CAP = 4294966527 (patched); record 2 Reserved, record 3 Active, the rest terminal",
+      "status": [
+        "Cancelled",
+        "Completed"
+      ],
+      "version_after": 4294966529
+    },
+    {
+      "call": "observe (restate), every record terminal",
+      "core_error": "Arithmetic",
+      "observed_panic": "Arithmetic",
+      "state": "version = VERSION_CAP + 2",
+      "storage_unchanged": true
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-REVERT",
+  "result": "pass",
+  "version_cap": 4294966527,
+  "wasm_variant": "upstream"
+}

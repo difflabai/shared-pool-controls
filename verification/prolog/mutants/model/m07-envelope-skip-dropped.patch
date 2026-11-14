@@ -1,0 +1,15 @@
+# mutant: m07-envelope-skip-dropped
+# mutates: the record being settled or cancelled is counted twice in the envelope
+# expect: test_model STOCK:
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -268,7 +268,7 @@
+ open_terms([], _, _, _, []).
+ open_terms([c(RI, U, _, St) | Cs], Id, Rs, Skip, Out) :-
+     Id1 is Id + 1,
+-    (   open_status(St), Skip \== Id
++    (   open_status(St), Skip \== x
+     ->  nth0(RI, Rs, R), hull_term(R, U, T), Out = [T | Out1]
+     ;   Out = Out1
+     ),

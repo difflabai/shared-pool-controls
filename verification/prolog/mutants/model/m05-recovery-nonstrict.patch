@@ -1,0 +1,14 @@
+# mutant: m05-recovery-nonstrict
+# mutates: ADM-2: the recovery check accepts a completion that does not lower energy
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -413,7 +413,7 @@
+             % happen once the envelope (guard envelope_arith) passed; surfaced loudly.
+             throw(unreachable(recovery_add, S, Op))
+         ),
+-        energy(C, After, EA), energy(C, V, E0), EA < E0
++        energy(C, After, EA), energy(C, V, E0), EA =< E0
+     ).
+ 
+ submit_next(S, submit(_, RI, U, _, _, _), Next) :-

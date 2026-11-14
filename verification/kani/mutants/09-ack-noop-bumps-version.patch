@@ -1,0 +1,14 @@
+# killed-by: h_step_ack_tx
+# acknowledge: the reverted reconcile griefing (a repeated ack bumps the version)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -446,9 +446,6 @@
+         // reconcile is permissionless: a no-op must not bump the version, or
+         // anyone could repeatedly invalidate every in-flight request.
+         let k = self.index(id)?;
+-        if self.records[k].status == next {
+-            return Ok(());
+-        }
+         self.bump()?;
+         self.records[k].status = next;
+         Ok(())

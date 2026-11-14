@@ -1,0 +1,15 @@
+# checks: executor-w2-noview
+# TLA-EXEC, EX-6: confirm_not_executed without the "stale id" check
+# (E:134 dropped) stores a job for a forgotten id. Must be killed by
+# InvJobWindow.
+--- a/Executor.tla
++++ b/Executor.tla
+@@ -247,7 +247,7 @@
+ (* (E:136-141), then notify sends settle(id, false) (E:142).              *)
+ Confirm(i) ==
+     /\ i \notin DOMAIN jobs
+-    /\ i + W > newest
++    /\ TRUE
+     /\ Cardinality(DOMAIN jobs) < MaxJobs
+     /\ jobs' = (i :> [st |-> "cancelled", kind |-> "conf"]) @@ jobs
+     /\ made' = Made(i)

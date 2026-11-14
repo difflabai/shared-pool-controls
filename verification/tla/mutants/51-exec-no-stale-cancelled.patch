@@ -1,0 +1,15 @@
+# checks: executor-w2-noview
+# TLA-EXEC, FR-14 (revert): execute of a forgotten id has no "cancelled"
+# early return (E:73-75 dropped) and stores a job WINDOW or more behind
+# newest. Must be killed by InvJobWindow.
+--- a/Executor.tla
++++ b/Executor.tla
+@@ -212,7 +212,7 @@
+     /\ IF i \in DOMAIN jobs THEN
+           /\ ev' = [k |-> "exec_stored", id |-> i]
+           /\ UNCHANGED <<jobs, newest, made>>
+-       ELSE IF i + W <= newest THEN
++       ELSE IF FALSE THEN
+           /\ ev' = [k |-> "exec_stale", id |-> i]
+           /\ UNCHANGED <<jobs, newest, made>>
+        ELSE LET n == Max(newest, i)

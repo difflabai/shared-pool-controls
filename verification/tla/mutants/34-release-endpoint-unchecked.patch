@@ -1,0 +1,31 @@
+# checks: Witness_F2bRefused trace
+# FR-2 (F-2b). The +-1e6 endpoint check covers the completion terms only,
+# not the release terms. As with 24, an endpoint beyond +-1e6 then fails
+# Bounds instead of Arithmetic (any passing envelope has its endpoints
+# inside [min, max]), so the reachable states are the same and INV-RES's
+# endpoint clause cannot see it. The error name can: F-2b's admission (B
+# x 2 with only A applied, whose completion terms alone end at 1e6) is
+# Bounds, not Arithmetic, so Witness_F2bRefused (MC_F2b) is unreachable;
+# trace 208 (release-arith, refused Arithmetic at submit) kills it too.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -206,10 +206,18 @@
+ \* term >= 0), so it fails (Arithmetic) exactly when a final low or high
+ \* leaves +-MAX_VALUE; then Bounds if some metric's envelope violation
+ \* exceeds the smaller of its violation now and at the candidate (U:261).
++CTerm(rc, u, m, neg) == IF neg THEN Min0(rc.complete[m] * u) ELSE Max0(rc.complete[m] * u)
++CEnd(cand, er, eu, skip, m, neg) ==
++    cand[m] + SumTo([k \in 1 .. NR |->
++                        LET c == records[k] IN
++                        IF Open(c.status) /\ firstId + k - 1 # skip
++                        THEN CTerm(Rcp(c.recipe), c.units, m, neg) ELSE 0], NR)
++            + (IF eu = 0 THEN 0 ELSE CTerm(Rcp(er), eu, m, neg))
+ CheckBounds(cand, er, eu, skip) ==
+     LET lo == [m \in MIdx |-> Low(cand, er, eu, skip, m)]
+         hi == [m \in MIdx |-> High(cand, er, eu, skip, m)]
+-    IN IF \E m \in MIdx : ~Bounded(lo[m]) \/ ~Bounded(hi[m]) THEN "Arithmetic"
++    IN IF \E m \in MIdx : ~Bounded(CEnd(cand, er, eu, skip, m, TRUE))
++                          \/ ~Bounded(CEnd(cand, er, eu, skip, m, FALSE)) THEN "Arithmetic"
+        ELSE IF \E m \in MIdx :
+                  Max0(Mn(m) - lo[m]) + Max0(hi[m] - Mx(m)) > Min(PV(values, m), PV(cand, m))
+             THEN "Bounds"

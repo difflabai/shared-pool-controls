@@ -1,0 +1,15 @@
+# killed-by: h_step_settle_tx
+# settle: caller not checked against the executor
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -492,9 +492,7 @@
+     pub fn settle(&mut self, caller: &str, id: u32, completed: bool) -> Result<(), Error> {
+         let c = self.record(id)?;
+         let r = &self.config.recipes[c.recipe as usize];
+-        if caller != r.executor {
+-            return Err(Error::Unauthorized);
+-        }
++
+         if (completed && c.status == Status::Completed)
+             || (!completed && c.status == Status::Cancelled)
+         {

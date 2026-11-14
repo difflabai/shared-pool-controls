@@ -1,0 +1,17 @@
+Lean mutant 26-refresh-rebases
+FR-7 (ghost): an accepted refresh re-bases base/k0 as every v1.0.0 observe
+did, although records opened before it are still open.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -547,8 +547,8 @@
+   | .pause _ b => { s with paused := b, version := s.version + 1 }
+   | .observe _ vals now =>
+     { s with values := vals, observedAt := now, version := s.version + 1,
+-             base := if refresh s vals then s.base else vals,
+-             k0 := if refresh s vals then s.k0 else s.records.length }
++             base := vals,
++             k0 := s.records.length }
+ 
+ /-- A call's result. -/
+ inductive Res where

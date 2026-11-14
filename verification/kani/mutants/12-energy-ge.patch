@@ -1,0 +1,13 @@
+# killed-by: h_step_submit_tx
+# candidate: equal energy rejected (> became >=)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -308,7 +308,7 @@
+         self.check_bounds(&next, Some((r, req.units)), None)?;
+         let before = self.energy(&self.values)?;
+         let after = self.energy(&next)?;
+-        if after > before {
++        if after >= before {
+             return Err(Error::Energy);
+         }
+         if self.violations(&self.values).iter().any(|v| *v > 0)

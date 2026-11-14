@@ -1,0 +1,18 @@
+# checks: trace
+# submit in a violating state no longer requires that the reservation
+# plus its completion strictly lowers energy (ADM-2). MCConfig admits no
+# submit in a violating state at v1.1, and in RecoveryConfig ADM-1 already
+# implies it (the hedge reserves 1 on the energy term's metric, so an
+# energy that does not rise falls, and its completion leaves that metric
+# alone): only a trace kills it.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -279,8 +279,6 @@
+          IN IF cb # "Ok" THEN cb
+             ELSE IF Energy(next) > e0 THEN "Energy"
+             ELSE IF Violating /\ AddFails(next, Rcp(r).complete, u) THEN "Arithmetic"
+-            ELSE IF Violating /\ Energy(AddVec(next, Rcp(r).complete, u)) >= e0
+-                 THEN "Energy"
+             ELSE IF CapErr # "Ok" THEN "Arithmetic"
+             \* submit's id = first_id + len (U:363-366): unreachable (WIN-1).
+             ELSE IF firstId + NR > MaxVersion THEN "Arithmetic"

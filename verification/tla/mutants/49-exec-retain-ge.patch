@@ -1,0 +1,15 @@
+# checks: executor-w2-noview
+# TLA-EXEC: advance keeps a job with id + WINDOW >= newest (E:176 with
+# >= for >), so a job WINDOW behind newest is not forgotten. Must be
+# killed by InvJobWindow.
+--- a/Executor.tla
++++ b/Executor.tla
+@@ -126,7 +126,7 @@
+ 
+ (* E:173-177 advance(id): newest = max(newest, id), then keep the jobs    *)
+ (* with id + WINDOW > newest.                                             *)
+-Keep(n) == [j \in {x \in DOMAIN jobs : x + W > n} |-> jobs[j]]
++Keep(n) == [j \in {x \in DOMAIN jobs : x + W >= n} |-> jobs[j]]
+ 
+ (* E:153-160 on_settled(id): private, needs one promise result (E:155),   *)
+ (* advance(id) unless the settle failed (E:157-159). As <<newest, jobs>>. *)

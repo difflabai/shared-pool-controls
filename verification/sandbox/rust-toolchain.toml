@@ -1,0 +1,5 @@
+# The upstream toolchain (source-mirror/rust-toolchain.toml), for the tests and
+# the relay contract.
+[toolchain]
+channel = "1.98"
+targets = ["wasm32-unknown-unknown"]

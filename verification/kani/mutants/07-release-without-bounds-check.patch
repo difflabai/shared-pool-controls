@@ -1,0 +1,18 @@
+# killed-by: h_wf_cancel
+# release: no check_bounds before undoing a reservation. Equivalent on INV
+# states: admission counted the release in the envelope, so there the check
+# provably passes (LIVE-ALL). Killed in the WF domain, where a release can
+# fail Bounds (cover "wf cancel: Bounds (release)"): the original refuses,
+# the mutant releases.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -478,9 +478,6 @@
+         let r = &self.config.recipes[c.recipe as usize];
+         let undo: Vec<i64> = r.reserve.iter().map(|d| -d).collect();
+         let next = add(&self.values, &undo, c.units)?;
+-        // The release is still checked. Admission counted it in the envelope,
+-        // so in a reachable state this check passes; no release is forced.
+-        self.check_bounds(&next, None, Some(id))?;
+         let k = self.index(id)?;
+         self.bump()?;
+         self.values = next;

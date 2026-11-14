@@ -1,0 +1,24 @@
+Lean mutant 22-valid-allows-self-executor
+FR-5 (X H3): validate drops the actor != executor check (lib.rs 130), in
+both Valid and validate.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -590,7 +590,7 @@
+ /-- One recipe's checks, `k` its index. -/
+ structure RecipeOk (cfg : Cfg A) (k : Nat) (r : Recipe A) : Prop where
+   /-- lib.rs 130 (v1.1.0, F-4): an actor may not be its own executor -/
+-  actorNe : r.actor ≠ r.executor
++  actorNe : True
+   reserveLen : r.reserve.length = cfg.n
+   completeLen : r.complete.length = cfg.n
+   unitsPos : 0 < r.maxUnits
+@@ -617,7 +617,7 @@
+ 
+ /-- One recipe's checks as a test (lib.rs 127-148). -/
+ def recipeOkB (cfg : Cfg A) (k : Nat) (r : Recipe A) : Bool :=
+-  decide (r.actor ≠ r.executor) && decide (r.reserve.length = cfg.n) &&
++  true && decide (r.reserve.length = cfg.n) &&
+   decide (r.complete.length = cfg.n) && decide (0 < r.maxUnits) &&
+   decide (r.maxUnits ≤ MAX_UNITS) && decide (r.requires.length ≤ MAX_RECIPES) &&
+   r.requires.all (fun pu => decide (pu.1 < k ∧ 0 < pu.2 ∧ pu.2 ≤ MAX_UNITS)) &&

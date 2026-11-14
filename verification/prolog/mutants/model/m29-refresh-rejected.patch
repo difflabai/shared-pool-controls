@@ -1,0 +1,17 @@
+# mutant: m29-refresh-rejected
+# mutates: REFRESH-1: restating the current values with a record open is Pending (v1.0.0) (FR-7; F-6)
+# expect: test_model F-6 fixed
+# expect: test_model observe: owner, all terminal or a restatement
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 wedge
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -490,7 +490,7 @@
+ % differ and some record is open; v1.0.0: any open record).
+ holds(observe, all_terminal_or_restate, S, observe(_, Vs, _)) :-
+     pool_values(S, V0),
+-    (   Vs == V0 -> true
++    (   Vs == V0, V0 == [] -> true
+     ;   pool_records(S, Rs), \+ ( member(c(_, _, _, St), Rs), open_status(St) )
+     ).
+ holds(observe, bounded_values, S, observe(_, Vs, _)) :-

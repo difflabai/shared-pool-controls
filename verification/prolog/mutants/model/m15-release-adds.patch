@@ -1,0 +1,16 @@
+# mutant: m15-release-adds
+# mutates: TERM-1: cancellation adds the reservation instead of subtracting it
+# expect: test_model cancel: actor or owner
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 healthy
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -512,7 +512,7 @@
+ 
+ release_next(S, Id, Next) :-
+     record_of(S, Id, c(RI, U, _, _)), pool_config(S, C), recipe_of(C, RI, r(_, _, Res, _, _, _)),
+-    pool_values(S, V), sub_vec(V, Res, U, Next).
++    pool_values(S, V), add_vec(V, Res, U, Next).
+ complete_next(S, Id, Next) :-
+     record_of(S, Id, c(RI, U, _, _)), pool_config(S, C), recipe_of(C, RI, r(_, _, _, Com, _, _)),
+     pool_values(S, V), add_vec(V, Com, U, Next).

@@ -1,0 +1,14 @@
+Lean mutant 15-settle-complete-uses-reserve
+settle(.., true) applies the reserve vector instead of complete.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -464,7 +464,7 @@
+ 
+ /-- `settle(.., true)`'s new values. -/
+ def completeNext (cfg : Cfg A) (s : State) (id : Nat) : List Int :=
+-  addv s.values (cfg.recipe (s.record id).recipe).complete (s.record id).units
++  addv s.values (cfg.recipe (s.record id).recipe).reserve (s.record id).units
+ 
+ /-- Status in `Dispatched | Active | Unknown`. -/
+ def inFlight : Status → Bool

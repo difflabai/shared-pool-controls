@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# check_bounds ignores the envelope's low side.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -211,7 +211,7 @@
+         hi == [m \in MIdx |-> High(cand, er, eu, skip, m)]
+     IN IF \E m \in MIdx : ~Bounded(lo[m]) \/ ~Bounded(hi[m]) THEN "Arithmetic"
+        ELSE IF \E m \in MIdx :
+-                 Max0(Mn(m) - lo[m]) + Max0(hi[m] - Mx(m)) > Min(PV(values, m), PV(cand, m))
++                 Max0(hi[m] - Mx(m)) > Min(PV(values, m), PV(cand, m))
+             THEN "Bounds"
+        ELSE "Ok"
+ 
