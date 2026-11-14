@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# set_paused does not bump the version.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -449,7 +449,7 @@
+ SetPaused(c, b) ==
+     /\ PauseErr(c, b) = "Ok"
+     /\ paused' = b
+-    /\ version' = version + 1
++    /\ version' = version
+     /\ UNCHANGED <<cfg, values, observedAt, records, firstId, doneU, base, k0>>
+     /\ Step("pause", c, 0, 0, 0, 0, b, 0, 0)
+ 

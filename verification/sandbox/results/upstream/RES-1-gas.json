@@ -1,0 +1,2107 @@
+{
+  "against_docs_api_md": [
+    {
+      "call": "dispatch",
+      "docs_attach_tgas": 100,
+      "docs_least_tgas": 70,
+      "margin_to_attach_tgas": 30,
+      "matches_docs": true,
+      "min_prepaid_tgas": 70
+    },
+    {
+      "call": "reconcile",
+      "docs_attach_tgas": 60,
+      "docs_least_tgas": 46,
+      "margin_to_attach_tgas": 14,
+      "matches_docs": true,
+      "min_prepaid_tgas": 46
+    },
+    {
+      "call": "confirm_not_executed (254 jobs)",
+      "docs_attach_tgas": 70,
+      "docs_least_tgas": 55,
+      "margin_to_attach_tgas": 15,
+      "matches_docs": true,
+      "min_prepaid_tgas": 55
+    },
+    {
+      "call": "finish (256 jobs)",
+      "docs_attach_tgas": 70,
+      "docs_least_tgas": 55,
+      "margin_to_attach_tgas": 15,
+      "matches_docs": true,
+      "min_prepaid_tgas": 55
+    },
+    {
+      "call": "finish (512 jobs)",
+      "docs_attach_tgas": 70,
+      "docs_least_tgas": 56,
+      "margin_to_attach_tgas": 14,
+      "matches_docs": true,
+      "min_prepaid_tgas": 56
+    }
+  ],
+  "below_minimum_attempts": [
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 41,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 42,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 43,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 44,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 45,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 46,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 47,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 48,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 49,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 50,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 51,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 52,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 53,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 54,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 55,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 56,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 57,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 58,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 59,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 60,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 61,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 62,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 63,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 64,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.11,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 65,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 5.12,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 66,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 6.54,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 67,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 8.01,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 68,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 8.2,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 69,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 286
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.09,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 286
+      },
+      "call": "dispatch",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 8.2,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 69,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Reserved"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.07,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.07,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 41,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.07,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 42,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.07,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 43,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.07,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 44,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 287
+      },
+      "call": "reconcile",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.11,
+      "failed_receipt_on": "pool.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 45,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.04,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.04,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 41,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.04,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 42,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 43,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 44,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 45,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 46,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 47,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 48,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 49,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 50,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 51,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 52,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 53,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "id": 283,
+        "recipe": 31,
+        "units": 100
+      },
+      "call": "confirm_not_executed",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 3.12,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 54,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Unknown"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.05,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.05,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 41,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.05,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 42,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 43,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 44,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 45,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 46,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 47,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 48,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 49,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 50,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 51,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 52,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.48,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 53,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 282
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 3.12,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 54,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.51,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 40,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.51,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 41,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.51,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 42,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 43,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 44,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 45,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 46,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 47,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 48,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 49,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 50,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 51,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 52,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 2.94,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 53,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 3.11,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 54,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    },
+    {
+      "args": {
+        "completed": true,
+        "id": 281
+      },
+      "call": "finish",
+      "events": 0,
+      "executor_storage_unchanged": true,
+      "failed_receipt_burnt_tgas": 4.19,
+      "failed_receipt_on": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.test.near",
+      "failure": "Exceeded the prepaid gas.",
+      "ok": false,
+      "pool_storage_unchanged": true,
+      "prepaid_tgas": 55,
+      "receipts_on_other_contract": 0,
+      "record_status_after": "Active"
+    }
+  ],
+  "calls": [
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 28.57,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch #287 with 70 Tgas prepaid (the minimum)",
+      "margin_to_300_tgas": 281.9,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626819025649,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1434911982849,
+          "gas_tgas": 1.43,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 18.1
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 28.65,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch #286 with 300 Tgas after failed low-gas attempts",
+      "margin_to_300_tgas": 281.98,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626819025649,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1345827194148,
+          "gas_tgas": 1.35,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 18.02
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 28.65,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch #285 with 70 Tgas prepaid (the minimum, again)",
+      "margin_to_300_tgas": 281.98,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626819025649,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1350141451238,
+          "gas_tgas": 1.35,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 18.02
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 8.77,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "reconcile #287 with 46 Tgas prepaid (the minimum)",
+      "margin_to_300_tgas": 286.23,
+      "receipts": [
+        {
+          "gas": 4151972928860,
+          "gas_tgas": 4.15,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626741686585,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1232004013545,
+          "gas_tgas": 1.23,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 13.77
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 19.08,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 28.64,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch, execute returns cancelled, on_result releases (255 other open records)",
+      "margin_to_300_tgas": 278.68,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 10916843757860,
+          "gas_tgas": 10.92,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1355031186553,
+          "gas_tgas": 1.36,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 21.32
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.38,
+          "on": "pool",
+          "receipt": 1
+        }
+      ],
+      "call": "dispatch, execute fails, on_result marks Unknown",
+      "margin_to_300_tgas": 282.05,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7616830708961,
+          "gas_tgas": 7.62,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1294345089498,
+          "gas_tgas": 1.29,
+          "ok": false,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 17.95
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 7.53,
+          "on": "exec",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 40,
+          "margin_to_budget_tgas": 29.13,
+          "on": "pool",
+          "receipt": 2
+        }
+      ],
+      "call": "confirm_not_executed with 55 Tgas prepaid (the minimum) -> settle(false) [40 Tgas], on_settled [10 Tgas]",
+      "margin_to_300_tgas": 282.68,
+      "receipts": [
+        {
+          "gas": 3219253789205,
+          "gas_tgas": 3.22,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 2470107914349,
+          "gas_tgas": 2.47,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 10871631399965,
+          "gas_tgas": 10.87,
+          "ok": true,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 17.32
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 27.54,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch at the retention bound (exec.execute: 255 jobs -> 256)",
+      "margin_to_300_tgas": 280.87,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626819025649,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 2458782468919,
+          "gas_tgas": 2.46,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 19.13
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 8.24,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "reconcile at the retention bound (exec.status: 256 jobs, the job is last)",
+      "margin_to_300_tgas": 285.71,
+      "receipts": [
+        {
+          "gas": 4151972928860,
+          "gas_tgas": 4.15,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626741686585,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 1758804124800,
+          "gas_tgas": 1.76,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 14.29
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 7.53,
+          "on": "exec",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 40,
+          "margin_to_budget_tgas": 29.14,
+          "on": "pool",
+          "receipt": 2
+        }
+      ],
+      "call": "finish at the retention bound with 55 Tgas prepaid (the minimum) -> settle(true) [40 Tgas], on_settled [10 Tgas]",
+      "margin_to_300_tgas": 282.69,
+      "receipts": [
+        {
+          "gas": 3225835964643,
+          "gas_tgas": 3.23,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 2474728685319,
+          "gas_tgas": 2.47,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 10856792003914,
+          "gas_tgas": 10.86,
+          "ok": true,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 17.31
+    },
+    {
+      "call": "settle(true) by the executor key (about 250 other open records)",
+      "margin_to_300_tgas": 288.85,
+      "receipts": [
+        {
+          "gas": 10844131434586,
+          "gas_tgas": 10.84,
+          "ok": true,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 11.15
+    },
+    {
+      "call": "settle(false) by the executor key (about 250 other open records)",
+      "margin_to_300_tgas": 288.86,
+      "receipts": [
+        {
+          "gas": 10833392992109,
+          "gas_tgas": 10.83,
+          "ok": true,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 11.14
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 6.34,
+          "on": "exec",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 40,
+          "margin_to_budget_tgas": 36.68,
+          "on": "pool",
+          "receipt": 2
+        }
+      ],
+      "call": "confirm_not_executed of an unassigned id, 511 jobs -> 512 (the lock's settle fails NotFound; on_settled changes nothing)",
+      "margin_to_300_tgas": 287.86,
+      "receipts": [
+        {
+          "gas": 4394522168267,
+          "gas_tgas": 4.39,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 3663064160208,
+          "gas_tgas": 3.66,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 3324068879954,
+          "gas_tgas": 3.32,
+          "ok": false,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 12.14
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 7.71,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "reconcile at the job cap (exec.status: 512 jobs)",
+      "margin_to_300_tgas": 285.17,
+      "receipts": [
+        {
+          "gas": 4151972928860,
+          "gas_tgas": 4.15,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626741686585,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 2292129099465,
+          "gas_tgas": 2.29,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 14.83
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 10,
+          "margin_to_budget_tgas": 6.32,
+          "on": "exec",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 40,
+          "margin_to_budget_tgas": 29.18,
+          "on": "pool",
+          "receipt": 2
+        }
+      ],
+      "call": "finish at the job cap with 56 Tgas prepaid (the minimum) -> settle(true) [40 Tgas], on_settled [10 Tgas]",
+      "margin_to_300_tgas": 280.35,
+      "receipts": [
+        {
+          "gas": 4392793960701,
+          "gas_tgas": 4.39,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 3681149350161,
+          "gas_tgas": 3.68,
+          "ok": true,
+          "on": "exec"
+        },
+        {
+          "gas": 10818442523998,
+          "gas_tgas": 10.82,
+          "ok": true,
+          "on": "pool"
+        }
+      ],
+      "tx_total_tgas": 19.65
+    },
+    {
+      "budgets": [
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 22.37,
+          "on": "pool",
+          "receipt": 1
+        },
+        {
+          "attached_budget_tgas": 30,
+          "margin_to_budget_tgas": 26.35,
+          "on": "exec",
+          "receipt": 2
+        }
+      ],
+      "call": "dispatch at the job cap (exec.execute: 512 jobs, forgets id 32, adds 288)",
+      "margin_to_300_tgas": 279.68,
+      "receipts": [
+        {
+          "gas": 8287973886831,
+          "gas_tgas": 8.29,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 7626819025649,
+          "gas_tgas": 7.63,
+          "ok": true,
+          "on": "pool"
+        },
+        {
+          "gas": 3650026354777,
+          "gas_tgas": 3.65,
+          "ok": true,
+          "on": "exec"
+        }
+      ],
+      "tx_total_tgas": 20.32
+    }
+  ],
+  "dispatch_pool_receipt_burnt_tgas": {
+    "at_300_tgas": 8.29,
+    "at_minimum_prepaid": 8.29
+  },
+  "executor": {
+    "confirm_511_to_512_tgas": 4.39,
+    "confirm_not_executed_at_cap": {
+      "lock_receipts": 0,
+      "observed_panic": "panicked at crates/executor/src/lib.rs:135:9:\nfull",
+      "result": "fails"
+    },
+    "execute_256th_tgas": 2.46,
+    "execute_at_512_tgas": 3.65,
+    "finish_at_512_tgas": 4.39,
+    "finish_last_of_256_tgas": 3.23,
+    "on_settled_after_confirm_tgas": 2.47,
+    "on_settled_at_256_tgas": 2.47,
+    "on_settled_at_512_tgas": 3.68,
+    "on_settled_attached_tgas": 10,
+    "on_settled_limit_tgas": 6,
+    "on_settled_margin_tgas": 6.32,
+    "on_settled_refused_tgas": 3.66,
+    "state_bytes_at_256_jobs": 5745,
+    "state_bytes_at_512_jobs": 12145,
+    "status_at_256_tgas": 1.76,
+    "status_at_512_tgas": 2.29
+  },
+  "largest_other_call_receipt": {
+    "call": "settle(true) by the executor key (about 250 other open records)",
+    "margin_to_attach_tgas": 19.16,
+    "tgas": 10.84
+  },
+  "method": "upstream crates/sandbox/tests/res1.rs (v1.1.0) sections D-F: whole-Tgas sweep from 40 Tgas up; every amount below the minimum fails with the runtime's out-of-gas error in its first receipt, runs no other receipt, emits no event, and leaves both contracts' raw storage byte-identical and the pool equal to the core",
+  "minimum_prepaid_gas": [
+    {
+      "call": "dispatch",
+      "fails_at_tgas": "40..=69",
+      "first_receipt_burnt_tgas": 8.29,
+      "min_prepaid_tgas": 70,
+      "state": "pool 256 records, all open (Reserved); executor 31 jobs",
+      "static_gas_attached_tgas": "execute 30 + on_result 30"
+    },
+    {
+      "call": "reconcile",
+      "fails_at_tgas": "40..=45",
+      "first_receipt_burnt_tgas": 4.15,
+      "min_prepaid_tgas": 46,
+      "state": "pool 256 records, all open, record Active; executor 3 jobs (285..=287: dispatching 287 let execute forget ids 0..=30)",
+      "static_gas_attached_tgas": "status 10 + on_result 30"
+    },
+    {
+      "call": "confirm_not_executed (executor)",
+      "fails_at_tgas": "40..=54",
+      "first_receipt_burnt_tgas": 3.22,
+      "min_prepaid_tgas": 55,
+      "on_settled_burnt_tgas": 2.47,
+      "state": "executor 254 jobs (255 after); pool 256 records, 254 open, the record Unknown",
+      "static_gas_attached_tgas": "settle 40 + on_settled 10"
+    },
+    {
+      "call": "finish (executor)",
+      "fails_at_tgas": "40..=54",
+      "first_receipt_burnt_tgas": 3.23,
+      "min_prepaid_tgas": 55,
+      "on_settled_burnt_tgas": 2.47,
+      "state": "executor 256 jobs (the last job); pool 256 records, 253 open",
+      "static_gas_attached_tgas": "settle 40 + on_settled 10"
+    },
+    {
+      "call": "finish (executor) at the job cap",
+      "fails_at_tgas": "40..=55",
+      "first_receipt_burnt_tgas": 4.39,
+      "min_prepaid_tgas": 56,
+      "on_settled_burnt_tgas": 3.68,
+      "state": "executor 512 jobs; pool 256 records, 251 open",
+      "static_gas_attached_tgas": "settle 40 + on_settled 10"
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RES-1",
+  "result": "pass",
+  "seconds": 523,
+  "test": "res_1_min_prepaid_gas_and_executor_cap",
+  "thresholds": "docs/api.md:44-59: each least prepaid amount at least 10 Tgas below its documented attach (dispatch 100, reconcile 60, finish/confirm_not_executed 70); every on_settled < 6 Tgas; every pool receipt < 30 Tgas, and the largest receipt of submit, cancel, settle, observe and set_paused at least 10 Tgas below their 30 Tgas attach (docs/api.md:50); promise receipts under their attached gas",
+  "wasm_variant": "upstream",
+  "worst_pool_receipt_tgas": 10.92
+}

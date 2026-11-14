@@ -1,0 +1,14 @@
+# killed-by: h_full_256_prune
+# fix-revert: FR-3 (N11; F-3; upstream 1f01d43)
+# submit: the prune removes the front record but first_id is not advanced:
+# every retained id shifts by one (WIN-2, RD-ID).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -367,7 +367,6 @@
+         // candidate() checked that the oldest record is terminal.
+         if self.records.len() >= MAX_RECORDS {
+             self.records.remove(0);
+-            self.first_id += 1;
+         }
+         self.records.push(Commitment {
+             id,

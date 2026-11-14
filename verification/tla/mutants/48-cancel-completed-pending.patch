@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# FR-8. v1.0's cancel: a Completed record is Pending, not InvalidState.
+# Must be killed by TERM-1.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -320,7 +320,6 @@
+     IF ~Found(id) THEN "NotFound"
+     ELSE IF c # RecRcp(id).actor /\ c # cfg.owner THEN "Unauthorized"
+     ELSE IF Rec(id).status = "Cancelled" THEN "Noop"
+-    ELSE IF Rec(id).status = "Completed" THEN "InvalidState"
+     ELSE IF Rec(id).status # "Reserved" THEN "Pending"
+     ELSE ReleaseErr(id)
+ 

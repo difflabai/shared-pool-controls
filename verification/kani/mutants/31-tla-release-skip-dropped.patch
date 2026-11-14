@@ -1,0 +1,19 @@
+# applies-to: kani
+# killed-by: h_ref_cancel
+# transcription: ReleaseErr checks the envelope without skipping the record
+# it releases (CheckBounds(.., -1) for CheckBounds(.., id)), so the TLA+
+# side counts that record's own release and completion terms as if it
+# stayed open and rejects (Bounds) a cancel the core accepts: REF-1 (the
+# transcription is load-bearing, not only the core). Re-based on the v1.1.0
+# release_err (ids, the release-aware envelope).
+--- a/src/tla.rs
++++ b/src/tla.rs
+@@ -813,7 +813,7 @@
+         if self.add_fails(&self.values, &d, u) {
+             return TErr::Arithmetic;
+         }
+-        let cb = self.check_bounds(&self.add_vec(&self.values, &d, u), 0, 0, id as i64);
++        let cb = self.check_bounds(&self.add_vec(&self.values, &d, u), 0, 0, -1);
+         if cb != TErr::Ok {
+             return cb;
+         }

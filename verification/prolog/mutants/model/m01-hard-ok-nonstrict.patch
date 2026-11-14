@@ -1,0 +1,15 @@
+# mutant: m01-hard-ok-nonstrict
+# mutates: ADM-1/HARD-STEP: a call that keeps a violation equal to min(before, after) is rejected (E >= min instead of E > min)
+# expect: test_model submit: each documented reason
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -303,7 +303,7 @@
+     point_violation(Ms, Current, PV),
+     point_violation(Ms, Cand, PN),
+     interval_violation(Ms, Low, High, EV),
+-    \+ ( nth0(I, EV, E), nth0(I, PV, P), nth0(I, PN, Q), E > min(P, Q) ).
++    \+ ( nth0(I, EV, E), nth0(I, PV, P), nth0(I, PN, Q), E >= min(P, Q) ).
+ 
+ %% energy(+Cfg, +Values, -E): spec:33, sum of w * r^2 with r the target
+ %% deviation |v - t|, excess max(0, v - t) or deficit max(0, t - v).

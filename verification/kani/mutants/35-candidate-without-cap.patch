@@ -1,0 +1,16 @@
+# killed-by: h_version_cap_submit h_step_submit_inv
+# fix-revert: FR-6 (N4; F-5; upstream da43188)
+# candidate: the VERSION_CAP check deleted: a submit at the cap is admitted
+# (VER-CAP, INV-VERCAP).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -316,9 +316,6 @@
+         {
+             return Err(Error::Energy);
+         }
+-        if self.version >= VERSION_CAP {
+-            return Err(Error::Arithmetic);
+-        }
+         Ok(next)
+     }
+     pub fn preview(&self, caller: &str, req: &Request, now: u64) -> Decision {

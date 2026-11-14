@@ -1,0 +1,14 @@
+Mutant s09_new_not_private: SH-2: anyone may initialise the pool.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -32,7 +32,6 @@
+ #[near]
+ impl Contract {
+     #[init]
+-    #[private]
+     pub fn new(config: Config) -> Self {
+         config
+             .owner

@@ -1,0 +1,17 @@
+# killed-by: h_version_max_ack
+# bump: version wraps at u32::MAX instead of failing. Equivalent from INV
+# states, where INV-VERCAP keeps a reserve so that bump never overflows (and
+# h_version_max_pause now stops at the cap first). Killed in the WF domain at
+# u32::MAX: acknowledging a Dispatched record is Arithmetic, the mutant
+# gives Ok and version 0.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -393,7 +393,7 @@
+         Ok(&self.records[self.index(id)?])
+     }
+     fn bump(&mut self) -> Result<(), Error> {
+-        self.version = self.version.checked_add(1).ok_or(Error::Arithmetic)?;
++        self.version = self.version.wrapping_add(1);
+         Ok(())
+     }
+     /// The increment for calls that start or administer work. It stops at

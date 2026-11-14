@@ -1,0 +1,14 @@
+Mutant s30_on_settled_not_private: EX-8: on_settled accepts any predecessor.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -150,7 +150,6 @@
+     /// `execute` does. A refused settle changes nothing; the transaction
+     /// already reports the lock's error. `#[private]` admits only this
+     /// account, and only `notify` gives it a promise result.
+-    #[private]
+     pub fn on_settled(&mut self, id: u32) {
+         assert_eq!(env::promise_results_count(), 1, "not a settle callback");
+         // Settle returns no value, but any success counts (even `Err(TooLong)`).

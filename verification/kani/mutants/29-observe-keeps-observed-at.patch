@@ -1,0 +1,13 @@
+# killed-by: h_step_observe_post
+# observe: the new baseline keeps the old observation time (snapshot age
+# never refreshed)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -544,7 +544,6 @@
+         self.energy(&values)?;
+         self.bump_new()?;
+         self.values = values;
+-        self.observed_at = now;
+         Ok(())
+     }
+     /// Offchain bounded search. This is not part of the admission authority.

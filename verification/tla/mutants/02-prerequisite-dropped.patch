@@ -1,0 +1,14 @@
+# checks: safety-1 trace
+# submit ignores prerequisites.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -269,9 +269,6 @@
+     ELSE IF r >= NRcp THEN "InvalidRecipe"
+     ELSE IF c # Rcp(r).actor THEN "Unauthorized"
+     ELSE IF u = 0 \/ u > Rcp(r).maxUnits THEN "InvalidUnits"
+-    ELSE IF \E q \in DOMAIN Rcp(r).requires :
+-                doneU[Rcp(r).requires[q][1] + 1] < Rcp(r).requires[q][2]
+-         THEN "Prerequisite"
+     ELSE IF AddFails(values, Rcp(r).reserve, u) THEN "Arithmetic"
+     ELSE LET next == AddVec(values, Rcp(r).reserve, u)
+              cb   == CheckBounds(next, r, u, -1)

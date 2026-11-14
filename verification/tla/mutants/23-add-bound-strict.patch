@@ -1,0 +1,13 @@
+# checks: Witness_EdgeValue trace
+# add() rejects a result of exactly +-MAX_VALUE.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -173,7 +173,7 @@
+ \* add(base, d, u): the exact result, and whether some component leaves
+ \* +-MAX_VALUE (Arithmetic). Lengths are equal in every WF state.
+ AddVec(b, d, u)   == [m \in DOMAIN b |-> b[m] + d[m] * u]
+-AddFails(b, d, u) == \E m \in DOMAIN b : ~Bounded(b[m] + d[m] * u)
++AddFails(b, d, u) == \E m \in DOMAIN b : ~(-MaxValue < b[m] + d[m] * u /\ b[m] + d[m] * u < MaxValue)
+ Neg(d) == [m \in DOMAIN d |-> -d[m]]
+ 
+ \* envelope()'s terms for one record or the extra (U:216-228): on metric m,

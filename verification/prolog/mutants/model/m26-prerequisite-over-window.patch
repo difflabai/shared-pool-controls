@@ -1,0 +1,17 @@
+# mutant: m26-prerequisite-over-window
+# mutates: DEP-1: prerequisites count the retained Completed records, not completed_units (v1.0.0) (FR-4; F-3)
+# expect: test_model F-3 fixed: completed_units counts a pruned prerequisite
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 window:
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -393,7 +393,8 @@
+ % spec:21 "completed-unit prerequisites (completed_units)"; handoff:19
+ holds(submit, prerequisites, S, submit(_, RI, _, _, _, _)) :-
+     pool_config(S, C), recipe_of(C, RI, r(_, _, _, _, _, Req)),
+-    forall(member(p(P, U), Req), ( completed_units(S, P, N), N >= U )).
++    pool_records(S, Rs),
++    forall(member(p(P, U), Req), ( findall(X, member(c(P, X, _, completed), Rs), Xs), sum_list(Xs, N), N >= U )).
+ holds(submit, reserve_arith, S, Op) :- submit_next(S, Op, _).
+ holds(submit, envelope_arith, S, Op) :- submit_envelope(S, Op, _, _).
+ holds(submit, bounds, S, Op) :-

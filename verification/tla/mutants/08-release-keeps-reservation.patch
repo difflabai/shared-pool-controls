@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# release does not undo the reservation.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -424,7 +424,7 @@
+ 
+ \* release(id)'s effect.
+ Release(id) ==
+-    /\ values' = AddVec(values, Neg(RecRcp(id).reserve), Rec(id).units)
++    /\ values' = values
+     /\ SetStatus(id, "Cancelled")
+     /\ version' = version + 1
+     /\ UNCHANGED <<cfg, observedAt, paused, firstId, doneU, base, k0>>

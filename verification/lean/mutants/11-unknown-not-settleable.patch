@@ -1,0 +1,14 @@
+Lean mutant 11-unknown-not-settleable
+Unknown is not in flight: settle refuses it.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -470,7 +470,7 @@
+ def inFlight : Status → Bool
+   | .dispatched => true
+   | .active => true
+-  | .unknown => true
++  | .unknown => false
+   | _ => false
+ 
+ /-- `settle` (lib.rs 492). -/

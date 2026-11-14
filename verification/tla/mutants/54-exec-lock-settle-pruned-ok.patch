@@ -1,0 +1,16 @@
+# checks: executor-w2-noview
+# TLA-EXEC, critique 3.9: the lock answers Ok (no change) to a settle of a
+# pruned id (C:385-391 and C:493 with NotFound dropped below first_id), so
+# on_settled runs for an id the lock does not retain. newest stays below
+# first_id + WINDOW, so only SettleVouch (StepExec) can kill it.
+--- a/Executor.tla
++++ b/Executor.tla
+@@ -117,7 +117,7 @@
+ (* C:492-521 settle(executor, id, completed): the first failing guard,    *)
+ (* "Noop" for the repeated terminal outcome (Ok, no change), or "Ok".     *)
+ SettleErr(i, c) ==
+-    IF i \notin Retained THEN "NotFound"
++    IF i \notin Retained THEN (IF i < firstId THEN "Noop" ELSE "NotFound")
+     ELSE IF (c /\ St(i) = "C") \/ (~c /\ St(i) = "X") THEN "Noop"
+     ELSE IF St(i) # "F" THEN "InvalidState"
+     ELSE "Ok"

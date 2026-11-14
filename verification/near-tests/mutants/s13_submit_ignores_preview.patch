@@ -1,0 +1,19 @@
+Mutant s13_submit_ignores_preview: SH-4/SH-5: submit tries the core directly and keeps only an Ok id (a core error after an allowed preview no longer panics).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -68,11 +68,7 @@
+     }
+     pub fn submit(&mut self, request: Request) -> Submission {
+         let decision = self.pool.preview(&caller(), &request, now());
+-        let id = if decision.allowed {
+-            Some(must(self.pool.submit(&caller(), request.clone(), now())))
+-        } else {
+-            None
+-        };
++        let id = self.pool.submit(&caller(), request.clone(), now()).ok();
+         event(
+             "decision",
+             near_sdk::serde_json::json!({"actor":caller(),"request":request,"id":id,"allowed":decision.allowed,"reason":decision.reason,"before":decision.before,"after":decision.after,"version":self.pool.version}),

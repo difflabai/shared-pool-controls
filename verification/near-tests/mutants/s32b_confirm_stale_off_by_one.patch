@@ -1,0 +1,15 @@
+Mutant s32b_confirm_stale_off_by_one: EX-6: confirm_not_executed accepts an id exactly WINDOW below newest (`>=`, not `>`).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -131,7 +131,7 @@
+     pub fn confirm_not_executed(&mut self, id: u32, recipe: u32, units: u32) {
+         self.operator();
+         assert!(!self.jobs.iter().any(|j| j.id == id), "job exists");
+-        assert!(u64::from(id) + WINDOW > u64::from(self.newest), "stale id");
++        assert!(u64::from(id) + WINDOW >= u64::from(self.newest), "stale id");
+         assert!(self.jobs.len() < MAX_JOBS, "full");
+         self.jobs.push(Job {
+             id,

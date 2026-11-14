@@ -1,0 +1,14 @@
+# mutant: c04-max-records-255
+# mutates: C-4: MAX_RECORDS differs from api.md's 256
+# expect: test_requirements C-4 constants
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -12,7 +12,7 @@
+ pub const MAX_RECIPES: usize = 32;
+ pub const MAX_TERMS: usize = 64;
+ /// Records retained in a pool's window (`Pool::records`).
+-pub const MAX_RECORDS: usize = 256;
++pub const MAX_RECORDS: usize = 255;
+ pub const MAX_VALUE: i64 = 1_000_000;
+ pub const MAX_WEIGHT: u32 = 1_000;
+ pub const MAX_UNITS: u32 = 100;

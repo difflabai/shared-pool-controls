@@ -1,0 +1,15 @@
+# mutant: m10-cancel-owner-dropped
+# mutates: AUTH-1: the owner can no longer cancel
+# expect: test_model cancel: actor or owner
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -451,7 +451,7 @@
+ % --- cancel (spec:43, 45; api:17)
+ holds(cancel, caller, S, cancel(Caller, Id, _)) :-
+     record_of(S, Id, c(RI, _, _, _)), pool_config(S, C),
+-    actor_of(C, RI, A), owner_of(C, O), ( Caller == A ; Caller == O ), !.
++    actor_of(C, RI, A), owner_of(C, _), Caller == A, !.
+ holds(cancel, not_cancelled, S, cancel(_, Id, _)) :- record_of(S, Id, c(_, _, _, St)), St \== cancelled.
+ % spec:43 "A cancel of a Completed record returns InvalidState" (v1.0.0: Pending)
+ holds(cancel, not_completed, S, cancel(_, Id, _)) :- record_of(S, Id, c(_, _, _, St)), St \== completed.

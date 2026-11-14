@@ -1,0 +1,14 @@
+# killed-by: h_full_256
+# candidate: Full only above 256 records (>= became >). At 256 with an open
+# front the mutant admits and then prunes the open record.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -284,7 +284,7 @@
+         }
+         // A full window frees a slot by pruning its oldest record, which must
+         // be terminal.
+-        if self.records.len() >= MAX_RECORDS && open(&self.records[0].status) {
++        if self.records.len() > MAX_RECORDS && open(&self.records[0].status) {
+             return Err(Error::Full);
+         }
+         let r = self

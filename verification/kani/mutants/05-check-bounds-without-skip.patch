@@ -1,0 +1,13 @@
+# killed-by: h_step_settle_tx h_live_all
+# settle(completed): check_bounds keeps the settled record in the envelope (skip dropped)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -510,7 +510,7 @@
+             return self.release(id);
+         }
+         let next = add(&self.values, &r.complete, c.units)?;
+-        self.check_bounds(&next, None, Some(id))?;
++        self.check_bounds(&next, None, None)?;
+         let (k, recipe, units) = (self.index(id)?, c.recipe as usize, c.units);
+         self.bump()?;
+         self.values = next;

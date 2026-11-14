@@ -1,0 +1,16 @@
+[package]
+name = "shared-pool-conformance"
+version = "0.1.0"
+edition = "2021"
+publish = false
+description = "Conformance traces of the real pool-core, replayed by the Prolog, TLA+ and Lean layers"
+
+# Standalone: the root workspace excludes this directory.
+[workspace]
+
+[dependencies]
+# The real core from the pinned submodule, with no serde/borsh: zero dependencies.
+pool-core = { path = "../source-mirror/crates/core", default-features = false }
+
+[profile.release]
+overflow-checks = true

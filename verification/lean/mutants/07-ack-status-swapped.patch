@@ -1,0 +1,14 @@
+Lean mutant 07-ack-status-swapped
+acknowledge(accepted) leads to Unknown, and a refusal to Active.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -429,7 +429,7 @@
+   bumpNewGuards s
+ 
+ /-- `acknowledge`'s target status. -/
+-def ackStatus (accepted : Bool) : Status := if accepted then .active else .unknown
++def ackStatus (accepted : Bool) : Status := if accepted then .unknown else .active
+ 
+ /-- `acknowledge` (lib.rs 436). -/
+ def ackGuards (s : State) (id : Nat) (accepted : Bool) : List Guard :=

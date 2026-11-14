@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# settle of a terminal record is a no-op either way.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -327,7 +327,7 @@
+ SettleErr(c, id, done) ==
+     IF ~Found(id) THEN "NotFound"
+     ELSE IF c # RecRcp(id).executor THEN "Unauthorized"
+-    ELSE IF (done /\ Rec(id).status = "Completed") \/ (~done /\ Rec(id).status = "Cancelled")
++    ELSE IF ~Open(Rec(id).status)
+          THEN "Noop"
+     ELSE IF ~InFlight(Rec(id).status) THEN "InvalidState"
+     ELSE IF ~done THEN ReleaseErr(id)

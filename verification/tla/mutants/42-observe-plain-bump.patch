@@ -1,0 +1,13 @@
+# checks: cap
+# FR-6. observe uses the plain bump (no cap).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -348,7 +348,7 @@
+     IF c # cfg.owner THEN "Unauthorized"
+     ELSE IF vals # values /\ AnyOpen THEN "Pending"
+     ELSE IF Len(vals) # NM \/ \E k \in DOMAIN vals : ~Bounded(vals[k]) THEN "Bounds"
+-    ELSE CapErr
++    ELSE VerErr
+ 
+ -----------------------------------------------------------------------------
+ (* Actions: the effect of an "Ok" call                                     *)

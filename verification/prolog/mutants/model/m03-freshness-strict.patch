@@ -1,0 +1,15 @@
+# mutant: m03-freshness-strict
+# mutates: TX-SUBMIT/TX-DISPATCH freshness: the snapshot is stale at exactly observed_at + max_age
+# expect: test_model submit: expiry and freshness boundaries
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -427,7 +427,7 @@
+ fresh(S, Now) :-
+     S = pool(config(_, MaxAge, _, _, _), _, _, Obs, _, _, _, _),
+     (   MaxAge =:= 0 -> true
+-    ;   sat_add64(Obs, MaxAge, Lim), Now =< Lim
++    ;   sat_add64(Obs, MaxAge, Lim), Now < Lim
+     ).
+ 
+ % --- dispatch (spec:39)

@@ -1,0 +1,14 @@
+# mutant: c12-observe-plain-bump
+# mutates: F-5 revert (FR-6) in observe: bump() in place of bump_new(), so observe no longer stops at VERSION_CAP (spec:50, api:30). The outcome names still line up (Unauthorized, Pending, Bounds, Arithmetic); C-2 requires the version_cap guard to be a site with the cap condition.
+# expect: test_requirements C-2 guard order
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -542,7 +542,7 @@
+             return Err(Error::Bounds);
+         }
+         self.energy(&values)?;
+-        self.bump_new()?;
++        self.bump()?;
+         self.values = values;
+         self.observed_at = now;
+         Ok(())

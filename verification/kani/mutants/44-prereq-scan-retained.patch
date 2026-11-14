@@ -1,0 +1,26 @@
+# killed-by: h_wf_submit h_full_256_prune
+# fix-revert: FR-4 (N13; F-3; upstream 1f01d43)
+# candidate: prerequisites counted from the retained Completed records (the
+# v1.0.0 scan), not completed_units: once the completions are pruned a
+# prerequisite that was met is refused. Survives any state whose
+# completions are still in the window; killed with completed_units free
+# (h_wf_submit) and by the h_full_256_prune array (first_id = 1,
+# completed_units[0] set by a pruned record).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -300,7 +300,14 @@
+         }
+         if r.requires
+             .iter()
+-            .any(|(p, units)| self.completed_units[*p as usize] < *units)
++            .any(|(p, units)| {
++                self.records
++                    .iter()
++                    .filter(|c| c.recipe == *p && c.status == Status::Completed)
++                    .map(|c| c.units)
++                    .sum::<u32>()
++                    < *units
++            })
+         {
+             return Err(Error::Prerequisite);
+         }

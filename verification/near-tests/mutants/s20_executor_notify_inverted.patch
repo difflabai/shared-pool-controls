@@ -1,0 +1,15 @@
+Mutant s20_executor_notify_inverted: EX-5: notify reports the opposite outcome to the lock.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -185,7 +185,7 @@
+         let settle = env::promise_create(
+             self.lock.clone(),
+             "settle",
+-            args(near_sdk::serde_json::json!({"id":id,"completed":completed})),
++            args(near_sdk::serde_json::json!({"id":id,"completed":!completed})),
+             zero,
+             Gas::from_tgas(SETTLE_TGAS),
+         );

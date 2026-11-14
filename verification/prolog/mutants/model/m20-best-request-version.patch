@@ -1,0 +1,14 @@
+# mutant: m20-best-request-version
+# mutates: RD-BEST: best_quantity checks each quantity at the pool's version, not the request's
+# expect: test_reads RD-PREVIEW/RD-BEST differential
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -605,7 +605,7 @@
+     model_constant(max_units, MaxU, _), Hi is min(U, MaxU),
+     pool_config(S, C),
+     findall(E-Neg, ( between(1, Hi, K),
+-                     admissible(S, Caller, req(RI, K, V, Exp, Now)),
++                     pool_version(S, V0), admissible(S, Caller, req(RI, K, V0, Exp, Now)),
+                      submit_next(S, submit(Caller, RI, K, V, Exp, Now), Next),
+                      energy(C, Next, E), Neg is -K ), Cands),
+     (   Cands == [] -> Best = none

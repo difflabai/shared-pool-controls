@@ -1,0 +1,200 @@
+{
+  "attempts": [
+    {
+      "attempt": 0,
+      "blocks": {
+        "callback": 31,
+        "execute": 30,
+        "settle": null
+      },
+      "delay_ms": 0,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 1,
+      "blocks": {
+        "callback": 44,
+        "execute": 43,
+        "settle": null
+      },
+      "delay_ms": 150,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 2,
+      "blocks": {
+        "callback": 58,
+        "execute": 57,
+        "settle": null
+      },
+      "delay_ms": 200,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 3,
+      "blocks": {
+        "callback": 72,
+        "execute": 71,
+        "settle": null
+      },
+      "delay_ms": 225,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 4,
+      "blocks": {
+        "callback": 86,
+        "execute": 85,
+        "settle": 87
+      },
+      "delay_ms": 250,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 5,
+      "blocks": {
+        "callback": 97,
+        "execute": 96,
+        "settle": 98
+      },
+      "delay_ms": 275,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 6,
+      "blocks": {
+        "callback": 107,
+        "execute": 106,
+        "settle": 108
+      },
+      "delay_ms": 300,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 7,
+      "blocks": {
+        "callback": 117,
+        "execute": 116,
+        "settle": 119
+      },
+      "delay_ms": 400,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 8,
+      "blocks": {
+        "callback": 128,
+        "execute": 127,
+        "settle": null
+      },
+      "delay_ms": 0,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 9,
+      "blocks": {
+        "callback": 141,
+        "execute": 140,
+        "settle": null
+      },
+      "delay_ms": 150,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 10,
+      "blocks": {
+        "callback": 155,
+        "execute": 154,
+        "settle": null
+      },
+      "delay_ms": 200,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 11,
+      "blocks": {
+        "callback": 169,
+        "execute": 168,
+        "settle": null
+      },
+      "delay_ms": 225,
+      "order": "finish before execute: rejected (panicked at crates/executor/src/lib.rs:114:14:\nunknown job); finished afterwards",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 12,
+      "blocks": {
+        "callback": 183,
+        "execute": 182,
+        "settle": 184
+      },
+      "delay_ms": 250,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 13,
+      "blocks": {
+        "callback": 193,
+        "execute": 192,
+        "settle": 194
+      },
+      "delay_ms": 275,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 14,
+      "blocks": {
+        "callback": 203,
+        "execute": 202,
+        "settle": 204
+      },
+      "delay_ms": 300,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    },
+    {
+      "attempt": 15,
+      "blocks": {
+        "callback": 213,
+        "execute": 212,
+        "settle": 215
+      },
+      "delay_ms": 400,
+      "order": "dispatch, callback, finish->settle",
+      "version_delta_dispatch_to_terminal": 3
+    }
+  ],
+  "counts": {
+    "callback_first": 8,
+    "finish_before_execute": 8
+  },
+  "executor": "upstream pool_executor, operator finish",
+  "finish_receipts_ok": {
+    "executor": [
+      true,
+      true
+    ],
+    "lock": [
+      true
+    ]
+  },
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "note": "single shard: finish's notify is created after execute's data receipt, so the callback runs first",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-RACE",
+  "wasm_variant": "upstream"
+}

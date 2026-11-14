@@ -1,0 +1,14 @@
+Lean mutant 06-cancel-any-caller
+cancel's authority check dropped.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -456,7 +456,7 @@
+ def cancelGuards (cfg : Cfg A) (s : State) (caller : A) (id : Nat) : List Guard :=
+   let c := s.record id
+   [foundGuard s id,
+-   (.err .unauthorized, decide (caller ≠ (cfg.recipe c.recipe).actor ∧ caller ≠ cfg.owner)),
++   (.err .unauthorized, false),
+    (.noop, decide (c.status = .cancelled)),
+    (.err .invalidState, decide (c.status = .completed)),
+    (.err .pending, decide (c.status ≠ .reserved))] ++

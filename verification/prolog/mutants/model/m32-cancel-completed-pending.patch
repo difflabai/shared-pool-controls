@@ -1,0 +1,16 @@
+# mutant: m32-cancel-completed-pending
+# mutates: TERM-1: a cancel of a Completed record reaches the reserved guard and is Pending (v1.0.0) (FR-8; div-cancel)
+# expect: test_model cancel: actor or owner
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 healthy
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -454,7 +454,7 @@
+     actor_of(C, RI, A), owner_of(C, O), ( Caller == A ; Caller == O ), !.
+ holds(cancel, not_cancelled, S, cancel(_, Id, _)) :- record_of(S, Id, c(_, _, _, St)), St \== cancelled.
+ % spec:43 "A cancel of a Completed record returns InvalidState" (v1.0.0: Pending)
+-holds(cancel, not_completed, S, cancel(_, Id, _)) :- record_of(S, Id, c(_, _, _, St)), St \== completed.
++holds(cancel, not_completed, _, _).
+ holds(cancel, reserved, S, cancel(_, Id, _)) :- record_of(S, Id, c(_, _, _, reserved)).
+ holds(Kind, release_arith, S, Op) :- release_kind(Kind), op_id(Op, Id), release_next(S, Id, _).
+ holds(Kind, envelope_arith, S, Op) :-

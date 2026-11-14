@@ -1,0 +1,15 @@
+# mutant: c08-fixture-self-executor
+# mutates: C-5 CASH-SELF: a hiring recipe's actor is the executor
+# expect: test_requirements C-5 fixture conservation
+# expect: test_requirements C-5 CASH-SELF
+--- a/source-mirror/crates/core/src/fixtures.rs
++++ b/source-mirror/crates/core/src/fixtures.rs
+@@ -210,7 +210,7 @@
+             c.recipes = vec![
+                 recipe(
+                     "Research worker units",
+-                    "research",
++                    "executor",
+                     8,
+                     &[(0, 1), (3, -1), (5, 1)],
+                     &[(5, -1), (6, 1)],

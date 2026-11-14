@@ -1,0 +1,26 @@
+# killed-by: h_step_submit_inv h_wedge h_step_submit_tx
+# fix-revert: FR-2 (N1; F-1, F-2, F-2b; upstream 59e404f)
+# envelope: the release outcome x of an open record is left out (the v1.0.0
+# envelope: low += d.min(0), high += d.max(0)). A hedge whose release would
+# break a limit is admitted (INV-RES), and its cancel or settle(false) then
+# fails Bounds (the F-1 wedge).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -217,15 +217,8 @@
+                 let d = r.complete[i]
+                     .checked_mul(i64::from(units))
+                     .ok_or(Error::Arithmetic)?;
+-                let x = r.reserve[i]
+-                    .checked_mul(-i64::from(units))
+-                    .ok_or(Error::Arithmetic)?;
+-                low[i] = low[i]
+-                    .checked_add(d.min(x).min(0))
+-                    .ok_or(Error::Arithmetic)?;
+-                high[i] = high[i]
+-                    .checked_add(d.max(x).max(0))
+-                    .ok_or(Error::Arithmetic)?;
++                low[i] = low[i].checked_add(d.min(0)).ok_or(Error::Arithmetic)?;
++                high[i] = high[i].checked_add(d.max(0)).ok_or(Error::Arithmetic)?;
+                 if !bounded(low[i]) || !bounded(high[i]) {
+                     return Err(Error::Arithmetic);
+                 }

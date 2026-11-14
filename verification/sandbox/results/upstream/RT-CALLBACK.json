@@ -1,0 +1,140 @@
+{
+  "assumption": "ASM-CALLBACK",
+  "executor_jobs": [
+    [
+      0,
+      "completed"
+    ],
+    [
+      1,
+      "cancelled"
+    ],
+    [
+      2,
+      "cancelled"
+    ],
+    [
+      3,
+      "cancelled"
+    ]
+  ],
+  "executor_newest": 3,
+  "final": {
+    "by_status": {
+      "Cancelled": 3,
+      "Completed": 1
+    },
+    "completed_units": [
+      4
+    ],
+    "first_id": 0,
+    "paused": false,
+    "records": 4,
+    "values": [
+      50,
+      20
+    ],
+    "version": 16
+  },
+  "finish_receipts_ok": {
+    "executor": [
+      true,
+      true
+    ],
+    "lock": [
+      true
+    ],
+    "order": "finish, then the lock's settle, then on_settled"
+  },
+  "modes": [
+    {
+      "event": {
+        "error": null,
+        "id": 0,
+        "outcome": "active"
+      },
+      "execute_returns": "active",
+      "executor_job": "active",
+      "mode": "normal",
+      "status": "Active",
+      "values": [
+        50,
+        8
+      ]
+    },
+    {
+      "event": {
+        "error": null,
+        "id": 1,
+        "outcome": "cancelled"
+      },
+      "execute_returns": "cancelled",
+      "mode": "reject",
+      "status": "Cancelled",
+      "values_after": [
+        50,
+        8
+      ],
+      "values_before": [
+        50,
+        16
+      ]
+    },
+    {
+      "cancel": "Pending",
+      "event": {
+        "error": null,
+        "id": 2,
+        "outcome": "unknown"
+      },
+      "execute_returns": "unknown",
+      "mode": "unknown",
+      "reconcile": {
+        "by": "mallory",
+        "repeat_is_noop": true,
+        "status": "Active",
+        "status_returns": "active"
+      },
+      "status": "Unknown"
+    },
+    {
+      "confirm_not_executed": {
+        "receipts_ok": {
+          "executor": [
+            true,
+            true
+          ],
+          "lock": [
+            true
+          ]
+        },
+        "status": "Cancelled",
+        "values": [
+          50,
+          16
+        ]
+      },
+      "dispatch_tx_success": true,
+      "event": {
+        "error": null,
+        "id": 3,
+        "outcome": "unknown"
+      },
+      "execute": "fails",
+      "execute_panic": "panicked at crates/executor/src/lib.rs:79:9:\nassertion `left != right` failed: injected failure\n  left: \\",
+      "mode": "panic",
+      "reconcile": "status unknown, no-op",
+      "status": "Unknown",
+      "values": [
+        50,
+        24
+      ]
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-CALLBACK",
+  "result": "pass",
+  "wasm_variant": "upstream"
+}

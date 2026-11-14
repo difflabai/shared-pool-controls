@@ -1,0 +1,13 @@
+# checks: WitStep_UnknownToActive trace
+# acknowledge of an Unknown record is a no-op (no late Active).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -301,7 +301,7 @@
+ \* callback is the only caller, SH-3). The plain bump.
+ AckErr(id, acc) ==
+     IF ~Found(id) THEN "NotFound"
+-    ELSE IF Rec(id).status \notin {"Dispatched", "Unknown"} THEN "Noop"
++    ELSE IF Rec(id).status # "Dispatched" THEN "Noop"
+     ELSE IF Rec(id).status = AckTo(acc) THEN "Noop"
+     ELSE VerErr
+ 

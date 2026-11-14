@@ -1,0 +1,148 @@
+Mutant s00a_v100_contract: SH-3/SH-10/SH-12: the v1.0.0 contract (NT-F2, NT-F3, NT-F4 unfixed; Promise type).
+Historical: the v1.0.0 (6f61616) production code of crates/contract/src/lib.rs, kept with
+the v1.1.0 tests module; the near-tests harness builds with --cfg nt_v100_contract for it.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -1,5 +1,5 @@
+ //! Thin NEAR shell: identity, storage, receipts, and asynchronous execution.
+-use near_sdk::{env, near, require, AccountId, Gas, NearToken, PanicOnDefault};
++use near_sdk::{env, near, AccountId, Gas, PanicOnDefault, Promise, PromiseError};
+ use pool_core::{Commitment, Config, Decision, Pool, Request};
+ 
+ #[near(contract_state)]
+@@ -51,14 +51,11 @@
+     pub fn get_pool(&self) -> Pool {
+         self.pool.clone()
+     }
+-    /// Up to `limit` (at most 50) retained records, from id `from` on. Ids
+-    /// below `get_pool().first_id` were pruned; a page starting there begins
+-    /// at the oldest retained record.
+     pub fn get_commitments(&self, from: u32, limit: u32) -> Vec<Commitment> {
+         self.pool
+             .records
+             .iter()
+-            .skip(from.saturating_sub(self.pool.first_id) as usize)
++            .skip(from as usize)
+             .take(limit.min(50) as usize)
+             .cloned()
+             .collect()
+@@ -79,24 +76,26 @@
+         );
+         Submission { decision, id }
+     }
+-    pub fn dispatch(&mut self, id: u32) {
++    pub fn dispatch(&mut self, id: u32) -> Promise {
+         must(self.pool.dispatch(&caller(), id, now()));
+-        let c = must(self.pool.record(id));
++        let c = &self.pool.records[id as usize];
+         let r = &self.pool.config.recipes[c.recipe as usize];
+         let args = near_sdk::serde_json::to_vec(
+             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),
+         )
+         .unwrap();
+-        call_then_callback(&r.executor, "execute", &args, Gas::from_tgas(30), id);
++        Promise::new(r.executor.parse().unwrap())
++            .function_call(
++                "execute",
++                args,
++                near_sdk::NearToken::from_yoctonear(0),
++                Gas::from_tgas(30),
++            )
++            .then(self.callback(id))
+     }
+     /// Any observer may request reconciliation; no authority is granted by this call.
+-    pub fn reconcile(&self, id: u32) {
+-        // NT-F2: near-sdk generates the nonpayable check only for &mut self methods.
+-        require!(
+-            env::attached_deposit().is_zero(),
+-            "Method reconcile doesn't accept deposit"
+-        );
+-        let c = must(self.pool.record(id));
++    pub fn reconcile(&self, id: u32) -> Promise {
++        let c = self.pool.records.get(id as usize).expect("NotFound");
+         assert!(
+             matches!(
+                 c.status,
+@@ -107,30 +106,24 @@
+             "InvalidState"
+         );
+         let r = &self.pool.config.recipes[c.recipe as usize];
+-        let args = near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap();
+-        call_then_callback(&r.executor, "status", &args, Gas::from_tgas(10), id);
++        Promise::new(r.executor.parse().unwrap())
++            .function_call(
++                "status",
++                near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
++                near_sdk::NearToken::from_yoctonear(0),
++                Gas::from_tgas(10),
++            )
++            .then(self.callback(id))
+     }
+     #[private]
+-    pub fn on_result(&mut self, id: u32) {
+-        // NT-F4: read the raw result. A failed call, a missing result, more than
+-        // 64 bytes, or anything but one JSON string is "unknown". No promise result
+-        // and no id makes this callback panic.
+-        let status = if env::promise_results_count() == 1 {
+-            env::promise_result_checked(0, 64)
+-                .ok()
+-                .and_then(|b| near_sdk::serde_json::from_slice::<String>(&b).ok())
+-        } else {
+-            None
+-        }
+-        .unwrap_or_else(|| "unknown".into());
+-        let Ok(c) = self.pool.record(id) else {
+-            // No such record: nothing to update, so log the result and return.
+-            return event(
+-                "reconciled",
+-                near_sdk::serde_json::json!({"id":id,"outcome":status,"error":"NotFound"}),
+-            );
+-        };
+-        let executor = self.pool.config.recipes[c.recipe as usize].executor.clone();
++    pub fn on_result(&mut self, id: u32, #[callback_result] result: Result<String, PromiseError>) {
++        let executor = self
++            .pool
++            .records
++            .get(id as usize)
++            .map(|c| self.pool.config.recipes[c.recipe as usize].executor.clone())
++            .expect("NotFound");
++        let status = result.unwrap_or_else(|_| "unknown".into());
+         let update = match status.as_str() {
+             "completed" => self.pool.settle(&executor, id, true),
+             "cancelled" => self.pool.settle(&executor, id, false),
+@@ -166,23 +159,15 @@
+         );
+     }
+ }
+-/// Calls `method` on the executor with no deposit, then this contract's
+-/// `on_result({id})` with 30 Tgas, and makes the callback's result the result
+-/// of the current call. NT-F3: this uses near-sdk's low-level promise functions.
+-/// Its `Promise` type links the host functions for every action (deploy, keys,
+-/// transfer, stake, accounts); build.sh fails if any of them is imported.
+-fn call_then_callback(executor: &str, method: &str, args: &[u8], gas: Gas, id: u32) {
+-    let zero = NearToken::from_yoctonear(0);
+-    let call = env::promise_create(executor.parse().unwrap(), method, args, zero, gas);
+-    let callback = env::promise_then(
+-        call,
+-        env::current_account_id(),
+-        "on_result",
+-        near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
+-        zero,
+-        Gas::from_tgas(30),
+-    );
+-    env::promise_return(callback);
++impl Contract {
++    fn callback(&self, id: u32) -> Promise {
++        Promise::new(env::current_account_id()).function_call(
++            "on_result",
++            near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
++            near_sdk::NearToken::from_yoctonear(0),
++            Gas::from_tgas(30),
++        )
++    }
+ }
+ #[cfg(test)]
+ mod tests {

@@ -1,0 +1,14 @@
+# mutant: r01-property-dropped
+# mutates: C-6: traceability.pl loses the TLA-IND row, so the catalogue no longer equals strategy.md section 5 (nothing else names TLA-IND)
+# expect: test_requirements C-6 traceability
+# expect: test_requirements C-6 compares every catalogue ID
+--- a/prolog/requirements/traceability.pl
++++ b/prolog/requirements/traceability.pl
+@@ -110,7 +110,6 @@
+ property('MC-2', [prolog], "trace replay").
+ % TLA+
+ property('TLA-SAFE', [tla], "TLC safety").
+-property('TLA-IND', [tla], "inductive invariant (Apalache, optional)").
+ property('TLA-LIVE-1', [tla], "LIVE-2 on the completion path").
+ property('TLA-LIVE-F1', [tla], "F-1 counterexample (must be violated)").
+ property('TLA-LIVE-F2', [tla], "F-2 counterexample, healthy observations and a fair honest executor (must be violated)").

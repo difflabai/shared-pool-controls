@@ -1,0 +1,13 @@
+# checks: cap
+# FR-6. candidate() has no version cap (submit's plain bump only).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -281,7 +281,7 @@
+             ELSE IF Violating /\ AddFails(next, Rcp(r).complete, u) THEN "Arithmetic"
+             ELSE IF Violating /\ Energy(AddVec(next, Rcp(r).complete, u)) >= e0
+                  THEN "Energy"
+-            ELSE IF CapErr # "Ok" THEN "Arithmetic"
++            ELSE IF VerErr # "Ok" THEN "Arithmetic"
+             \* submit's id = first_id + len (U:363-366): unreachable (WIN-1).
+             ELSE IF firstId + NR > MaxVersion THEN "Arithmetic"
+             ELSE "Ok"

@@ -1,0 +1,13 @@
+# killed-by: h_step_cancel_tx
+# cancel: the owner can no longer cancel (actor only)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -456,7 +456,7 @@
+     pub fn cancel(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {
+         let c = self.record(id)?;
+         let r = &self.config.recipes[c.recipe as usize];
+-        if caller != r.actor && caller != self.config.owner {
++        if caller != r.actor {
+             return Err(Error::Unauthorized);
+         }
+         if c.status == Status::Cancelled {

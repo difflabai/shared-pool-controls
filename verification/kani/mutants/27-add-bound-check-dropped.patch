@@ -1,0 +1,22 @@
+# killed-by: h_wf_cancel
+# add: result not checked against +-1e6 (only i64 overflow). Equivalent on
+# submit (the envelope's bound check on the candidate returns the same
+# Arithmetic) and on every release or completion from an INV state (it lands
+# inside the INV-RES box). Killed in the WF domain: undoing a reservation
+# can leave +-1e6, where the original fails with Arithmetic and the mutant
+# with Bounds (or accepts).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -79,11 +79,7 @@
+             let v = x
+                 .checked_add(d.checked_mul(i64::from(units)).ok_or(Error::Arithmetic)?)
+                 .ok_or(Error::Arithmetic)?;
+-            if bounded(v) {
+-                Ok(v)
+-            } else {
+-                Err(Error::Arithmetic)
+-            }
++            Ok(v)
+         })
+         .collect()
+ }

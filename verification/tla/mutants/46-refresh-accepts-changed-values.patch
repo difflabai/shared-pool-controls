@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# FR-7. observe accepts new values while a record is open (no Pending
+# guard). Must be killed by OBS-1 / OBS-2.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -346,7 +346,6 @@
+ \* no exit here.
+ ObserveErr(c, vals, now) ==
+     IF c # cfg.owner THEN "Unauthorized"
+-    ELSE IF vals # values /\ AnyOpen THEN "Pending"
+     ELSE IF Len(vals) # NM \/ \E k \in DOMAIN vals : ~Bounded(vals[k]) THEN "Bounds"
+     ELSE CapErr
+ 

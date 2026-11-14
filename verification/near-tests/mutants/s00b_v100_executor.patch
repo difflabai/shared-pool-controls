@@ -1,0 +1,186 @@
+Mutant s00b_v100_executor: EX-6/EX-7/EX-8: the v1.0.0 executor (no window, 256-job cap, no on_settled; Promise type).
+Historical: the v1.0.0 (6f61616) production code of crates/executor/src/lib.rs, kept with
+the v1.1.0 tests module; the near-tests harness builds with --cfg nt_v100_executor for it.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -1,18 +1,5 @@
+ //! Synthetic, enforced adapter. It holds no real assets and runs no real jobs.
+-use near_sdk::{env, near, AccountId, Gas, NearToken, PanicOnDefault, PromiseError};
+-/// The lock retains its 256 most recent records (pool_core::MAX_RECORDS). A
+-/// job whose id is this far behind `newest` belongs to a pruned, terminal
+-/// record, so it is forgotten.
+-const WINDOW: u64 = 256;
+-/// Jobs held at most. Job ids are distinct and each is above
+-/// `newest - WINDOW`, so at most WINDOW of them are at or below `newest`.
+-/// Every other job is a confirmation above `newest` whose `on_settled` has
+-/// not run yet, or whose `settle` the lock refused. So the cap needs at
+-/// least WINDOW such jobs above `newest`.
+-const MAX_JOBS: usize = 512;
+-/// Gas for the lock's `settle`, and for this contract's `on_settled` after it.
+-const SETTLE_TGAS: u64 = 40;
+-const ON_SETTLED_TGAS: u64 = 10;
++use near_sdk::{env, near, AccountId, Gas, NearToken, PanicOnDefault, Promise};
+ #[near(serializers=[borsh,json])]
+ #[derive(Clone)]
+ pub struct Job {
+@@ -28,11 +15,6 @@
+     operator: AccountId,
+     jobs: Vec<Job>,
+     mode: String,
+-    /// The largest id the lock has vouched for: one whose `execute` created a
+-    /// job (an `execute` of an id that has a job moves nothing), or one whose
+-    /// `settle` from this executor it accepted. Either way the lock retained
+-    /// that record then, so every id WINDOW or more below it was pruned.
+-    newest: u32,
+ }
+ #[near]
+ impl Executor {
+@@ -44,7 +26,6 @@
+             operator,
+             jobs: vec![],
+             mode: "normal".into(),
+-            newest: 0,
+         }
+     }
+     pub fn set_mode(&mut self, mode: String) {
+@@ -55,10 +36,6 @@
+         );
+         self.mode = mode;
+     }
+-    /// Starts job `id` once and raises `newest` to it; an id that has a job (a
+-    /// repeat, or a confirmation's) returns its status and moves nothing. An id
+-    /// WINDOW or more behind `newest` returns "cancelled" and starts nothing:
+-    /// the lock pruned its record, so it is terminal and never dispatched again.
+     pub fn execute(&mut self, id: u32, recipe: u32, units: u32) -> String {
+         assert_eq!(
+             env::predecessor_account_id(),
+@@ -69,13 +46,7 @@
+             assert!(j.recipe == recipe && j.units == units, "payload mismatch");
+             return j.status.clone();
+         }
+-        // A forgotten id belongs to a pruned record: never start it.
+-        if u64::from(id) + WINDOW <= u64::from(self.newest) {
+-            return "cancelled".into();
+-        }
+-        // The lock dispatched `id`, so it retains the record.
+-        self.advance(id);
+-        assert!(self.jobs.len() < MAX_JOBS, "full");
++        assert!(self.jobs.len() < 256, "full");
+         assert_ne!(self.mode, "panic", "injected failure");
+         let status = if self.mode == "reject" {
+             "cancelled"
+@@ -102,10 +73,8 @@
+             .map(|j| j.status.clone())
+             .unwrap_or_else(|| "unknown".into())
+     }
+-    /// Independent provider/acceptor attests exact completion or definitive
+-    /// cancellation. If the lock accepts the settle, `on_settled` raises
+-    /// `newest` to `id`; this is also how a refused confirmation is retried.
+-    pub fn finish(&mut self, id: u32, completed: bool) {
++    /// Independent provider/acceptor attests exact completion or definitive cancellation.
++    pub fn finish(&mut self, id: u32, completed: bool) -> Promise {
+         self.operator();
+         let j = self
+             .jobs
+@@ -118,46 +87,24 @@
+             "terminal outcome conflict"
+         );
+         j.status = next.into();
+-        self.notify(id, completed);
++        self.notify(id, completed)
+     }
+-    /// Definitive evidence for an execute receipt that failed before creating
+-    /// a job. A forgotten id fails "stale id". The job is stored first and kept
+-    /// whatever the lock answers. If the lock accepts the settle, `on_settled`
+-    /// raises `newest` to `id`. If it refuses (an unassigned or pruned id, a
+-    /// record still Reserved, another outcome recorded, another executor's
+-    /// recipe), the job stays until `newest` is WINDOW or more past its id, for
+-    /// good if the lock never reaches that id. MAX_JOBS is reached only with at
+-    /// least WINDOW jobs above `newest`, refused or waiting for `on_settled`.
+-    pub fn confirm_not_executed(&mut self, id: u32, recipe: u32, units: u32) {
++    /// Definitive evidence for an execute receipt that failed before creating a job.
++    pub fn confirm_not_executed(&mut self, id: u32, recipe: u32, units: u32) -> Promise {
+         self.operator();
+         assert!(!self.jobs.iter().any(|j| j.id == id), "job exists");
+-        assert!(u64::from(id) + WINDOW > u64::from(self.newest), "stale id");
+-        assert!(self.jobs.len() < MAX_JOBS, "full");
++        assert!(self.jobs.len() < 256, "full");
+         self.jobs.push(Job {
+             id,
+             recipe,
+             units,
+             status: "cancelled".into(),
+         });
+-        self.notify(id, false);
++        self.notify(id, false)
+     }
+     pub fn get_jobs(&self) -> Vec<Job> {
+         self.jobs.clone()
+     }
+-    /// Private callback of `notify`, after the lock's `settle({id,..})`. The
+-    /// lock accepts a settle only for a record it retains, so on success every
+-    /// id WINDOW or more below `id` is pruned there: raise `newest`, as
+-    /// `execute` does. A refused settle changes nothing; the transaction
+-    /// already reports the lock's error. `#[private]` admits only this
+-    /// account, and only `notify` gives it a promise result.
+-    #[private]
+-    pub fn on_settled(&mut self, id: u32) {
+-        assert_eq!(env::promise_results_count(), 1, "not a settle callback");
+-        // Settle returns no value, but any success counts (even `Err(TooLong)`).
+-        if env::promise_result_checked(0, 0) != Err(PromiseError::Failed) {
+-            self.advance(id);
+-        }
+-    }
+ }
+ impl Executor {
+     fn operator(&self) {
+@@ -167,37 +114,16 @@
+             "only independent operator"
+         );
+     }
+-    /// The lock retained record `id` at some moment, so every id WINDOW or
+-    /// more below it was pruned then: terminal, and never dispatched again.
+-    /// Raises `newest` to `id` and forgets those jobs.
+-    fn advance(&mut self, id: u32) {
+-        self.newest = self.newest.max(id);
+-        let newest = u64::from(self.newest);
+-        self.jobs.retain(|j| u64::from(j.id) + WINDOW > newest);
+-    }
+-    /// Calls the lock's `settle({id,completed})`, then this contract's
+-    /// `on_settled({id})`. The call's result stays the lock's (Ok, or its
+-    /// error): `on_settled` waits on `settle` but is not returned. NT-F3:
+-    /// low-level promise functions only, never near-sdk's `Promise` type.
+-    fn notify(&self, id: u32, completed: bool) {
+-        let zero = NearToken::from_yoctonear(0);
+-        let args = |v: near_sdk::serde_json::Value| near_sdk::serde_json::to_vec(&v).unwrap();
+-        let settle = env::promise_create(
+-            self.lock.clone(),
++    fn notify(&self, id: u32, completed: bool) -> Promise {
++        Promise::new(self.lock.clone()).function_call(
+             "settle",
+-            args(near_sdk::serde_json::json!({"id":id,"completed":completed})),
+-            zero,
+-            Gas::from_tgas(SETTLE_TGAS),
+-        );
+-        env::promise_then(
+-            settle,
+-            env::current_account_id(),
+-            "on_settled",
+-            args(near_sdk::serde_json::json!({"id":id})),
+-            zero,
+-            Gas::from_tgas(ON_SETTLED_TGAS),
+-        );
+-        env::promise_return(settle);
++            near_sdk::serde_json::to_vec(
++                &near_sdk::serde_json::json!({"id":id,"completed":completed}),
++            )
++            .unwrap(),
++            NearToken::from_yoctonear(0),
++            Gas::from_tgas(40),
++        )
+     }
+ }
+ #[cfg(test)]

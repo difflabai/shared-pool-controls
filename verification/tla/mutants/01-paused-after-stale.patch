@@ -1,0 +1,17 @@
+# checks: trace
+# submit checks Stale before Paused (guard order). Only the error name of
+# a stale request while paused differs (both reject, nothing changes), so
+# no state or step property sees it: the traces do.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -261,8 +261,8 @@
+ 
+ \* candidate() (U:267-323) then submit's additions (U:360-366).
+ SubmitErr(c, r, u, v, exp, now) ==
+-    IF paused THEN "Paused"
+-    ELSE IF v # version THEN "Stale"
++    IF v # version THEN "Stale"
++    ELSE IF paused THEN "Paused"
+     ELSE IF exp <= now \/ exp > now + Window THEN "Expired"
+     ELSE IF SnapExpired(now) THEN "SnapshotExpired"
+     ELSE IF WinFull THEN "Full"

@@ -1,0 +1,168 @@
+{
+  "also": "EX-8 (on_settled privacy and result count on the real runtime)",
+  "assumption": "ASM-PRIVATE",
+  "cases": [
+    {
+      "call": "pool.new",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "owner.test.near"
+    },
+    {
+      "call": "pool.new",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "actor.test.near"
+    },
+    {
+      "call": "pool.new",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "mallory.test.near"
+    },
+    {
+      "call": "pool.new",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "exec.test.near"
+    },
+    {
+      "call": "pool.new via relay, signed by the pool's key",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "relay.test.near"
+    },
+    {
+      "call": "pool.get_pool before new (view)",
+      "observed_error": "The contract is not initialized"
+    },
+    {
+      "call": "exec.new",
+      "expected": "Method new is private",
+      "observed_panic": "Method new is private",
+      "predecessor": "owner.test.near"
+    },
+    {
+      "call": "pool.new and exec.new again, by their own accounts",
+      "expected": "The contract has already been initialized",
+      "observed_panic": "The contract has already been initialized",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result",
+      "expected": "Method on_result is private",
+      "observed_panic": "Method on_result is private",
+      "predecessor": "owner.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result",
+      "expected": "Method on_result is private",
+      "observed_panic": "Method on_result is private",
+      "predecessor": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result",
+      "expected": "Method on_result is private",
+      "observed_panic": "Method on_result is private",
+      "predecessor": "mallory.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result",
+      "expected": "Method on_result is private",
+      "observed_panic": "Method on_result is private",
+      "predecessor": "exec.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result via relay",
+      "expected": "Method on_result is private",
+      "observed_panic": "Method on_result is private",
+      "predecessor": "relay.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result signed by the pool's own key (no promise result), Unknown record",
+      "event": {
+        "error": null,
+        "id": 0,
+        "outcome": "unknown"
+      },
+      "predecessor": "pool.test.near",
+      "result": "Ok",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result signed by the pool's own key, Active record",
+      "event": {
+        "error": null,
+        "id": 1,
+        "outcome": "unknown"
+      },
+      "predecessor": "pool.test.near",
+      "result": "Ok",
+      "status": "Active",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.on_result signed by the pool's own key, id 999 (not issued)",
+      "event": {
+        "error": "NotFound",
+        "id": 999,
+        "outcome": "unknown"
+      },
+      "result": "Ok",
+      "storage_unchanged": true
+    },
+    {
+      "call": "exec.on_settled({id: 600})",
+      "executor_storage_unchanged": true,
+      "expected": "Method on_settled is private",
+      "observed_panic": "Method on_settled is private",
+      "predecessor": "owner.test.near"
+    },
+    {
+      "call": "exec.on_settled({id: 600})",
+      "executor_storage_unchanged": true,
+      "expected": "Method on_settled is private",
+      "observed_panic": "Method on_settled is private",
+      "predecessor": "actor.test.near"
+    },
+    {
+      "call": "exec.on_settled({id: 600})",
+      "executor_storage_unchanged": true,
+      "expected": "Method on_settled is private",
+      "observed_panic": "Method on_settled is private",
+      "predecessor": "mallory.test.near"
+    },
+    {
+      "call": "exec.on_settled({id: 600})",
+      "executor_storage_unchanged": true,
+      "expected": "Method on_settled is private",
+      "observed_panic": "Method on_settled is private",
+      "predecessor": "pool.test.near"
+    },
+    {
+      "call": "exec.on_settled via relay",
+      "executor_storage_unchanged": true,
+      "expected": "Method on_settled is private",
+      "observed_panic": "Method on_settled is private",
+      "predecessor": "relay.test.near"
+    },
+    {
+      "call": "exec.on_settled({id: 600}) signed by the executor's own key (no promise result)",
+      "executor_storage_unchanged": true,
+      "expected": "not a settle callback",
+      "observed_panic": "panicked at crates/executor/src/lib.rs:155:9:\nassertion `left == right` failed: not a settle callback\n  left: 0\n right: 1",
+      "predecessor": "exec.test.near"
+    }
+  ],
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "property": "RT-PRIVATE",
+  "result": "pass",
+  "wasm_variant": "upstream"
+}

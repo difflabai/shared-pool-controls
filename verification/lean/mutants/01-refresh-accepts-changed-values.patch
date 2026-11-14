@@ -1,0 +1,16 @@
+Lean mutant 01-refresh-accepts-changed-values
+Re-target of v1.0.0 mutant 01 (observe-pending-dropped): observe accepts new
+values while a record is open (no Pending at all), so the refresh of lib.rs
+538 also accepts changed values. Not a fix revert (no FR id).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -494,7 +494,7 @@
+ record is open. -/
+ def observeGuards (cfg : Cfg A) (s : State) (caller : A) (vals : List Int) : List Guard :=
+   [(.err .unauthorized, decide (caller ≠ cfg.owner)),
+-   (.err .pending, decide (vals ≠ s.values) && anyOpen s.records),
++   (.err .pending, false),
+    (.err .bounds, decide (vals.length ≠ s.values.length) || !decide (AllB vals)),
+    (.err .bounds, energyBad cfg vals)] ++
+   bumpNewGuards s

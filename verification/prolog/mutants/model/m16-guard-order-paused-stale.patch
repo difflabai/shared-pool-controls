@@ -1,0 +1,18 @@
+# mutant: m16-guard-order-paused-stale
+# mutates: C-2: the specified submit order checks Stale before Paused
+# expect: test_requirements C-2 guard order
+# expect: test_model submit: the first failing guard
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/requirements/pool_req.pl
++++ b/prolog/requirements/pool_req.pl
+@@ -293,8 +293,8 @@
+ op_kind(observe).
+ 
+ % --- submit (spec:19-27, api:13, api:28-32)
+-guard(submit,  1, paused,        err('Paused'),          doc('spec:21 "Check paused"')).
+-guard(submit,  2, version,       err('Stale'),           doc('spec:21 "version equality"; api:30')).
++guard(submit,  2, paused,        err('Paused'),          doc('spec:21 "Check paused"')).
++guard(submit,  1, version,       err('Stale'),           doc('spec:21 "version equality"; api:30')).
+ guard(submit,  3, expiry,        err('Expired'),         doc('spec:21 "expiry strictly after now and at most one day ahead"; api:30')).
+ guard(submit,  4, freshness,     err('SnapshotExpired'), doc('spec:21 "observation freshness if configured"')).
+ guard(submit,  5, record_bound,  err('Full'),            doc('spec:21 "record bound (Full only when 256 records are retained and the oldest is open)"; api:28')).

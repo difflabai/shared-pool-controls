@@ -1,0 +1,15 @@
+Mutant s31_retain_keeps_the_boundary: EX-6: advance keeps the job exactly WINDOW below newest (`>=`).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -173,7 +173,7 @@
+     fn advance(&mut self, id: u32) {
+         self.newest = self.newest.max(id);
+         let newest = u64::from(self.newest);
+-        self.jobs.retain(|j| u64::from(j.id) + WINDOW > newest);
++        self.jobs.retain(|j| u64::from(j.id) + WINDOW >= newest);
+     }
+     /// Calls the lock's `settle({id,completed})`, then this contract's
+     /// `on_settled({id})`. The call's result stays the lock's (Ok, or its

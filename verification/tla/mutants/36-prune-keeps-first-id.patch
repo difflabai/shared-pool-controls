@@ -1,0 +1,14 @@
+# checks: safety-1 trace
+# FR-3. submit prunes the oldest record without advancing first_id, so
+# every retained id shifts. Must be killed by LIFE-1 / TX-SUBMIT (WIN-1).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -398,7 +398,7 @@
+     /\ LET new   == [recipe |-> r, units |-> u, exp |-> exp, status |-> "Reserved"]
+            prune == NR >= MaxRecords
+        IN /\ records' = IF prune THEN Append(Tail(records), new) ELSE Append(records, new)
+-          /\ firstId' = IF prune THEN firstId + 1 ELSE firstId
++          /\ firstId' = firstId
+           /\ IF prune /\ k0 <= firstId
+              THEN /\ base' = [m \in MIdx |-> base[m] + Contrib(records[1], m)]
+                   /\ k0' = firstId + 1

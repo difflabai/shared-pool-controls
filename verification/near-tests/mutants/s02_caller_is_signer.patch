@@ -1,0 +1,15 @@
+Mutant s02_caller_is_signer: SH-1: caller() is the signer instead of the predecessor.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -18,7 +18,7 @@
+     env::block_timestamp() / 1_000_000_000
+ }
+ fn caller() -> String {
+-    env::predecessor_account_id().to_string()
++    env::signer_account_id().to_string()
+ }
+ fn must<T>(result: Result<T, pool_core::Error>) -> T {
+     result.unwrap_or_else(|e| env::panic_str(&e.to_string()))

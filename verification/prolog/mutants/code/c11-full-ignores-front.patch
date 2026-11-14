@@ -1,0 +1,14 @@
+# mutant: c11-full-ignores-front
+# mutates: v1.1.0 record bound (F-3 / FR-3): submit fails Full whenever 256 records are retained, even if the oldest is terminal (spec:21, api:28: Full only while the oldest is open). The outcome order is unchanged; C-2 compares the extracted condition with guard_condition(submit, record_bound, ...).
+# expect: test_requirements C-2 guard order
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -284,7 +284,7 @@
+         }
+         // A full window frees a slot by pruning its oldest record, which must
+         // be terminal.
+-        if self.records.len() >= MAX_RECORDS && open(&self.records[0].status) {
++        if self.records.len() >= MAX_RECORDS {
+             return Err(Error::Full);
+         }
+         let r = self

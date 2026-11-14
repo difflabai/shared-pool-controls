@@ -1,0 +1,161 @@
+{
+  "also": "EX-7 (checked after every transaction)",
+  "checkpoints": [
+    {
+      "first_id": 0,
+      "job_ids": "0..=0",
+      "jobs": 1,
+      "record": 0,
+      "records": 1
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=50",
+      "jobs": 51,
+      "record": 50,
+      "records": 51
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=100",
+      "jobs": 101,
+      "record": 100,
+      "records": 101
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=150",
+      "jobs": 151,
+      "record": 150,
+      "records": 151
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=200",
+      "jobs": 201,
+      "record": 200,
+      "records": 201
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=250",
+      "jobs": 251,
+      "record": 250,
+      "records": 251
+    },
+    {
+      "first_id": 0,
+      "job_ids": "0..=255",
+      "jobs": 256,
+      "record": 255,
+      "records": 256
+    },
+    {
+      "first_id": 1,
+      "job_ids": "1..=256",
+      "jobs": 256,
+      "record": 256,
+      "records": 256
+    },
+    {
+      "first_id": 2,
+      "job_ids": "2..=257",
+      "jobs": 256,
+      "record": 257,
+      "records": 256
+    },
+    {
+      "first_id": 44,
+      "job_ids": "44..=299",
+      "jobs": 256,
+      "record": 299,
+      "records": 256
+    }
+  ],
+  "completed_units": [
+    20
+  ],
+  "ex7_checks": 620,
+  "executor_job_ids": "44..=299",
+  "executor_jobs": 256,
+  "final": {
+    "by_status": {
+      "Cancelled": 246,
+      "Completed": 10
+    },
+    "completed_units": [
+      20
+    ],
+    "first_id": 44,
+    "paused": false,
+    "records": 256,
+    "values": [
+      0
+    ],
+    "version": 920
+  },
+  "finding": "F-3 (fixed in v1.1.0)",
+  "first_id": 44,
+  "max_jobs_seen": 256,
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pages": {
+    "get_commitments(0, 50)": "44..=93",
+    "get_commitments(100, 100)": "100..=149 (limit capped at 50)",
+    "get_commitments(290, 50)": "290..=299",
+    "get_commitments(300, 50)": "empty",
+    "get_commitments(44, 50)": "44..=93"
+  },
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "port_of": "upstream crates/sandbox/tests/integration.rs window_of_300_records_through_the_executor",
+  "property": "RT-WINDOW",
+  "pruned_id_0": [
+    {
+      "call": "pool.dispatch(0)",
+      "observed_panic": "NotFound",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.cancel(0)",
+      "observed_panic": "NotFound",
+      "signer": "actor.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.settle(0)",
+      "observed_panic": "NotFound",
+      "signer": "exec.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "pool.reconcile(0)",
+      "observed_panic": "NotFound",
+      "signer": "mallory.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "exec.finish(0)",
+      "expected": "unknown job",
+      "observed_panic": "panicked at crates/executor/src/lib.rs:114:14:\nunknown job",
+      "signer": "owner.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "exec.confirm_not_executed(0)",
+      "expected": "stale id",
+      "observed_panic": "panicked at crates/executor/src/lib.rs:134:9:\nstale id",
+      "signer": "owner.test.near",
+      "storage_unchanged": true
+    },
+    {
+      "call": "exec.status(0) (view)",
+      "result": "unknown"
+    }
+  ],
+  "records": 300,
+  "result": "pass",
+  "retained": 256,
+  "seconds": 322,
+  "wasm_variant": "upstream"
+}

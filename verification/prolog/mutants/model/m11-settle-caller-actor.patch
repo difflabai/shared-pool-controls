@@ -1,0 +1,15 @@
+# mutant: m11-settle-caller-actor
+# mutates: AUTH-1: settle checks the recipe actor instead of the executor
+# expect: test_model TERM-1: same terminal
+# expect: test_mc2 MC-2: all traces replay
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -469,7 +469,7 @@
+ % --- settle (spec:42, 44, 45)
+ holds(Kind, caller, S, settle(Caller, Id, _)) :-
+     settle_kind(Kind),
+-    record_of(S, Id, c(RI, _, _, _)), pool_config(S, C), executor_of(C, RI, X), Caller == X.
++    record_of(S, Id, c(RI, _, _, _)), pool_config(S, C), actor_of(C, RI, X), Caller == X.
+ holds(Kind, not_same_terminal, S, settle(_, Id, Done)) :-
+     settle_kind(Kind),
+     record_of(S, Id, c(_, _, _, St)),

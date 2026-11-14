@@ -1,0 +1,789 @@
+[project]
+name = "shared-pool"
+upstream = "https://github.com/difflabai/shared-pool-controls"
+upstream_path = ""
+pinned_commit = "57b3f02d18e85149db3c1035431368c4e07a4d8a"   # merge commit of upstream PR #4 on main (2026-11-13 UTC, "Merge pull request #4 from difflabai/gabehamilton/v1.1-verification-findings"): shared-pool-controls v1.1.0. Its tree is the tree of the PR head 6fcbd56. Re-verification in progress (strategy.md Target); v1.0.0 (pin a4bb5c3) was verified in PR #31 (results at a072a2d; to be tagged shared-pool-v1.0.0 when it merges).
+last_reviewed = "2026-11-14"
+release_overflow_checks = true  # ASM-COMPILE: check-pin.sh fails unless upstream [profile.release] sets overflow-checks = true
+verified_release = "v1.1.0"     # the release under verification (root Cargo.toml version = "1.1.0")
+catalogue = "strategy.md"       # status-lint checks the rows against its section 5 (header comment below)
+# Identity (strategy.md section 12): for each entry check-pin.sh checks that
+# every path (relative to upstream_path) is the same git tree or blob, mode
+# included, at the pin and at the entry's commit, fetching the commit by SHA
+# if the mirror lacks it. An entry whose commit is the pin only checks that
+# its paths exist. The merge commit is the pin; PR #4's head 6fcbd56 has the
+# same tree, so every path below is byte-identical at both.
+identity = [
+  { label = "v1.1.0 merge commit", commit = "57b3f02d18e85149db3c1035431368c4e07a4d8a", paths = ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "crates", "scripts", "scenarios", "docs"] },
+  { label = "PR #4 head", commit = "6fcbd566e9b335fa2011272a897bd4beb7e6969b", paths = ["Cargo.toml", "Cargo.lock", "rust-toolchain.toml", "crates", "scripts", "scenarios", "docs"] },
+]
+# The previous verification: v1.0.0, pin a4bb5c3 (PR #1 head), whose
+# crates/core/src/lib.rs, crates/contract and crates/executor are
+# byte-identical to 6f61616 "Mark the contract as v1.0.0". Its results are
+# on PR #31's branch at a072a2d (to be tagged shared-pool-v1.0.0 when PR
+# #31 merges); the regressions in [findings] cite them.
+previous_release = "v1.0.0"
+previous_pinned_commit = "a4bb5c3c9cef1ed03bcbe8f3350ab6e84200eae7"
+previous_release_commit = "6f616160303e0376fc5e032837fcd566a344f66a"
+
+# Status values, evidence vocabulary and ceilings: projects/near-approval/strategy.md section 12.
+# Status values: unverified | in-progress | verified | verified-with-assumptions | stale
+# Project rules: projects/shared-pool/strategy.md section 12. In short:
+#   - Nothing here goes past in-progress: [review] spec_reviewer is empty
+#     (and Kani's ceiling is verified-with-assumptions in any case).
+#   - One module per strategy.md section 5 subsection (5.1 .. 5.13); the
+#     properties are exactly section 5's non-ASM rows (103), the
+#     [assumptions.<ID>] tables its ASM-* rows (15). IDs equal
+#     prolog/requirements/traceability.pl's property/3 (118).
+#   - v1.1.0 re-verification (pin 57b3f02). A row is `in-progress` once its
+#     primary layer re-checked it at the pin: TLA+ (TLA-EXEC included),
+#     Lean, Prolog, conformance, near-tests and the sandbox have (W3-W10),
+#     and so has Kani (W11-W13: the v1.1.0 measurement, CI's kani groups
+#     and the local record at 2d33d33). Every row's `kani`
+#     segment of `harness`, `kani_bound` and `kani_run` is v1.1.0's.
+#     strategy.md section 5 has the v1.1.0 statement. TLA-IND is
+#     `unverified` (OQ-7), as at v1.0.0. ASM-TOOLS is `unverified` again, as
+#     at v1.0.0 (canaries, covers and mutants are controls, not a check of
+#     soundness). The assumptions' `source` doc cites are v1.1.0 lines.
+#   - `layer` is the first layer of the row's Layer(s) cell (near-tests maps
+#     to unit, difftest or wasm-check by the file that tags it); `cross` holds
+#     the row's other layers plus any other layer whose files carry the ID's
+#     PROP tag. Other evidence the row cites is named in `harness`.
+#   - status-lint (tools/scripts/check-status.sh, through [project]
+#     catalogue) checks these rules against strategy.md section 5: the IDs
+#     and one module per subsection, `layer` and `cross` against Layer(s),
+#     and each row's `status` (an assumption's `level` too) against its
+#     Status cell. "stale; v1.0.0: ..." is `stale`; so is "Kani: pending
+#     (v1.0.0: ...)" on a Kani row or an assumption, where a bare "Kani:
+#     pending" is `unverified` or `stale`. Otherwise a result (proved,
+#     model-checked, tested, checked; a Kani row needs "bounded proof") is
+#     `in-progress`, and none (open, untested, policy) `unverified`. A row's
+#     status and its cell change together.
+#   - Kani-primary properties carry the Kani layer's result (strategy.md
+#     section 6, kani/RESULTS.md): in-progress, evidence bounded-proof, the
+#     harnesses first in `harness`, the bound in `kani_bound`, and in
+#     `kani_run` whether CI runs each harness or the local record holds it.
+#     Their other layers' results stay in `cross` and `harness`. What Kani
+#     does not establish (LIVE-2; F-2 and F-5 reached from Pool::new) is not
+#     claimed for Kani.
+# Property keys (near-approval strategy.md section 12): id, status, layer,
+#   evidence (the TARGET evidence), cross, harness (where the `PROP:` tag or
+#   the ID sits), depends_on (relative to upstream_path, here the repository
+#   root), assumptions (ASM IDs; strategy.md section 12 says which),
+#   description; optional blocked_by (an OQ of strategy.md section 16),
+#   closes (the [findings.<ID>] tables at the end of this file that the
+#   row's v1.1.0 result closes: a fix's regression property, the killer of
+#   its fix-revert mutant, or an inverted witness) and finding (an open
+#   finding the row's section 5 Statement or Status cell names; none at
+#   v1.1.0). status-lint checks both against [findings]: each `closes`
+#   entry is a finding whose closed_by lists the row, and back, and a
+#   `finding` names an open one.
+#   Optional observed / observed_on (as for assumptions): what a test in
+#   `cross` saw (RD-PREVIEW, RD-BEST: the COV-2 differential). Optional
+#   kani_bound, on every row with a Kani result (primary or cross): the
+#   bounds the bounded proof holds within (kani/RESULTS.md, Bounds); Kani
+#   0.68.0, CBMC 6.11.0, on the pin 57b3f02 (Kani inputs of
+#   2d33d33), 2026-11-14.
+#   kani_run, on the same rows: where each of the row's Kani harnesses is
+#   checked now (strategy.md sections 6 and 14). "CI kani job": the kani job
+#   of .github/workflows/shared-pool.yml runs it whenever a change reaches
+#   the Kani layer, on GitHub's hosted runner unless KANI_RUNNER or CI_RUNNER
+#   names another (the 50 harnesses whose peak,
+#   measured or, where no run measured it, estimated, rounded up, is 13 GB
+#   or less; a peak is resident memory, which can understate a job's
+#   footprint: strategy.md section 6). "local record": it peaked above
+#   13 GB, or is h_wedge or h_full_256 (strategy.md section 14), so it was
+#   run on a 64 GB Apple M1 Max at commit 2d33d33 and recorded
+#   in kani/local (kani/RESULTS.md, Local record). CI's kani-record job
+#   checks that record (fingerprint of the Kani inputs = the commit's, every
+#   result as required) and does not run the harness again, unless
+#   KANI_RUNNER names a runner large enough (the kani-large job).
+# Assumption keys: statement (strategy.md section 5.14), level
+#   (threat_model.pl assumption/3), checked_by (properties only: the union of
+#   assumption_checked_by/2 and section 5.14's Evidence cell), status, and,
+#   where there is one, source: the NEAR pages near-approval read against its
+#   [protocol_reference], or the upstream docs at the pin as spec:<line>,
+#   api:<line>, handoff:<line>. observed / observed_on record what a check
+#   saw, including checks that are not properties (check-pin.sh, the wasm
+#   surface).
+
+[review]
+spec_reviewer = ""          # empty until a named human who did not write pool-core signs off
+spec_reviewed_at = ""
+
+[tools]
+lean = "4.34.1"
+tla2tools = "1.7.4"
+apalache = "0.47.2"
+kani = "0.68.0"
+cbmc = "6.11.0"
+scryer_prolog = "0.10.0"
+near_sdk = "5.29.1"         # from source-mirror Cargo.lock
+upstream_rust = "1.98"      # source-mirror rust-toolchain.toml
+
+[source_hashes]             # sha256 at pinned_commit; check-pin.sh recomputes
+"Cargo.toml" = "be3e474323d5364cd74bfbb9b949ffee001e7a0f5cf8a08ccde4884ef895ac08"
+"Cargo.lock" = "09a1439436039ddeaf4129577fd4de5c21c84c42b0651ddb493079922754e83e"
+"rust-toolchain.toml" = "5878a36e61292d01952bbaa165e48284703ed79ec46918d407aefccf7709d2f9"
+"crates/core/Cargo.toml" = "5f29e05fedf59163b56ab57c3d760e5614b331523e76a1a6056d8c630707bfd2"
+"crates/core/src/lib.rs" = "c3bb825b91f7c277dee8651beafd45955f7cf8935c858f928b6a1b62d607ba48"
+"crates/core/src/fixtures.rs" = "d63273f7f4efbb23acfb8e13bcb90a2af66047a18ffed6b0a1ecbdd086dc601d"
+"crates/core/src/tests.rs" = "795366ef5574a2bfb69866dc6a41c586462904072c3d46fb2fef556548af98e2"
+"crates/core/src/findings.rs" = "d2cf95a45e37b3ab350111125ac6f936ad10a1830d480a1d49b9ebdf27713c0f"
+"crates/contract/Cargo.toml" = "fa1906e2a7bee9593eff9fdecd957a6f3a5bb4072ac11e492363304062f545f2"
+"crates/contract/src/lib.rs" = "3810d18d9afa6ba3a6fc6dac9c2e897acc343d8e532bd13b2c2bbc81da20c03c"
+"crates/executor/Cargo.toml" = "b75fb69980e7b0c06926096c14927e96ecb6372760a1edaa33457c6f9b9f8804"
+"crates/executor/src/lib.rs" = "a2d63842c23d760882b36b1d0548062b6b4fe24f49b7ce5fda7c492cbe129198"
+"crates/sandbox/Cargo.toml" = "24b6e0e946710ca6e7f7f508249e0d32cc36a2d12c1bf9a31c4dad079ad85e03"
+"crates/sandbox/tests/integration.rs" = "0dbcbc093557df587f5efea086af72c45c242d81b2fe60194089667558a056c1"
+"crates/sandbox/tests/res1.rs" = "ab6aa6d20253f8268dbffc951bde8618a3b07fb5b56f567013917cc7048e8bc2"
+"crates/demo/src/main.rs" = "c1558094b907463a5d6b56f971417f83ba751157bfbd22a9bf865a63bb56fcc5"
+"scripts/build.sh" = "429b63ea57ca92d140d1a79c43228e7a3b182e57875f2f0c2829d3180dd61f3e"
+"docs/spec.md" = "27ad470589db5c4a48c651135026a74c1fdcea4fbc08c87d413e65e6b0e49a11"
+"docs/api.md" = "1b1175b07181e520bc271412e4238b2895bdbf299906f17368ee32dbc16c6d34"
+"docs/verification-handoff.md" = "495ebd96b2268fce731f5afe1086663a36b31287f31c8f84268e4d5182b2266b"
+"docs/verification-findings.md" = "7f4ffd9e82df8ce20c4c809215f8cab074d0bf3244ec22bd19b0d6752e2e2819"
+"scenarios/friday/trace.json" = "ae1dd04b661765aa3c5b1eecd8015f10b66cf1208922f85eff4697dc7e13eeb7"
+"scenarios/gpu/trace.json" = "b872dbfa9165925fb3a57c33c1eeeff38ddcc48af1a483e2627de8c61f9de87b"
+"scenarios/hiring/trace.json" = "da50a246ad0b6b664f4648c0dd19618d947306c80ad8e3085d3e904c2f7e9960"
+"scenarios/inventory/trace.json" = "cf4ab803d162077c8570aec6cf29eb7916c1eb77defbd25d93235a7ffd0513e2"
+"scenarios/risk/trace.json" = "75c216fc5c028b754aaf99d7d0b4775ae57a3bdf2606762e26d112a71a6e89ff"
+"scenarios/station/trace.json" = "ae2409969289e823f5413f4a33f1e911fba4a13d0010bbdcb7b8d8ac505943b5"
+
+# ---------------------------------------------------------------------------
+# Trust assumptions (strategy.md sections 3.3 and 5.14).
+# level: high | med | low | policy (threat_model.pl assumption/3)
+# ---------------------------------------------------------------------------
+
+[assumptions.ASM-PRED]
+statement = "The predecessor cannot be forged"
+level = "high"
+checked_by = ["RT-PRED", "SH-1"]
+source = ["https://nomicon.io/RuntimeSpec/Receipts.html", "https://nomicon.io/RuntimeSpec/Components/BindingsSpec/ContextAPI.html", "spec:13"]
+observed = "RT-PRED: an actor's relay.forward(submit) is attributed to the relay (the decision event's actor is the relay, Unauthorized, storage byte-identical); the same request sent directly is accepted; with the relay as a recipe's actor, a forward signed by an unrelated account is accepted as the relay's submit; dispatch, cancel, settle (even signed by the executor's key), set_paused and observe through the relay fail Unauthorized and write nothing. SH-1 (mocked runtime, host path and the documented build): the caller is the predecessor, not the signer (near-tests/tests/shell.rs sh1_caller_is_the_predecessor_not_the_signer; tests/store_diff.rs, 15% relayed calls)."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14; SH-1: near-tests/run.sh all on the same build at 5cf571e, 2026-11-14"
+status = "in-progress"
+
+[assumptions.ASM-PRIVATE]
+statement = "#[private] <=> predecessor = current account"
+level = "high"
+checked_by = ["RT-PRIVATE", "SH-2", "SH-3", "EX-8"]
+source = ["https://docs.rs/near-sdk/5.29.1/near_sdk/", "spec:13", "api:9", "api:20"]
+observed = "RT-PRIVATE: pool.new fails 'Method new is private' for the owner, the actor, an unrelated account and the executor, and through the relay when signed with the pool's own key; exec.new the same; a second new fails 'The contract has already been initialized'; on_result fails 'Method on_result is private' for four foreign callers and the relay; the executor's on_settled fails 'Method on_settled is private' for the owner, the actor, an unrelated account, the lock and the relay. On the deployment account's own key, on_result is now Ok with outcome 'unknown' (no promise result; an Active record stays Active, storage unchanged; id 999 logs error NotFound) and on_settled fails 'not a settle callback'; storage unchanged in every case. Every failure carries its message (SB-1 / NT-F1 fixed)."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "in-progress"
+
+[assumptions.ASM-CALLBACK]
+statement = "The callback sees the executor's return or PromiseError"
+level = "high"
+checked_by = ["RT-CALLBACK", "SH-3"]
+source = ["https://nomicon.io/RuntimeSpec/Components/BindingsSpec/PromisesAPI.html", "https://docs.rs/near-sdk/5.29.1/near_sdk/", "api:40"]
+observed = "RT-CALLBACK: 'active' -> Active, reservation kept; 'cancelled' -> Cancelled, released exactly; 'unknown' -> Unknown; execute panics -> Unknown, the dispatch transaction succeeds and the reservation is kept; a non-string result (the number 5, or a 70-byte string from status) -> Unknown (NT-F4 fixed, upstream's hand-assembled executor). The executor's on_settled runs after the lock's settle in every finish and confirm_not_executed."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "in-progress"
+
+[assumptions.ASM-ATOMIC]
+statement = "A panicking receipt writes nothing"
+level = "high"
+checked_by = ["RT-REVERT", "RES-1"]
+source = ["https://nomicon.io/RuntimeSpec/Receipts.html", "https://nomicon.io/RuntimeSpec/Actions.html"]
+observed = "RT-REVERT: ten core errors (Unauthorized, NotFound and InvalidState on dispatch and settle; Unauthorized and Pending on cancel; Unauthorized on set_paused; Pending on observe), Paused on dispatch, Bounds on observe (three inputs), InvalidState on cancel of a Completed record, the 1-yocto reconcile, and Arithmetic at VERSION_CAP (patched) for set_paused, observe and dispatch: each panics with its message, the pool's raw storage is byte-identical and no event is emitted. RES-1: 84 out-of-gas attempts at the maximum-size state (dispatch 40-69 Tgas, reconcile 40-45, confirm_not_executed 40-54, finish 40-54 at 256 jobs and 40-55 at 512) each fail 'Exceeded the prepaid gas.' in the first receipt, run no later receipt, log nothing, and leave both contracts' raw storage byte-identical."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "in-progress"
+
+[assumptions.ASM-INTERLEAVE]
+statement = "Receipts can run between dispatch and on_result; ack and settle are independent model steps"
+level = "med"
+checked_by = ["RT-RACE"]
+source = ["https://nomicon.io/RuntimeSpec/Scenarios/CrossContractCall.html", "https://nomicon.io/RuntimeSpec/Receipts.html"]
+observed = "RT-RACE (one shard): a settle sent from inside execute always lands before the dispatch callback and the late 'active' ack is a no-op (version +2, not +3), for settle(true) and settle(false); the executor key's settle 0-400 ms after dispatch produced every serial order the core allows, the late-ack order included (3 of 6); the operator's finish cannot overtake the callback on one shard (8 finish-before-execute, 8 callback-first in 16 attempts). Multiple shards and congestion are not tested."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "in-progress"
+
+# Untested: TLA+ and Lean allow any block time per call (a superset of
+# monotone time); MC-1 assumes it, and so does LIVE-2, which cites MC-1.
+[assumptions.ASM-TIME]
+statement = "The block timestamp is monotone"
+level = "high"
+checked_by = []
+source = ["https://nomicon.io/RuntimeSpec/Components/BindingsSpec/ContextAPI.html", "https://nomicon.io/ChainSpec/BlockProcessing.html"]
+status = "unverified"
+
+# Carried by the rows that model an honest executor (LIVE-2, TLA-LIVE-F2,
+# MC-1) and, as T-UNKNOWN's residual, by its mitigations ASYNC-1,
+# RT-CALLBACK, SH-3 and INV-LEDGER; T-WEDGE (with ASM-GAS) and T-JOBCAP
+# list it among their mitigations (threat_model.pl). Since v1.1.0 the
+# honest settle(false) always succeeds (LIVE-ALL); what stays assumed is
+# that the executor reports, and truthfully (T-SLOTS: head-of-line Full
+# until it does).
+[assumptions.ASM-EXEC]
+statement = "The executor is honest: settle(false) only on definitive nonexecution"
+level = "policy"
+checked_by = []
+source = ["handoff:35", "api:16", "spec:54"]
+status = "unverified"
+
+# T-OBS's residual: carried by its mitigations OBS-1 and INV-WF
+# (threat_model.pl). The in-bounds observations of TLA-LIVE-1 and
+# TLA-LIVE-F2 are premises of those claims, not this assumption: a true
+# observation may be out of bounds (spec:58). LIVE-1 no longer needs B = 0
+# at v1.1.0 (a corollary of LIVE-ALL).
+[assumptions.ASM-OWNER]
+statement = "Observations are true"
+level = "policy"
+checked_by = []
+source = ["handoff:35", "spec:58", "spec:60"]
+status = "unverified"
+
+# No deployment of this pin exists (strategy.md section 9.3). T-REDEPLOY
+# is mitigated by SH-11 and SH-12, which check the in-contract half (no
+# upgrade, migrate or reset export; no deploy, key or transfer import), and
+# by this assumption (threat_model.pl). It underlies every on-chain
+# result, as ASM-TOOLS underlies every tool result.
+[assumptions.ASM-DEPLOY]
+statement = "No code replacement; the deployment lock is out of scope"
+level = "policy"
+checked_by = ["SH-11", "SH-12"]
+source = ["spec:60", "handoff:47"]
+observed = "near-tests/wasm-surface.sh on the documented build: SURF-1 (no upgrade, migrate or reset export), SURF-2 (no deploy, key, transfer, stake, account, global-contract or promise_batch import) and SURF-3 (imports == build.sh's allowlist) pass; the in-contract half is checked (NT-F3 fixed). Assumed: the account holder's own keys and redeploys"
+observed_on = "near-tests/wasm-surface.sh (near-tests/run.sh surface, within run.sh all at 5cf571e) on upstream scripts/build.sh's wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "unverified"
+
+# Controls, not checks of soundness: canaries, witnesses and mutants in every
+# runner, the Lean axiom audit (lean/Audit.lean), extract.py --check.
+[assumptions.ASM-TOOLS]
+statement = "Scryer, TLC, Lean, Kani and the extractors are sound for what is used"
+level = "med"
+checked_by = []
+observed = "Kani: h_canary FAILS on its own assertion only, the covers pending in CI's covers job (each must be SATISFIED in some harness of its family), and every mutant as its patch expects where it ran (kani/RESULTS.md). In CI the kani job reruns h_canary with the other harnesses that fit the hosted runner (50 in all), and the covers job checks the covers over those and the local record's 48 harnesses (kani/local, Kani inputs of 2d33d33; the kani-record job checks it); the mutants job reruns all 45 in plain mode on every run, kani-mutants (manual runs) under Kani the 17 sized to fit the hosted runner, and the local record holds 1 of the other 28 (plain and Kani; 27 declared not run at v1.1.0, kani/local/not-run.tsv). The two Kani 0.68.0 soundness hazards found at v1.0.0 (a written static sharing storage with an equal constant; a reference into a local array of structs at an unfolded index) stay worked around (kani/RESULTS.md, Tool issues). Controls, not a check of soundness"
+observed_on = "Kani 0.68.0, CBMC 6.11.0 on the pin 57b3f02, 2026-11-14; the local record (kani/local/provenance.txt)"
+status = "unverified"
+
+# Checked only by [review] spec_reviewer, which is empty. The Prolog author
+# had read the code (strategy.md section 8).
+[assumptions.ASM-SPEC]
+statement = "The specs, and the Prolog transcription of the docs, mean what we intend"
+level = "low"
+checked_by = []
+status = "unverified"
+
+[assumptions.ASM-MODEL]
+statement = "The small scopes are representative: Kani's bounds, TLC's universes and 32-bit integers, MC-1's universes"
+level = "med"
+checked_by = ["LEAN-IND", "LEAN-STEP", "LEAN-LIVE1", "REF-5", "REF-5L", "MC-2"]
+observed = "Lean proves Inv, the step properties, LIVE-ALL and LIVE-1 for the model at every size (LEAN-IND, LEAN-STEP, LEAN-LIVE1). Traces 206 (values at +-1,000,000) and 207 (256 records and the window's prunes) replay equal on TLC (REF-5), Lean (REF-5L) and Prolog (MC-2); the reads at and above VERSION_CAP (COV-2). Kani's bounds (kani/RESULTS.md, Bounds and What is not shown): the step harnesses and REF-1..3 use 1 metric, 1 term, 2 recipes and INV pre-states with exactly 2 records and first_id = 0, values anchored at -1e6, 0 and 1e6 (each +-4) and deltas -3..3; INV-WF to INV-DEP, INV-RES, INV-VERCAP and WIN-1 are preserved from 0, 1, 2 and 3 records, so they hold in every reachable state with at most 3 records and no prune (4 or more not covered); h_wf_<op> from WF states of up to 2 records with first_id and completed_units free; h_version_cap_<op> at or above VERSION_CAP, h_version_max_<op> at u32::MAX; INV-VER and STALE-1's no-replay only along 2-operation traces from Pool::new; 2 metrics and 2 terms only in the energy, init and validate harnesses (the energy contract over the whole value range), 64 terms only concrete; the window only at 255 and 256 records (h_full_*, one constant array; the prune in h_full_256_prune); LIVE-ALL at 3 records. Beyond them: plain mode (random, up to 2 metrics, 2 terms, 2 recipes and 3 records; window_walk and cap_walk with prunes; REF-1..3 on all 216 traces) and Lean at every size for what it states. Not covered: TLC's MaxVersion is 2^31 - 1 and it cannot represent large energies (Kani's NUM-1 does); a value strictly between Kani's anchors and the extremes outside energy"
+observed_on = "Kani 0.68.0, CBMC 6.11.0 on the pin 57b3f02 (Kani inputs of 2d33d33), 2026-11-14; traces and reads of the v1.1.0 corpus"
+status = "in-progress"
+
+[assumptions.ASM-LEAN-TLA]
+statement = "The Lean and TLA+ models transcribe the code"
+level = "med"
+checked_by = ["REF-1", "REF-2", "REF-3", "REF-5", "REF-5L", "MC-2", "C-2"]
+observed = "TLA+: REF-1..3 (Kani, h_ref_<op>, 7 of 7 ok, 43 of 43 ref covers SATISFIED) show, within the step bounds (1 metric, 1 term, 2 recipes, INV pre-states with exactly 2 records and first_id = 0), that every call of the real core refines tla/SharedPool.tla as transcribed in kani/src/tla.rs (the v1.1.0 transcription): the core's error is the TLA+ error operator's and Ok exactly when the action is enabled or a Noop (REF-1), the abstraction of an Ok post-state is the action's post-state (REF-2), every other call stutters (REF-3); plain mode checks the same on every call of the 216 traces (8,865 calls), on the step tests' samples, and with prunes and the ghost fold in checked_step (window_walk). tla.rs is a hand transcription of the .tla: it meets TLC only through the traces, where both agree with the core (mutant 31, a transcription error, is killed by h_ref_cancel). 216 real-core traces (8,865 calls) equal on TLC TraceCheck (REF-5, 9,081 of 9,081 states), the Lean machine (REF-5L) and Prolog step/4 (MC-2, 0 divergences); C-2: TLA+ GuardOrder = the code's guard order. Lean's link to the code is the traces only (REF-5L): evidence, not a proof"
+observed_on = "Kani 0.68.0, CBMC 6.11.0 on the pin 57b3f02 (h_ref_<op>: run.sh ref at db957d4 (h_ref_dispatch, h_ref_ack, h_ref_pause, h_ref_observe); run 1 at 2d33d33 (h_ref_submit, h_ref_cancel, h_ref_settle)), 2026-11-14; traces of the v1.1.0 corpus"
+status = "in-progress"
+
+[assumptions.ASM-COMPILE]
+statement = "overflow-checks = true in the release profile"
+level = "high"
+checked_by = []
+source = ["https://doc.rust-lang.org/cargo/reference/profiles.html#overflow-checks"]
+observed = "tools/scripts/check-pin.sh shared-pool (release_overflow_checks = true): upstream Cargo.toml [profile.release] sets overflow-checks = true at 57b3f02 (pin ok, 2026-11-14); the sandbox and near-tests wasm are built by scripts/build.sh (--release) with that profile"
+status = "in-progress"
+
+[assumptions.ASM-GAS]
+statement = "Callers attach at least the prepaid gas api.md documents; a receipt that runs out of gas changes nothing (ASM-ATOMIC) and can be retried. Liveness is conditional on authoritative evidence and gas (handoff:34)"
+level = "med"
+checked_by = ["RES-1"]
+source = ["api:46-57", "handoff:34"]
+observed = "RES-1 at 57b3f02: every pool receipt < 30 Tgas, the largest of the calls without promises 14.81 (>= 10 below their 30 attach); least prepaid dispatch 70, reconcile 46, confirm_not_executed 55, finish 55 / 56 (512 jobs), each >= 10 Tgas below api.md's attach; smaller amounts fail out of gas and change neither contract (ASM-ATOMIC); on_settled <= 3.68 of 10 Tgas. Equal to docs/api.md:44-59."
+observed_on = "near-sandbox 2.13.4 (near-workspaces 0.23.0), one shard; upstream scripts/build.sh wasm of 57b3f02 (pool_contract sha256 e6383aab...97e2ea, pool_executor b92f1469...634e83), rustc 1.98.1, 2026-11-14"
+status = "in-progress"
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.1: configuration and numerics.
+# Kani primary (section 5 lists kani first): bounded proofs on the real core
+# (kani/RESULTS.md), in-progress; Kani's CFG-1 is a composition of four
+# harnesses (deviation 23). Lean proves CFG-1 for the model without the
+# string checks.
+# ---------------------------------------------------------------------------
+[modules.config_numerics]
+source = "crates/core/src/lib.rs"
+lean_model = "lean/PoolLean/Machine.lean"
+
+  [modules.config_numerics.properties]
+  CFG-1 = { id = "CFG-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["lean", "tla"], harness = "kani: h_init (validate free), h_validate, h_init_inv, h_init_inv_2: a composition (kani/RESULTS.md deviation 23); lean: Inv.lean inv_init (Valid cfg => Inv (init cfg now); strings not modelled); tla: TraceCheck.tla TInv on the initial state of every trace the core accepted (trace 210's config, which the core refuses, fails ValidCfg)", kani_bound = "raw configs of at most 2 metrics, 2 terms, 3 recipes and 2 requirements per recipe, strings of 0 or 2 bytes, each field in range, at an edge or out of range; INV of the initial pool for the shapes 1/1/2 and 2/2/2 (metrics/terms/recipes); 3 metrics and 128/129-byte strings plain mode only", kani_run = "CI kani job: h_init_inv, h_init_inv_2; local record: h_init, h_validate", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Pool::new is Ok iff validate is Ok, and the initial state (first_id = 0, completed_units = 0) satisfies INV. Lean proves Valid cfg => Inv (init cfg now), strings not modelled" }
+  CFG-2 = { id = "CFG-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["lean", "tla"], harness = "kani: h_validate (validate = the spec's valid on raw configs; F-4 fixed: a config with actor = executor is InvalidConfig, cover SATISFIED); lean: Machine.lean Valid/validate; Window.lean valid_iff (validate decides Valid), valid_actor_ne_executor; Witness.lean self_executor_invalid, owner_executor_valid; tla: TraceCheck.tla TInv (trace 210's config refused by ValidCfg; mutant t39)", kani_bound = "raw configs of at most 2 metrics, 2 terms, 3 recipes and 2 requirements per recipe, strings of 0 or 2 bytes, each field in range, at an edge or out of range; 3 metrics and 128/129-byte strings plain mode only", kani_run = "local record: h_validate", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-4"], description = "validate => references in range, vectors of length n, prerequisites strictly earlier and distinct, values bounded, and every recipe's actor differs from its executor (v1.1.0, F-4; the owner may be an executor)" }
+  NUM-1 = { id = "NUM-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["lean"], harness = "kani: h_energy (Ok, one term per term), h_energy_exact (each term w*r^2 and the exact sum), h_energy_max (64 terms); lean: exact Int energy, overflow not modelled", kani_bound = "2 metrics, 2 terms, values anywhere in [-1e6, 1e6], any weight 1..1000 (h_energy); Anchored(4) values, any weight (h_energy_exact); the 64-term worst case concrete, 2.56e17 exact (h_energy_max)", kani_run = "local record: h_energy, h_energy_exact, h_energy_max", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-COMPILE", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Valid config and bounded values => energy_terms and energy are Ok and exact" }
+  NUM-2 = { id = "NUM-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["lean"], harness = "kani: h_step_submit_tx, h_step_cancel_tx, h_step_settle_tx (the exact result in guard order includes every Arithmetic exit of add, Why::Add); trace 206 (Arithmetic from add at 999,990 + 15 and from the envelope at 1,000,005) and trace 208 (F-2b: the release term's endpoint refused at admission) replayed by REF-5, REF-5L, MC-2 and SH-8; tla: MC_F2b (F2bConfig, values at +-1e6): Witness_EdgeValue (kills t23), Witness_F2bRefused (kills t24, t34); prolog: MC-1 f2b universe (every release term within +-1e6)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared (values at both extremes)", kani_run = "CI kani job: h_step_cancel_tx; local record: h_step_submit_tx, h_step_settle_tx", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-COMPILE", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-2b"], description = "add fails closed exactly when the exact result leaves +-1,000,000; so does each envelope endpoint (completion and release terms); from an INV state no release or completion add fails (INV-RES)" }
+  ROB-1 = { id = "ROB-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = [], harness = "kani: every harness that calls the core (Kani's panic, arithmetic overflow, bounds and unwinding checks are on in all 98 of run.sh list; the PROP tag is on the core call in checks.rs step); Lean's INV-WF shows every index the guards read is in range but does not model panics", kani_bound = "each harness's bounds (kani/RESULTS.md Bounds); the step harnesses: step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free; std memory safety not checked (--no-memory-safety-checks; the core forbids unsafe)", kani_run = "CI kani job: its 50 harnesses (every one whose peak, rounded up, is 13 GB or less); local record: the other 48 (above 13 GB, h_wedge and h_full_256)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-COMPILE", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "No core panic from any INV state, for any arguments" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.2: transition contracts. Each gives the exact result
+# (the first failing guard, in the code's order), the exact post-state and
+# the frame. Kani primary: bounded proofs on the real core against the
+# executable spec (kani/src/spec.rs), from 2-record INV states (`kani_bound`).
+# TLA+, Lean and Prolog check them too (proved for the model where Lean has
+# a theorem; all replay the 216 real-core traces of the v1.1.0 corpus,
+# 8,865 calls).
+# ---------------------------------------------------------------------------
+[modules.transitions]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/SharedPool.tla"
+lean_model = "lean/PoolLean/Machine.lean"
+prolog_requirements = "prolog/model/pool_machine.pl"
+
+  [modules.transitions.properties]
+  TX-0 = { id = "TX-0", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_tx (7 kinds), h_wf_<op> (submit, dispatch, ack, cancel, settle), h_version_cap_<op> (7), h_version_max_<op> (ack, cancel, settle), h_full_255, h_full_256, h_full_256_prune; lean: StepProps.lean stepProps (every call, every state); tla: TraceCheck.tla Replay; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free; h_version_cap_<op>: INV states at version >= VERSION_CAP; h_version_max_<op>: WF states at version = u32::MAX; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "CI kani job: h_step_dispatch_tx, h_step_ack_tx, h_step_cancel_tx, h_step_pause_tx, h_step_observe_tx, h_wf_dispatch, h_wf_ack, h_wf_cancel, h_version_cap_dispatch, h_version_cap_ack, h_version_cap_cancel, h_version_cap_pause, h_version_cap_observe, h_version_max_ack, h_version_max_cancel, h_version_max_settle; local record: h_step_submit_tx, h_step_settle_tx, h_wf_submit, h_wf_settle, h_version_cap_submit, h_version_cap_settle, h_full_255, h_full_256, h_full_256_prune", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Every Err leaves the Pool unchanged" }
+  TX-SUBMIT = { id = "TX-SUBMIT", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_submit_tx, h_step_submit_post, h_wf_submit, h_full_255, h_full_256, h_full_256_prune (Full only with 256 records and an open front; at 256 with a terminal front the submit prunes it; F-3's cycle: h_slot_cycle_0, h_slot_cycle_2); tla: Props.tla TX-SUBMIT in StepProperty (time, capacity and unit guards, effect, the prune), TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "local record: h_step_submit_tx, h_step_submit_post, h_wf_submit, h_full_255, h_full_256, h_full_256_prune, h_slot_cycle_0, h_slot_cycle_2", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "submit: exact result in guard order, exact post-state, frame" }
+  TX-DISPATCH = { id = "TX-DISPATCH", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_dispatch_tx, h_step_dispatch_post, h_wf_dispatch; tla: Props.tla TX-DISPATCH in StepProperty, TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free", kani_run = "CI kani job: h_step_dispatch_tx, h_step_dispatch_post, h_wf_dispatch", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "dispatch: exact result in guard order, exact post-state, frame" }
+  TX-ACK = { id = "TX-ACK", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_ack_tx, h_step_ack_post, h_wf_ack; tla: TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order, C-3 lifecycle", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free", kani_run = "CI kani job: h_step_ack_tx, h_step_ack_post, h_wf_ack", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "acknowledge: exact result in guard order, exact post-state, frame (the no-op ack keeps the version, as spec:41 now says)" }
+  TX-CANCEL = { id = "TX-CANCEL", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_cancel_tx, h_step_cancel_post, h_wf_cancel; tla: TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order (cancel of a Completed record is InvalidState in 18 traces; mutants t48, l25, m32)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free", kani_run = "CI kani job: h_step_cancel_tx, h_wf_cancel; local record: h_step_cancel_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["div-cancel-terminal-name"], description = "cancel: exact result in guard order, exact post-state, frame (cancel of a Completed record is InvalidState)" }
+  TX-SETTLE = { id = "TX-SETTLE", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_settle_tx, h_step_settle_post, h_wf_settle; tla: TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free", kani_run = "local record: h_step_settle_tx, h_step_settle_post, h_wf_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "settle: exact result in guard order, exact post-state, frame" }
+  TX-PAUSE = { id = "TX-PAUSE", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_pause_tx, h_step_pause_post; tla: TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_pause_tx, h_step_pause_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "set_paused: exact result in guard order, exact post-state, frame" }
+  TX-OBSERVE = { id = "TX-OBSERVE", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_observe_tx, h_step_observe_post; tla: TraceCheck (REF-5); lean: REF-5L replay; prolog: tests/test_mc2.pl (MC-2: 216 traces, 8,865 calls, 0 divergences), tests/test_model.pl, C-2 guard order", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_observe_tx; local record: h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "observe: exact result in guard order, exact post-state, frame" }
+  TX-NOOP = { id = "TX-NOOP", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_tx (7 kinds), h_wf_<op> (submit, dispatch, ack, cancel, settle), h_version_max_<op> (ack, cancel, settle: at u32::MAX only idempotent paths succeed); lean: StepProps.lean stepProps; tla: TraceCheck.tla Replay; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free; h_version_max_<op>: WF states at version = u32::MAX", kani_run = "CI kani job: h_step_dispatch_tx, h_step_ack_tx, h_step_cancel_tx, h_step_pause_tx, h_step_observe_tx, h_wf_dispatch, h_wf_ack, h_wf_cancel, h_version_max_ack, h_version_max_cancel, h_version_max_settle; local record: h_step_submit_tx, h_step_settle_tx, h_wf_submit, h_wf_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Idempotent Ok paths change nothing, version included" }
+  TX-VER = { id = "TX-VER", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_tx (7 kinds), h_version_cap_<op> (7), h_version_max_<op> (ack, cancel, settle; F-5 fixed: at u32::MAX nothing wraps); lean: StepProps.lean stepProps; tla: Props.tla TX-VER in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_version_cap_<op>: INV states at version >= VERSION_CAP; h_version_max_<op>: WF states at version = u32::MAX", kani_run = "CI kani job: h_step_dispatch_tx, h_step_ack_tx, h_step_cancel_tx, h_step_pause_tx, h_step_observe_tx, h_version_cap_dispatch, h_version_cap_ack, h_version_cap_cancel, h_version_cap_pause, h_version_cap_observe, h_version_max_ack, h_version_max_cancel, h_version_max_settle; local record: h_step_submit_tx, h_step_settle_tx, h_version_cap_submit, h_version_cap_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Every other Ok increments the version by exactly 1" }
+  VER-CAP = { id = "VER-CAP", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_version_cap_<op> (7: at or above VERSION_CAP submit, dispatch, set_paused and observe fail Arithmetic and change nothing; ack, settle and cancel stay available), h_version_max_<op> (ack, cancel, settle at u32::MAX); tla: Props.tla VER-CAP in StepProperty, MC_Cap (TLA-CAP: 64,644 distinct from Pool::new at VersionCap - 4; Witness_AtCap, WitStep_ResolveAtCap; mutants t40-t44); lean: Calls.lean cap_stops; Inv.lean bump_ok; Witness.lean cap_instance, cap_drain; prolog: MC-1 cap universe (1,834 states: submit, dispatch, set_paused and observe stop with Arithmetic; ack, cancel and settle continue; mutants m27, m28), verification/props.pl; COV-2 reads at the 12 cap states (m28)", kani_bound = "h_version_cap_<op>: INV states at version >= VERSION_CAP (otherwise the step shape: 1 metric, 1 term, 2 recipes, 2 records); h_version_max_<op>: WF states at version = u32::MAX", kani_run = "CI kani job: h_version_cap_dispatch, h_version_cap_ack, h_version_cap_cancel, h_version_cap_pause, h_version_cap_observe, h_version_max_ack, h_version_max_cancel, h_version_max_settle; local record: h_version_cap_submit, h_version_cap_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-5"], description = "version >= VERSION_CAP (u32::MAX - 768) => submit (the last check of candidate), dispatch, set_paused and observe fail Arithmetic at their guard positions and change nothing (bump_new); acknowledge, settle and cancel use the plain increment (bump) and stay available" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.3: step properties. Kani primary: bounded proofs on
+# the real core from 2-record INV states. Proved for the Lean model at every
+# size, model-checked by TLC (StepProperty) and checked on every replayed
+# call of the real core's traces (MC-2).
+# ---------------------------------------------------------------------------
+[modules.step_properties]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/Props.tla"
+lean_model = "lean/PoolLean/StepProps.lean"
+prolog_requirements = "prolog/verification/props.pl"
+
+  [modules.step_properties.properties]
+  # F-4 is fixed (CFG-2: validate refuses actor = executor); the owner may
+  # still be a recipe's executor (amb-owner-roles, ASM-OWNER).
+  AUTH-1 = { id = "AUTH-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_tx (7 kinds); F-4 fixed: h_validate refuses actor = executor (CFG-2); lean: StepProps.lean exec_auth (every Ok, no-ops included); tla: Props.tla AUTH-1 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_dispatch_tx, h_step_ack_tx, h_step_cancel_tx, h_step_pause_tx, h_step_observe_tx; local record: h_step_submit_tx, h_step_settle_tx, h_validate", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-4"], description = "Effective submit and dispatch => caller = actor; cancel => actor or owner; settle => executor; pause and observe => owner" }
+  STALE-1 = { id = "STALE-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_submit_tx, h_bmc_from_init_s_submit (no accepted request is accepted again along 2-operation traces from Pool::new); lean: StepProps.lean stale1_no_replay, version_mono_run; tla: Props.tla STALE-1 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; 2-operation traces from Pool::new (values -3..3, deltas -2..2, max_units <= 2)", kani_run = "local record: h_step_submit_tx, h_bmc_from_init_s_submit", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Submit Ok => request version = version; versions never repeat, so an accepted request cannot replay" }
+  ADM-1 = { id = "ADM-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_submit_tx (against the spec's exact energy); lean: StepProps.lean stepProps; tla: Props.tla ADM-1 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "local record: h_step_submit_tx", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Submit Ok => energy(post) <= energy(pre)" }
+  ADM-2 = { id = "ADM-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_submit_tx (against the spec's exact energy); lean: StepProps.lean stepProps; tla: Props.tla ADM-2 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "local record: h_step_submit_tx", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Submit Ok in a violating state => energy(post + completion) < energy(pre)" }
+  HARD-STEP = { id = "HARD-STEP", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_post (7 kinds); lean: StepProps.lean stepProps; tla: Props.tla HARD-STEP in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Every Ok except observe: PV_i(post) <= PV_i(pre) for every metric" }
+  DEP-1 = { id = "DEP-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_submit_tx, h_wf_submit (completed_units free), h_full_256_prune (the completions of a pruned record still count); lean: Calls.lean dep1, dep1_iff (pruned completions count); tla: Props.tla DEP-1 in StepProperty, WitStep_PrereqAfterPrune (mutant t37); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; MC-1 window (a prerequisite admitted after its record was pruned; mutant m26)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_wf_<op>: WF states of up to 2 records with first_id, completed_units, the values and the version free; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "local record: h_step_submit_tx, h_wf_submit, h_full_256_prune", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "Submit Ok => prerequisites met by completed_units (lifetime Completed units, pruned records included)" }
+  LIFE-1 = { id = "LIFE-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_post (7 kinds), h_full_256_prune (only a terminal front is pruned); lean: StepProps.lean stepProps; tla: Props.tla LIFE-1 in StepProperty (with the prune); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; C-3", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "CI kani job: h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post, h_full_256_prune", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Status graph Reserved -> Dispatched or Cancelled, Dispatched -> Active or Unknown, Unknown -> Active, in flight -> Completed or Cancelled; terminals absorbing; a record is appended at id next; only the oldest record is pruned, and only when terminal; id, recipe, units and expiry immutable while retained" }
+  ASYNC-1 = { id = "ASYNC-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_post (7 kinds); lean: StepProps.lean stepProps; tla: Props.tla ASYNC-1 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; on the wasm: RT-CALLBACK", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-EXEC", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Acknowledge never changes values; Active and Unknown keep the reservation" }
+  TERM-1 = { id = "TERM-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_post (7 kinds); lean: StepProps.lean term1, term1_cancel; Witness.lean cancel_completed_instance; tla: Props.tla TERM-1 (error view, in InvMC; Witness_CancelCompletedInvalid; mutant t48); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; mutant m32", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["div-cancel-terminal-name"], description = "The same terminal repeated is an Ok no-op; the opposite terminal is InvalidState, for settle and for cancel of a Completed record (v1.0.0 gave Pending, strategy.md section 4.3)" }
+  OBS-1 = { id = "OBS-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_observe_tx; lean: Calls.lean obs1; tla: Props.tla OBS-1 in StepProperty; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; mutant m30", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_observe_tx", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-6"], description = "Observe Ok => no open record, or the values are unchanged (the refresh, OBS-2); config unchanged" }
+  PAUSE-1 = { id = "PAUSE-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_<op>_tx and h_step_<op>_post (7 kinds each): submit and dispatch blocked; settle, acknowledge, cancel and observe unaffected, shown at the spec level with code = spec from every state (kani/RESULTS.md deviation 18); lean: Calls.lean pause1_blocks, pause1_transparent; tla: Props.tla PAUSE-1 in StepProperty, WitStep_Paused* witnesses; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_dispatch_tx, h_step_ack_tx, h_step_cancel_tx, h_step_pause_tx, h_step_observe_tx, h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_step_submit_tx, h_step_settle_tx, h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "Paused => submit and dispatch have no effect; settle, ack, cancel and observe are unaffected" }
+  OBS-2 = { id = "OBS-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_step_observe_tx, h_step_observe_post (the refresh: only observed_at and the version change, base and k0 kept; F-6 fixed); tla: Props.tla StepProperty (OBS-2), WitStep_Refresh; mutants t46, t47; lean: Calls.lean obs2 (the frame: values, records, base, k0 unchanged); prolog: verification/props.pl on every MC-1 edge and every MC-2 call (trace 211); mutant m30", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_observe_tx; local record: h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-6"], description = "Observe Ok with some record open => the new values equal the current values, and only observed_at and the version change; the ghosts base and k0 are kept (the refresh, F-6)" }
+  WIN-2 = { id = "WIN-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["tla", "lean", "prolog"], harness = "kani: h_full_256_prune (the submit at 256 records prunes the terminal front; first_id advances, ids are not reused), h_step_<op>_post (no prune below 256 records); tla: Props.tla Win2 (error view, every MC cfg), LIFE-1 and WIN-2 in StepProperty, Witness_Prune; lean: Window.lean pruned_terminal, pruned_notFound; prolog: verification/props.pl on MC-1's window and window1 universes (NotFound on the pruned id) and every MC-2 call (trace 207); near-tests: tests/shell.rs sh9_pruned_ids_are_not_found_and_pages_are_by_id; sandbox: RT-WINDOW", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "CI kani job: h_step_dispatch_post, h_step_ack_post, h_step_pause_post; local record: h_full_256_prune, h_step_submit_post, h_step_cancel_post, h_step_settle_post, h_step_observe_post", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "A pruned record was terminal when it was pruned, and its id is NotFound for dispatch, acknowledge, cancel, settle and record, which change nothing; ids are never reused" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.4: invariants. Section 5 lists tla first, so TLC is
+# primary: each invariant on its own INVARIANT line of every MC cfg
+# (MC_Safety, MC_Cap, MC_Recovery, MC_F2b) and Inv on every TraceCheck
+# state of the 216 traces; these rows are in-progress on the v1.1.0 runs.
+# Kani is a cross layer here: INV-WF to INV-DEP, INV-RES, INV-VERCAP and
+# WIN-1 by induction over states with at most 3 records and first_id = 0,
+# INV-VER along 2-operation traces from Pool::new (`kani_bound`). Inv
+# omits INV-HEALTHY (it enumerates outcome combinations), so TraceCheck
+# does not check that one. Lean proves the conjunction Inv (with INV-RES,
+# INV-VERCAP, WIN-1 and WIN-2) at every size (inv_init, inv_step,
+# reach_inv) and INV-HEALTHY as Live.lean healthy; Prolog checks each
+# invariant on MC-1's seven universes and the real core's trace states.
+# ---------------------------------------------------------------------------
+[modules.invariants]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/Props.tla"
+lean_model = "lean/PoolLean/Inv.lean"
+prolog_requirements = "prolog/verification/props.pl"
+
+  [modules.invariants.properties]
+  INV-WF = { id = "INV-WF", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-WF (InvWF in every MC cfg: MC_Safety 435,342 distinct views, MC_Cap, MC_Recovery, MC_F2b; Inv on every TraceCheck state, 216 traces; mutant t38); lean: Inv.lean reach_inv (WF, with WIN-1 and WIN-2); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; kani: h_step_<op>_inv (2 records), h_step_<op>_inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction); h_bmc_from_init_po, h_bmc_from_init_s_<op> (2-operation traces from Pool::new)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "Values have length n and are bounded; records[k].id = first_id + k (WIN-1); recipe in range; 1 <= units <= max_units; at most 256 records; one completed_units entry per recipe; config never changes" }
+  INV-LEDGER = { id = "INV-LEDGER", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-LEDGER (InvLedger in every MC cfg, TraceCheck; mutant t36); lean: Inv.lean reach_inv; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; mutant m31; kani: h_step_<op>_inv (2 records), h_step_<op>_inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction); h_bmc_from_init_po, h_bmc_from_init_s_<op> (2-operation traces from Pool::new)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-EXEC", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "values = base + sum of reservations of records with id >= k0 not Cancelled + sum of completions of Completed records with id >= k0, over every issued record (pruned ones through the ghost summary)" }
+  INV-HARD = { id = "INV-HARD", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-HARD (InvHard over the hull, every MC cfg, TraceCheck); lean: Inv.lean hard_of_inv (from reach_inv); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; kani: h_step_<op>_inv (2 records), h_step_<op>_inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction); h_bmc_from_init_po, h_bmc_from_init_s_<op> (2-operation traces from Pool::new)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "The release-aware envelope over the open records is computable and EV_i <= B_i (a corollary of INV-RES and PV_i(values) <= B_i)" }
+  INV-HEALTHY = { id = "INV-HEALTHY", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-HEALTHY (InvOutcomes, an invariant of MC_Safety and the other MC cfgs; TraceCheck checks Inv, which omits it); lean: Live.lean healthy (INV-OUTCOMES: every outcome combination); prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; kani: h_step_<op>_inv (2 records), h_step_<op>_inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction); h_bmc_from_init_po, h_bmc_from_init_s_<op> (2-operation traces from Pool::new)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "B = 0 => every combination of outcomes of the open records (stay open, complete, release) lands in bounds" }
+  INV-DEP = { id = "INV-DEP", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-DEP (InvDep in every MC cfg, TraceCheck; WitStep_PrereqAfterPrune; mutant t37); lean: Inv.lean reach_inv; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; kani: h_step_<op>_inv (2 records), h_step_<op>_inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction); h_bmc_from_init_po, h_bmc_from_init_s_<op> (2-operation traces from Pool::new)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "Every retained record's prerequisites are met by completed_units (monotone)" }
+  INV-VER = { id = "INV-VER", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-VER (InvVer in every MC cfg, TraceCheck); lean: Inv.lean reach_inv; prolog: verification/props.pl on every MC-2 call (216 traces; MC-1's visited key drops the version); kani: h_init_inv, h_init_inv_2, h_bmc_from_init_po, h_bmc_from_init_s_<op> (7)", kani_bound = "the initial pool and 2-operation traces from Pool::new (values -3..3, deltas -2..2, max_units <= 2); not part of the induction (the step harnesses' ghost has no count of effective steps)", kani_run = "CI kani job: h_init_inv, h_init_inv_2; local record: h_bmc_from_init_po, h_bmc_from_init_s_submit, h_bmc_from_init_s_dispatch, h_bmc_from_init_s_ack, h_bmc_from_init_s_cancel, h_bmc_from_init_s_settle, h_bmc_from_init_s_pause, h_bmc_from_init_s_observe", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "The version equals the number of effective transitions" }
+  INV-RES = { id = "INV-RES", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-RES (InvRes over the hull, every MC cfg; MC_F2b for the endpoint clause; mutants t32, t33, t46); lean: Inv.lean inv_step/reach_inv (Inv.res), res_close, res_open; Live.lean res_sub; prolog: verification/props.pl, checked on every MC-1 state and edge (seven universes) and every MC-2 call (216 traces); tests/test_model.pl; mutants m21, m22; kani: h_step_<op>_inv, _inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction; checks.rs inv: INV-RES)", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-1", "F-2", "F-2b"], description = "The release-aware envelope over the open records (each may stay open, complete, or release its reservation) is computable, every endpoint within +-1,000,000, and EV_i = PV_i(values) for every metric (upstream findings.rs INV-RES)" }
+  INV-VERCAP = { id = "INV-VERCAP", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla INV-VERCAP (InvVerCap in MC_Cap, TLA-CAP, and the liveness cfgs); lean: Inv.lean inv_step/reach_inv (Inv.vercap), vercap_cap, bump_ok; prolog: MC-1 cap universe (1,834 states) and every MC-2 call; mutants m27, m28; kani: h_step_<op>_inv, _inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction), h_version_cap_<op> (7, at the cap); plain mode cap_walk", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3; h_version_cap_<op>: INV states at version >= VERSION_CAP", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2, h_version_cap_dispatch, h_version_cap_ack, h_version_cap_cancel, h_version_cap_pause, h_version_cap_observe; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_version_cap_submit, h_version_cap_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-5"], description = "version + sum over open records of rem(status) <= u32::MAX, with rem Reserved 3, Dispatched 3, Unknown 2, Active 1, terminal 0; so the plain increment of ack, settle and cancel never overflows" }
+  WIN-1 = { id = "WIN-1", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["lean", "kani", "prolog"], harness = "tla: Props.tla WIN-1 (InvWF: ids relative to firstId, every MC cfg; InvWinVer: firstId + len <= version, MC_Cap; StepProperty: completed_units); lean: Window.lean win1, submit_prunes, envS_win, anyOpen_win; Inv.lean (WF.win, WF.lenVer); prolog: MC-1 window (4,754 states) and window1 (2,186), and every MC-2 call (trace 207); mutant m25; kani: h_step_<op>_inv, _inv_0, _inv_1 and _inv_3 (7 kinds each), h_init_inv, h_init_inv_2 (the induction; checks.rs inv: win and INV-CU), h_full_255, h_full_256, h_full_256_prune", kani_bound = "induction over the step shape and domains: INV in the initial pool (shapes 1/1/2 and 2/2/2) and preserved, with the ghost update, by every step of every kind from INV states with exactly 0, 1, 2 and 3 records and first_id = 0, so in every state reachable from Pool::new with at most 3 records and no prune; 4 or more records, and a prune under INV, not covered (plain mode's window_walk); values Anchored(4), deltas -3..3; h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "CI kani job: h_step_dispatch_inv, h_step_ack_inv, h_step_pause_inv, h_step_observe_inv, h_step_dispatch_inv_0, h_step_ack_inv_0, h_step_cancel_inv_0, h_step_settle_inv_0, h_step_pause_inv_0, h_step_observe_inv_0, h_step_dispatch_inv_1, h_step_ack_inv_1, h_step_cancel_inv_1, h_step_pause_inv_1, h_step_observe_inv_1, h_step_ack_inv_3, h_step_pause_inv_3, h_step_observe_inv_3, h_init_inv, h_init_inv_2; local record: h_step_submit_inv, h_step_cancel_inv, h_step_settle_inv, h_step_submit_inv_0, h_step_submit_inv_1, h_step_settle_inv_1, h_step_submit_inv_3, h_step_dispatch_inv_3, h_step_cancel_inv_3, h_step_settle_inv_3, h_full_255, h_full_256, h_full_256_prune", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-OWNER", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "Window structure: records[k].id = first_id + k, at most 256 records, first_id + len <= version, and completed_units[r] = min(u32::MAX, lifetime Completed units of r) (Kani's INV-CU is tagged WIN-1)" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.5: reads. Kani primary: bounded proofs on the real
+# core (RD-BEST a composition, kani/RESULTS.md deviation 24). The shell half
+# of RD-PREVIEW is tested (near-tests). The core half and RD-BEST are also
+# tested by a differential of the real core against the Prolog model (COV-2:
+# conformance/traces/reads.txt, prolog/tests/test_reads.pl): testing on the
+# recorded states and requests, not proof, recorded in `observed`.
+# ---------------------------------------------------------------------------
+[modules.reads]
+source = "crates/core/src/lib.rs"
+prolog_requirements = "prolog/model/pool_machine.pl"
+
+  [modules.reads.properties]
+  RD-PREVIEW = { id = "RD-PREVIEW", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["difftest", "unit", "prolog"], harness = "kani: h_preview (allowed iff the spec's candidate is Ok; reason, candidate values, before, after and the term strings; no mutation), h_preview_post (allowed and version < u32::MAX => submit Ok with the previewed candidate); near-tests: tests/store_diff.rs (preview view every call), tests/shell.rs sh9_views_and_paging_by_id_through_the_window (the shell's preview equals the core's); prolog: tests/test_reads.pl via verification/reads.pl (COV-2 differential: the real core's preview in conformance/traces/reads.txt, written by conformance/src/main.rs --reads-out, against the model's preview_allowed, first failing submit guard, candidate and energies) and tests/test_model.pl preview_allowed over a request grid (model); conformance: src/main.rs also runs submit on a copy of the pool for every recorded preview and fails on a disagreement", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "local record: h_preview, h_preview_post", observed = "COV-2: 39,627 requests at 1,300 states of the 216 conformance traces (12 at VERSION_CAP or u32::MAX): 0 divergences between the real core's preview (allowed, reason, candidate, before, after) and the Prolog model. 1,785 allowed; 37,842 rejected (paused 4,919, stale 1,998, expired 3,384, snapshot_expired 815, full 26, invalid_recipe 2,202, unauthorized 5,505, invalid_units 13,484, prerequisite 642, arithmetic 61, bounds 3,712, energy 1,094). At the 12 cap states no request is allowed and 30 are refused Arithmetic. submit on a copy agrees with every preview. Model mutant m19 (preview ignores paused) is caught by test_reads only; m28 (submit, and so preview, not gated by VERSION_CAP) gives 180 divergences at the cap states. Reads mutant d02 (the core's preview allows a Paused request) stops the generator: preview and submit disagree on 4,919 requests. Testing, not proof. Not covered: other states and requests, terms_before/terms_after", observed_on = "conformance generator and Scryer Prolog 0.10.0 on 57b3f02; reads.txt sha256 9733bc8f...47700103; prolog/run.sh at a7781c7 and again at 5cf571e, 2026-11-14", depends_on = ["crates/core/src/lib.rs", "crates/contract/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "preview.allowed <=> candidate Ok <=> submit Ok (the version cap is candidate's last check, so no version premise); no mutation, no panic" }
+  RD-BEST = { id = "RD-BEST", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = ["prolog"], harness = "kani: h_best with h_preview, h_step_submit_tx, h_step_submit_post and h_energy: a composition (kani/RESULTS.md deviation 24); prolog: tests/test_reads.pl via verification/reads.pl (COV-2 differential: the real core's best_quantity in conformance/traces/reads.txt against the model's best_quantity/4) and tests/test_model.pl best_quantity against brute force on small cases (model)", kani_bound = "h_best: the step configuration with no record, any submit request of the step domain with units <= 7, candidate stubbed by a free Ok or Err per quantity and energy by a free result per call; the min(units, 100) cap and the real candidate and energy (units <= 3) plain mode only", kani_run = "CI kani job: h_best; local record: h_preview, h_step_submit_tx, h_step_submit_post, h_energy", observed = "COV-2: the same 39,627 requests: 0 divergences between the real core's best_quantity and the model's. 6,233 some, 33,394 none, 1,912 above MAX_UNITS. Reads mutant d01 (the core's ties broken to the smaller units, reads.txt regenerated) gives 1,645 divergences; model mutants m18 (same edit) and m20 (request version ignored) are caught, m20 by test_reads only, and m28 at the 12 cap states. Testing, not proof. Not covered: other states and requests", observed_on = "conformance generator and Scryer Prolog 0.10.0 on 57b3f02; reads.txt sha256 9733bc8f...47700103; prolog/run.sh at a7781c7 and again at 5cf571e, 2026-11-14", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], description = "best_quantity is sound and minimal as documented" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.6: liveness.
+# ---------------------------------------------------------------------------
+[modules.liveness]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/MC_Liveness.tla"
+lean_model = "lean/PoolLean/Live.lean"
+
+  [modules.liveness.properties]
+  LIVE-1 = { id = "LIVE-1", status = "in-progress", layer = "lean", evidence = "model-proof", cross = ["tla", "prolog", "unit", "kani"], harness = "lean: Live.lean live1, live1_exec, live1_reach (regression/Live1NoPremise.lean must compile); tla: Props.tla LIVE-1 (an invariant of MC_Safety and every MC cfg); prolog: verification/props.pl (probe LIVE-1) on every MC-1 state (seven universes) and every MC-2 trace state; near-tests: tests/wedge.rs f1_control_without_the_disturbing_observe; kani: h_live_all (settle(executor, id, true) Ok for every in-flight record, with no premise on the base or the version), h_wedge_healthy (in the F-2 states)", kani_bound = "the step configuration with exactly 3 records (two others may be open), no premise on B or the version (h_live_all); values Anchored(4), deltas -3..3", kani_run = "local record: h_live_all, h_wedge_healthy", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "INV => settle(executor, id, true) is Ok for every Dispatched, Active or Unknown record (a corollary of LIVE-ALL; v1.0.0 needed B = 0 and version < u32::MAX)" }
+  # v1.0.0: FALSE (F-1 after a disturbing observe, F-2 in a healthy state),
+  # so unverified while its counterexample witnesses passed. v1.1.0: holds
+  # in every liveness cfg (TLA-LIVE-1, TLA-LIVE-F1, TLA-LIVE-F2) and in
+  # MC-1; the witnesses are inverted (section 12), not deleted.
+  LIVE-2 = { id = "LIVE-2", status = "in-progress", layer = "tla", evidence = "model-check", cross = ["prolog", "unit", "difftest", "sandbox"], harness = "tla: MC_Liveness.tla LIVE-2: MC_Liveness (7,856 distinct) and MC_Liveness_F2Done (5,202) on the completion path, MC_Liveness_F1 (7,918; disturbing observes) and MC_Liveness_F2 (5,202; weak fairness of the honest settle(false) and of cancel) all hold (v1.0.0: F1 and F2 violated); MC_Liveness_Unfair violated, as required; prolog: tests/test_mc1.pl (no dead record in wedge, healthy, cap, f2b; no release-blocked state in reliance; v1.0.0: 228 dead, 150 blocked); near-tests: tests/wedge.rs f1_hedge_is_refused_through_the_shell, tests/traces.rs (traces 0 and 209 refuse the hedges on the real core); sandbox: RT-WEDGE (rt_wedge_f1_refused_and_cure_settles, rt_wedge_f2_honest_release_after_the_hedge); kani (witnesses of F-1 and F-2, not LIVE-2): h_wedge covers F-1 from Pool::new (a configuration of the step shape, values -4..4, fixed roles), h_wedge_healthy covers F-2 from constructed healthy INV states, whose reachability from Pool::new Kani does not show", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-EXEC", "ASM-INTERLEAVE", "ASM-TIME", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-1", "F-2"], description = "Every dispatched record eventually becomes terminal under executor fairness to either outcome, and in the F-2 universe under fairness of the honest settle(false) and of cancel (v1.1.0: must hold)" }
+  LIVE-ALL = { id = "LIVE-ALL", status = "in-progress", layer = "lean", evidence = "model-proof", cross = ["tla", "kani", "prolog", "unit", "difftest"], harness = "lean: Live.lean live_all, live_all_reach, no_wedge; tla: Props.tla LiveAll and NoWedge, invariants of MC_Safety, MC_Cap, MC_Recovery, MC_F2b and the liveness cfgs (CreditHedgeConfig included); prolog: verification/props.pl (probe LIVE-ALL) on every MC-1 state (seven universes) and every MC-2 call (216 traces); mutants m15, m21, m22; near-tests: LIVE-ALL at the shell in tests/shell.rs, tests/store_diff.rs and tests/traces.rs; kani: h_live_all (3 records, two others may be open; no premise on the base or the version), h_wedge (F-1 fixed, from Pool::new), h_wedge_healthy (F-2 fixed), h_version_cap_<op> (near the cap)", kani_bound = "h_live_all: the step configuration with exactly 3 records, values Anchored(4), deltas -3..3, no premise on B or the version; h_wedge: one exit call after the dispatched hedge, from Pool::new; h_version_cap_<op>: INV states at version >= VERSION_CAP", kani_run = "CI kani job: h_version_cap_dispatch, h_version_cap_ack, h_version_cap_cancel, h_version_cap_pause, h_version_cap_observe; local record: h_live_all, h_wedge, h_wedge_healthy, h_version_cap_submit, h_version_cap_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-1", "F-2", "F-2b", "F-5"], description = "INV => for every open record: if Reserved, cancel by its actor and by the owner are Ok; if Dispatched, Unknown or Active, settle(executor, id, true) and settle(executor, id, false) are Ok; none raises a metric's violation. No premise on B or the version (upstream findings.rs assert_live)" }
+  WIN-ESC = { id = "WIN-ESC", status = "in-progress", layer = "lean", evidence = "model-proof", cross = ["tla", "kani", "prolog"], harness = "lean: Window.lean full_iff_front_open, submit_not_full_of_front_terminal, win_esc; tla: Props.tla WinEsc (every MC cfg; Witness_FullOpenFront; mutant t35); prolog: probe WIN-ESC on MC-1's window and window1 universes and every MC-2 call (trace 207); mutant m24; kani: h_full_255, h_full_256, h_full_256_prune (Full iff 256 records and an open front; with a terminal front the submit prunes it)", kani_bound = "h_full_*: 255 or 256 records, one constant array (h_full_256_prune: a terminal front, first_id = 1)", kani_run = "local record: h_full_255, h_full_256, h_full_256_prune", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "Full <=> 256 records retained and records[0] open. From every INV state with 256 retained and an open front, one call by the front's resolver (LIVE-ALL) makes it terminal, after which a valid submit does not fail Full" }
+  REFRESH-1 = { id = "REFRESH-1", status = "in-progress", layer = "lean", evidence = "model-proof", cross = ["tla", "kani", "prolog"], harness = "lean: Calls.lean refresh_ok; Witness.lean refresh_instance; tla: Props.tla RefreshAlways (every MC cfg; WitStep_Refresh; mutant t45); prolog: probe REFRESH-1 on every MC-1 state and every MC-2 call (trace 211); mutant m29; kani: h_step_observe_tx (below the cap the owner's observe of the current values is Ok, open records included), h_wedge (F-1 fixed)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records and first_id = 0, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared", kani_run = "CI kani job: h_step_observe_tx; local record: h_wedge", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-6"], description = "Version below VERSION_CAP => the owner's observe of the current values is Ok in every reachable state, open records included (F-6 fixed)" }
+  WIN-LIVE = { id = "WIN-LIVE", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "tla: MC_Liveness_Win.cfg (WinLive, MaxRecords 1: 1,868 distinct) and MC_Liveness_Win2.cfg (MaxRecords 2: 8,228 distinct; ~WinFull is violated at state 4, so not vacuous), weak fairness of the front record's resolver; v1.0.0: WinLive violated (tla/RESULTS.md, v1.0.0 evidence)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-INTERLEAVE", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "[](Full => <>~Full) under weak fairness of the front record's resolver (its cancel and settle)" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.7: contract shell, mocked runtime (near-tests/), on
+# the host path and the documented build (scripts/build.sh, --cfg near);
+# the no-cfg build is only NT-F1's negative control. shell.rs is `unit`,
+# store_diff.rs and traces.rs are `difftest`, wasm-surface.sh is
+# `wasm-check`. near-tests/run.sh all at 5cf571e: 38 of 38 tests, SURF-1,
+# SURF-2 and SURF-3 ok, 41 of 41 mutants killed (2026-11-14).
+# ---------------------------------------------------------------------------
+[modules.contract_shell]
+source = "crates/contract/src/lib.rs"
+prolog_requirements = "prolog/requirements/pool_req.pl"
+
+  [modules.contract_shell.properties]
+  SH-1 = { id = "SH-1", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh1_caller_is_the_predecessor_not_the_signer, sh1_now_is_the_block_timestamp_in_whole_seconds; tests/store_diff.rs (15% relayed calls); mutants s02, s10", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRED"], description = "caller = predecessor; now = block time in whole seconds" }
+  SH-2 = { id = "SH-2", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/shell.rs sh2_new_is_private_and_initialises_once; mutant s09", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRIVATE"], description = "new is private and initializes once" }
+  # NT-F4 (fixed by 1d441c5): on_result parses the raw promise result; one
+  # that is not a single JSON string of at most 64 bytes is Unknown.
+  SH-3 = { id = "SH-3", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh3_on_result_is_private, sh3_on_result_maps_the_status_string, sh3_non_string_promise_results_become_unknown (NT-F4 fixed: 16 raw-result cases), sh9_pruned_ids_are_not_found_and_pages_are_by_id (NotFound event); tests/store_diff.rs, tests/traces.rs; mutants s01, s03, s04, s08, s14, s23, s24, s25, s00a", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRIVATE", "ASM-CALLBACK", "ASM-EXEC"], closes = ["NT-F4"], description = "on_result is private; one JSON string result of at most 64 bytes is mapped as documented, and anything else (failed, missing, two results, not a string) is Unknown; an unknown or pruned id is logged with NotFound and changes nothing" }
+  SH-4 = { id = "SH-4", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh4_rejected_submit_returns_the_decision_and_writes_nothing, sh5_core_errors_are_panics_with_the_error_string (crafted allowed-but-failing submit); tests/store_diff.rs, tests/traces.rs; mutant s13", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], description = "submit = core preview then submit; a rejected submit writes nothing" }
+  # NT-F1 (fixed by effd174): scripts/build.sh builds with --cfg near and
+  # refuses a wasm that does not import panic_utf8 (SURF-3(b)); every
+  # failure carries its message.
+  SH-5 = { id = "SH-5", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest", "wasm-check"], harness = "near-tests/tests/shell.rs sh5_core_errors_are_panics_with_the_error_string (incl. the crafted first_id = u32::MAX submit), nt_f1_documented_build_reports_every_panic_message (NT-F1 fixed); tests/store_diff.rs, tests/traces.rs; near-tests/wasm-surface.sh SURF-1, SURF-3 (build.sh refuses a wasm without panic_utf8); mutants s07, s13, s14, s25", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "scripts/build.sh", "Cargo.lock"], assumptions = ["ASM-ATOMIC"], closes = ["NT-F1"], description = "A core Err panics with exactly the error string and changes nothing, on scripts/build.sh's output (--cfg near); the no-cfg control build must fail it (SURF-3)" }
+  SH-6 = { id = "SH-6", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh6_dispatch_promise_shape, sh9_pruned_ids_are_not_found_and_pages_are_by_id; tests/store_diff.rs; tests/executor.rs ex5_end_to_end_normal_reject_unknown_panic; mutants s11, s27, s28", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], description = "dispatch promise shape: promise_create of execute{id,recipe,units} to the executor, 30 Tgas, then promise_then(on_result, 30 Tgas) and promise_return, no deposit" }
+  SH-7 = { id = "SH-7", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh7_reconcile_guard_and_promise_shape; tests/store_diff.rs; tests/executor.rs ex5_end_to_end_normal_reject_unknown_panic; mutants s05, s15, s28", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], description = "reconcile guard and promise shape: rejects a deposit, NotFound for an unknown or pruned id; status{id} 10 Tgas, then on_result, by anyone, no state write" }
+  SH-8 = { id = "SH-8", status = "in-progress", layer = "difftest", evidence = "test", cross = [], harness = "near-tests/tests/store_diff.rs sh8_store_diff_host (2,000 x 40 calls), sh8_store_diff_wasm (300 x 40, documented build), sh8_store_diff_window (4 host + 1 wasm x 1,500 calls past the window); tests/traces.rs conformance_traces_through_the_shell (216 traces, 8,865 calls x host + documented build)", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], description = "Borsh state round trip (with first_id and completed_units, windows past 256 records): the shell equals the core, with a reload before every call" }
+  SH-9 = { id = "SH-9", status = "in-progress", layer = "unit", evidence = "test", cross = ["difftest"], harness = "near-tests/tests/shell.rs sh9_views_and_paging_by_id_through_the_window, sh9_pruned_ids_are_not_found_and_pages_are_by_id; tests/store_diff.rs; mutants s06, s26", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["F-3"], description = "Views: get_pool; get_commitments(from, limit) with from an id (below first_id it starts at the oldest retained record), pages of at most 50" }
+  # NT-F2 (fixed by 1d441c5): reconcile require!s a zero deposit, so every
+  # mutating method is nonpayable, as api:3 says.
+  SH-10 = { id = "SH-10", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/shell.rs sh10_mutating_methods_reject_attached_deposits, nt_f2_reconcile_rejects_an_attached_deposit (NT-F2 fixed); mutants s12, s22, s00a", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["NT-F2"], description = "Every mutating method, reconcile included, rejects deposits (NT-F2 fixed)" }
+  # NT-F3 (fixed by 3598902): low-level promises and build.sh's import
+  # allowlist; SURF-2 passes, so S-NOADMIN's funds-transfer and plugin
+  # clauses rest on SH-12 (the import surface), not on source review.
+  SH-11 = { id = "SH-11", status = "in-progress", layer = "wasm-check", evidence = "check", cross = [], harness = "near-tests/wasm-surface.sh SURF-1 vs wasm-surface.expected (the documented build; near-tests/run.sh surface)", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["NT-F1", "NT-F3"], description = "Export surface of scripts/build.sh's wasm: pool_contract exports exactly the 12 documented methods plus contract_source_metadata and memory (14), and pool_executor its 8 methods (with on_settled) plus the same two (10); no upgrade, migrate or reset export" }
+  SH-12 = { id = "SH-12", status = "in-progress", layer = "wasm-check", evidence = "check", cross = [], harness = "near-tests/wasm-surface.sh SURF-2 (no forbidden import, must pass), SURF-3(a) (imports == build.sh ALLOWED: contract 18, executor 16; build.json hashes == near-tests wasm), SURF-3(b) (build.sh's checker refuses the no-cfg wasm, a transfer import, a yield import); mutants s28, s35, s00a, s00b (FR-11)", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "scripts/build.sh", "Cargo.lock"], assumptions = [], closes = ["NT-F3"], description = "Import surface: both wasm files, as scripts/build.sh builds them, import exactly its allowlist; no deploy, key, transfer, stake, account, global-contract or promise_batch_* import (NT-F3 fixed)" }
+  SCN-1 = { id = "SCN-1", status = "in-progress", layer = "difftest", evidence = "test", cross = [], harness = "near-tests/tests/scenarios.rs scn1_published_scenarios_are_the_core (6 scenarios; config.json and trace.json)", depends_on = ["crates/core/src/lib.rs", "crates/core/src/fixtures.rs", "crates/demo/src/main.rs", "scenarios/friday/trace.json", "scenarios/gpu/trace.json", "scenarios/hiring/trace.json", "scenarios/inventory/trace.json", "scenarios/risk/trace.json", "scenarios/station/trace.json"], assumptions = [], description = "The published scenarios equal the core: for each of the six fixtures, re-deriving the scenario from pool_core (preview, submit, and when allowed dispatch, acknowledge and settle) reproduces scenarios/<name>/trace.json" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.8: the executor (near-tests/tests/executor.rs, host
+# and the documented build, end to end through the receipt router;
+# Executor.tla, TLA-EXEC; the sandbox's RT-WINDOW and RT-D1).
+# ---------------------------------------------------------------------------
+[modules.executor]
+source = "crates/executor/src/lib.rs"
+
+  [modules.executor.properties]
+  EX-1 = { id = "EX-1", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/executor.rs ex1_only_the_lock_executes, ex1_executor_wrappers; mutant s17", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRED"], description = "Only the lock executes" }
+  EX-2 = { id = "EX-2", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/executor.rs ex2_payload_binding_and_dedupe (512-job state), ex6_window_forgets_and_caps, ex6_random_differential_against_the_model; mutants s16, s21", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = [], description = "Payload binding and dedupe: a replay returns the recorded status; another payload fails" }
+  EX-3 = { id = "EX-3", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/executor.rs ex3_only_the_operator_attests, ex6_random_differential_against_the_model; mutant s18", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRED"], description = "Only the operator finishes, confirms or sets the mode" }
+  EX-4 = { id = "EX-4", status = "in-progress", layer = "unit", evidence = "test", cross = [], harness = "near-tests/tests/executor.rs ex4_terminal_conflict_rejected; tests/wedge.rs f1_no_wedge_end_to_end_with_the_executor; mutant s19", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = [], description = "A conflicting terminal outcome is rejected" }
+  EX-5 = { id = "EX-5", status = "in-progress", layer = "unit", evidence = "test", cross = ["sandbox"], harness = "near-tests/tests/executor.rs ex5_notify_calls_lock_settle, ex5_end_to_end_normal_reject_unknown_panic; tests/wedge.rs f1_no_wedge_end_to_end_with_the_executor; mutants s20, s35; sandbox/tests/runtime.rs rt_callback_status_mapping, rt_race_operator_finish_vs_callback, rt_wedge_f1_refused_and_cure_settles, rt_wedge_f2_honest_release_after_the_hedge (the executor's settle and on_settled on the wasm)", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = [], description = "Notify calls lock.settle{id,completed} at 40 Tgas, then on_settled{id} at 10 Tgas" }
+  EX-6 = { id = "EX-6", status = "in-progress", layer = "unit", evidence = "test", cross = ["tla"], harness = "near-tests/tests/executor.rs ex6_window_forgets_and_caps, ex6_window_constants_match_the_lock (WINDOW == MAX_RECORDS, MAX_JOBS >= 2*WINDOW), ex6_random_differential_against_the_model, ex8_on_settled_protocol, ex7_d1_confirmed_failed_executes_stay_within_256; mutants s31, s32a, s32b, s33, s34, s36, s37, s00b (FR-13, FR-14); tla: Executor.tla (TLA-EXEC)", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["F-3"], description = "Executor window: newest is the largest id for which execute created a job or on_settled saw a successful settle; a job is kept iff id + 256 > newest; at most 512 jobs; execute of a forgotten id returns \"cancelled\" and stores nothing; confirm_not_executed of one fails \"stale id\"; execute of a stored id returns its status and moves nothing" }
+  EX-7 = { id = "EX-7", status = "in-progress", layer = "difftest", evidence = "test", cross = ["sandbox", "tla"], harness = "near-tests/tests/executor.rs ex7_d1_confirmed_failed_executes_stay_within_256 (receipt router; EX-7 checked after every transaction), ex6_window_constants_match_the_lock; mutants s34, s00b; sandbox/tests/runtime.rs::rt_window_300_records_through_the_executor, rt_d1_confirmed_failed_executes_keep_256_jobs (Ex7 after every transaction); tla: Executor.tla InvRetainedJob (TLA-EXEC)", depends_on = ["crates/executor/src/lib.rs", "crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-INTERLEAVE"], closes = ["F-3"], description = "Cross-contract (upstream EXEC): the executor never forgets the job of a record the lock retains" }
+  EX-8 = { id = "EX-8", status = "in-progress", layer = "unit", evidence = "test", cross = ["sandbox", "tla"], harness = "near-tests/tests/executor.rs ex8_on_settled_protocol, ex8_callbacks_in_any_order, ex1_executor_wrappers (Method on_settled is private, wasm); mutants s29, s30, s38, s00b; sandbox/tests/runtime.rs::rt_private_new_and_on_result (on_settled private; own key 'not a settle callback'), rt_d1_confirmed_failed_executes_keep_256_jobs (refused settle moves nothing; accepted raises newest); tla: Executor.tla (TLA-EXEC, the model-level part)", depends_on = ["crates/executor/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRIVATE", "ASM-CALLBACK"], closes = ["F-3"], description = "on_settled is private, needs exactly one promise result, and advances newest only when the lock's settle succeeded" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.9: runtime (sandbox/, real wasm on near-sandbox
+# 2.13.4, one shard). One build, upstream scripts/build.sh (--cfg near),
+# with a host pool_core oracle compared after every step; sandbox/run.sh
+# at 8303e07 on the pin, 2026-11-14.
+# ---------------------------------------------------------------------------
+[modules.runtime]
+source = "crates/contract/src/lib.rs"
+prolog_requirements = "prolog/requirements/threat_model.pl"
+
+  [modules.runtime.properties]
+  RT-PRED = { id = "RT-PRED", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_pred_relay_is_the_caller", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRED"], description = "Calls through a relay are attributed to the relay" }
+  RT-PRIVATE = { id = "RT-PRIVATE", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_private_new_and_on_result", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-PRIVATE"], description = "new, on_result and the executor's on_settled reject foreign callers; on the pool's own key on_result is Ok with outcome unknown (no promise result) and changes nothing; on_settled on the executor's own key fails 'not a settle callback'" }
+  RT-CALLBACK = { id = "RT-CALLBACK", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_callback_status_mapping, rt_callback_non_string_executor_results", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-CALLBACK", "ASM-EXEC"], closes = ["NT-F4"], description = "execute panic -> Unknown; 'cancelled' -> Cancelled and released; 'active' -> Active; 'unknown' -> Unknown; a non-string result (the number 5, a 70-byte string) -> Unknown (NT-F4 fixed)" }
+  RT-REVERT = { id = "RT-REVERT", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_revert_core_errors_write_nothing", depends_on = ["crates/contract/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-ATOMIC"], closes = ["NT-F2", "F-5"], description = "A core error leaves storage byte-identical and emits nothing; a 1-yocto reconcile fails 'Method reconcile doesn't accept deposit' (NT-F2 fixed); at VERSION_CAP (patched) set_paused, observe and dispatch fail Arithmetic, preview and submit reject Arithmetic, cancel and finish still resolve the open records (F-5 fixed)" }
+  RT-RACE = { id = "RT-RACE", status = "in-progress", layer = "sandbox", evidence = "test", cross = ["unit"], harness = "sandbox/tests/runtime.rs::rt_race_settle_before_callback, rt_race_executor_key_settles_while_callback_in_flight, rt_race_operator_finish_vs_callback; near-tests/tests/executor.rs ex5_settle_before_callback_is_absorbed (pool side)", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-INTERLEAVE"], description = "Settle before the execute callback; the late ack is ignored. Tested on one shard; the operator's finish cannot overtake the callback there; an accepted finish has three receipts (finish, settle, on_settled) and raises newest" }
+  # Inverted finding witness (section 12): at v1.0.0 it passed while F-1
+  # reproduced on the wasm; at v1.1.0 F-1's hedge is refused and F-2's
+  # honest release is Ok on chain.
+  RT-WEDGE = { id = "RT-WEDGE", status = "in-progress", layer = "sandbox", evidence = "test", cross = ["unit"], harness = "sandbox/tests/runtime.rs::rt_wedge_f1_refused_and_cure_settles, rt_wedge_f2_honest_release_after_the_hedge; near-tests/tests/wedge.rs f1_hedge_is_refused_through_the_shell, f1_no_wedge_end_to_end_with_the_executor (mocked runtime)", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["F-1", "F-2"], description = "F-1 end to end, inverted: the F-1 configuration's hedge is refused on chain; a recovery by completion settles end to end, and the lock and the executor agree. F-1's hedge at [12, 5] is refused Bounds and nothing wedges; the cure-by-completion hedge settles through finish(true) and observe is Ok after. F-2 (risk fixture, Reserved and Unknown forms): the hedge is sized as if the position were released (8 and 7 refused Bounds, 6 admitted), the position's honest release is Ok, and observe is Ok after" }
+  RES-1 = { id = "RES-1", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/resources.rs::res_1_gas_at_max_state, res_1_min_prepaid_gas_and_executor_cap", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = ["ASM-ATOMIC", "ASM-GAS"], description = "Gas at the maximum-size state stays under 300 Tgas, and api.md's documented prepaid gas suffices (executor at 256 and 512 jobs). At the maximum-size state (32 metrics, 64 terms, 32 recipes, 256 open records) every pool receipt is under the 30 Tgas api.md attaches (worst 14.81: a submit with 255 open records). Least whole-Tgas prepaid gas: dispatch 70, reconcile 46, confirm_not_executed (254 jobs) 55, finish 55 (256 jobs) and 56 (512 jobs, the cap), each at least 10 below api.md's attach (100, 60, 70); every smaller amount from 40 Tgas fails out of gas in its first receipt and changes neither contract. Every on_settled < 6 Tgas (max 3.68 at 512 jobs). The largest receipt of submit, cancel, settle, observe and set_paused is at least 10 Tgas below their 30 Tgas attach (margin 15.19). All equal docs/api.md:44-59" }
+  RT-WINDOW = { id = "RT-WINDOW", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_window_300_records_through_the_executor", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["F-3"], description = "F-3 end to end on the real wasm: 300 records through the executor leave first_id 44, 256 records and at most 256 jobs; pruned ids are NotFound for dispatch, reconcile and settle; get_commitments pages across first_id; reconcile, cancel and settle of pruned id 0 are NotFound; the executor's finish(0) 'unknown job', confirm(0) 'stale id'" }
+  RT-D1 = { id = "RT-D1", status = "in-progress", layer = "sandbox", evidence = "test", cross = [], harness = "sandbox/tests/runtime.rs::rt_d1_confirmed_failed_executes_keep_256_jobs", depends_on = ["crates/contract/src/lib.rs", "crates/executor/src/lib.rs", "crates/core/src/lib.rs", "Cargo.lock"], assumptions = [], closes = ["F-3"], description = "The D-1 chain (confirmed failed executes) keeps the executor at 256 jobs or fewer, and never above 512, at upstream's ten checkpoints (300 confirmed failed executes); a refused confirmation keeps its job and moves nothing; a Reserved record confirmed early is cancelled at dispatch and finish(id, false) forgets the oldest job" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.10: requirement checks and Prolog model checks
+# (prolog/run.sh: suites, canaries, PROP tags, 47 of 47 mutants killed;
+# run at a7781c7 and again at 5cf571e).
+# ---------------------------------------------------------------------------
+[modules.requirements]
+source = "docs/spec.md"
+prolog_requirements = "prolog/requirements/pool_req.pl"
+
+  [modules.requirements.properties]
+  C-1 = { id = "C-1", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-1') over extracted/code_facts.pl; tests/test_requirements.pl", depends_on = ["docs/api.md", "docs/spec.md", "crates/core/src/lib.rs", "crates/contract/src/lib.rs"], assumptions = ["ASM-SPEC", "ASM-TOOLS"], description = "Authority matrix: docs = shell attributes and caller sources = core caller checks (12 methods, 6 core caller checks, 17 shell -> core calls, 7 of them reads)" }
+  C-2 = { id = "C-2", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-2') over extracted/code_facts.pl and extracted/tla_facts.pl; tests/test_requirements.pl; mutants c11 (FR-3), c12 (FR-6)", depends_on = ["docs/spec.md", "docs/api.md", "crates/core/src/lib.rs"], assumptions = ["ASM-SPEC", "ASM-TOOLS"], closes = ["div-cancel-terminal-name"], description = "Guard order: docs = code = TLA+ GuardOrder (8 op kinds, 57 guards; the Full and version-cap conditions compared)" }
+  C-3 = { id = "C-3", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-3') over extracted/code_facts.pl, extracted/tla_facts.pl and the traces; tests/test_requirements.pl", depends_on = ["docs/spec.md", "docs/api.md", "crates/core/src/lib.rs"], assumptions = ["ASM-SPEC", "ASM-TOOLS"], closes = ["div-ack-noop-version", "div-cancel-terminal-name"], description = "Lifecycle: docs = code = TLA+ Edges = the traces (v1.1.0: no divergence; 36 rows, 11 edges, all 36 rows observed in the traces; div-ack-noop-version and div-cancel-terminal-name closed)" }
+  C-4 = { id = "C-4", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-4') over extracted/code_facts.pl; tests/test_requirements.pl", depends_on = ["docs/spec.md", "docs/api.md", "docs/verification-handoff.md", "crates/core/src/lib.rs"], assumptions = ["ASM-SPEC", "ASM-TOOLS"], closes = ["F-5"], description = "Constants: docs = code (9 compared, 5 derived, VERSION_CAP = u32::MAX - 768 = 4294966527 included)" }
+  # Inverted finding witness: at v1.0.0 it reproduced F-2 (20 release-search
+  # counterexamples) and F-4 (CASH-SELF-ENFORCED); at v1.1.0 every claim
+  # holds, and code mutant c10 (FR-5) makes it fail.
+  C-5 = { id = "C-5", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-5'); tests/test_requirements.pl (fixture claims on trace configs 1-5, a two-record release search per fixture: GPU and FRIDAY 1,308 admitted pairs and 10,464 releases each, STOCK 36/288, CASH 28/224, RISK 81/648, 0 blocked); mutant c10 (FR-5)", depends_on = ["docs/spec.md", "docs/verification-handoff.md", "crates/core/src/lib.rs", "crates/core/src/fixtures.rs"], assumptions = ["ASM-SPEC", "ASM-TOOLS"], closes = ["F-2", "F-4"], description = "Fixture conservation (STOCK, CASH, RISK, self-authorization): every claim holds (23 claims; no finding reproduced, F-2 and F-4 fixed)" }
+  C-6 = { id = "C-6", status = "in-progress", layer = "prolog", evidence = "check", cross = [], harness = "verification/consistency.pl c_check('C-6') over requirements/traceability.pl, requirements/threat_model.pl and strategy.md section 5; tests/test_requirements.pl", depends_on = ["docs/spec.md", "docs/api.md", "docs/verification-handoff.md"], assumptions = ["ASM-TOOLS"], description = "Traceability: traceability.pl = strategy.md section 5 (IDs and layer lists: 118 IDs, 118 rows, 118 equal layer lists); 79 requirements and 25 threats traced; findings open 0 / fixed 6, divergences open 0 / closed 4" }
+  MC-1 = { id = "MC-1", status = "in-progress", layer = "prolog", evidence = "model-check", cross = [], harness = "verification/model_check.pl via tests/test_mc1.pl (universes wedge 4,672 states, healthy 5,032, reliance 454, window 4,754, window1 2,186, cap 1,834, f2b 1,776; all complete)", depends_on = ["docs/spec.md", "docs/api.md", "crates/core/src/lib.rs"], assumptions = ["ASM-EXEC", "ASM-MODEL", "ASM-TIME", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-1", "F-2", "F-2b", "F-5"], description = "Small model check of step/4: no INV, step-property or probe violation in seven universes; no dead record (wedge, healthy, cap, f2b), no release-blocked state (reliance); the windowed universes prune and fail Full only on an open front; cap stops the gated calls at VERSION_CAP" }
+  MC-2 = { id = "MC-2", status = "in-progress", layer = "prolog", evidence = "test", cross = [], harness = "verification/mc2.pl via tests/test_mc2.pl", depends_on = ["docs/spec.md", "docs/api.md", "crates/core/src/lib.rs"], assumptions = ["ASM-TOOLS", "ASM-SPEC"], description = "Replay of every trace through step/4: 216 traces, 8,865 calls, 0 divergences; invariants, step properties and probes (LIVE-1, LIVE-ALL, REFRESH-1, WIN-ESC) on the code's own states" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.11: TLA+ (tla/run.sh; 52 of 52 spec mutants killed,
+# 46 core and 6 executor, at a7781c7 and 6b120fd).
+# ---------------------------------------------------------------------------
+[modules.tla_model]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/SharedPool.tla"
+
+  [modules.tla_model.properties]
+  TLA-SAFE = { id = "TLA-SAFE", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "MC_Safety.tla, MC_Safety.cfg (InvMC's invariants, each on its own INVARIANT line, and StepProperty; MaxRecords 2, VIEW); MC_Recovery.cfg (RecoveryConfig); MC_F2b.cfg (F2bConfig, values at +-1e6); MC_Safety_1.cfg (MaxRecords 1; tla/run.sh safety-1, not in the default run)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-2b"], description = "InvMC and StepProperty in every reachable state and step of MC_Safety: 435,342 distinct views (12,091,340 generated), depth 20; MC_Recovery 92,444 distinct, depth 13; MC_F2b 30,904, depth 16; MC_Safety_1 11,222, depth 16" }
+  # Open (OQ-7): Apalache 0.47.2 rejects the model's recursive sums; the
+  # every-size safety result is LEAN-IND.
+  TLA-IND = { id = "TLA-IND", status = "unverified", layer = "tla", evidence = "bounded-proof", cross = [], harness = "tla/run.sh apalache (prints skip; no Apalache model yet)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], blocked_by = "OQ-7", description = "Inv is inductive (Apalache)" }
+  TLA-LIVE-1 = { id = "TLA-LIVE-1", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "MC_Liveness.tla with MC_Liveness.cfg (7,856 distinct) and MC_Liveness_F2Done.cfg (5,202); MC_Liveness_Unfair.cfg must fail and does", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-INTERLEAVE", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "LIVE-2 on the completion path: observes in bounds, executor weakly fair to completing" }
+  # Inverted finding witnesses (section 12): at v1.0.0 MC_Liveness_F1 and
+  # MC_Liveness_F2 were violated, as required, while F-1 and F-2
+  # reproduced; at v1.1.0 both must hold, and do.
+  TLA-LIVE-F1 = { id = "TLA-LIVE-F1", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "MC_Liveness.tla with MC_Liveness_F1.cfg (disturbing observes; 7,918 distinct, holds; v1.0.0: violated, F-1)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-INTERLEAVE", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS"], closes = ["F-1"], description = "LIVE-2 in F-1's setting (disturbing observes, the executor weakly fair to settling either way): holds at v1.1.0, 7,918 distinct states (at v1.0.0 a required violation, F-1)" }
+  TLA-LIVE-F2 = { id = "TLA-LIVE-F2", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "MC_Liveness.tla with MC_Liveness_F2.cfg (CreditHedgeConfig, healthy observations; weak fairness of the honest settle(false) and of cancel; 5,202 distinct, holds; v1.0.0: violated, F-2)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-EXEC", "ASM-INTERLEAVE", "ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS"], closes = ["F-2"], description = "LIVE-2 in F-2's configuration (healthy observations, the executor weakly fair to the honest settle(false) only, callers to cancelling): holds at v1.1.0, 5,202 distinct states (at v1.0.0 a required violation, F-2)" }
+  TLA-WIT = { id = "TLA-WIT", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "Props.tla and MCCommon.tla witnesses, each violated (reachable), as required: on MC_Safety.cfg Witness_Completed, _Prerequisite, _Disturbed, _Prune, _FullOpenFront, _CancelCompletedInvalid, _SubmitRejectedHull, WitStep_CancelledAfterDispatch, _UnknownToActive, _Refresh, _PrereqAfterPrune, _PausedSettle, _PausedAck, _PausedCancel, _PausedObserve; WitStep_Recovery on MC_Recovery.cfg; Witness_EdgeValue and Witness_F2bRefused on MC_F2b.cfg; Witness_AtCap and WitStep_ResolveAtCap on MC_Cap.cfg", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS"], description = "Completed, prerequisite, disturbed, recovery, prune and refresh states and steps are reachable; the wedge is not (NoWedge): 20 witnesses, each reachable (traces of 2-9 states)" }
+  REF-5 = { id = "REF-5", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "TraceCheck.tla, TraceCheck.cfg, trace2tla.py (tla/run.sh trace)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-TOOLS"], description = "The TLA+ model accepts every real-core trace: TraceCheck, 9,081 of 9,081 states (216 traces, 8,865 calls; trace 210's config refused by ValidCfg), Inv and StepProperty on every core state and step" }
+  TLA-CAP = { id = "TLA-CAP", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "MC_Cap.tla, MC_Cap.cfg (Pool::new at VersionCap - 4, MaxRecords 2, no VIEW; InvCapMC: InvMC plus InvVerCap and InvWinVer); Witness_AtCap, WitStep_ResolveAtCap; mutants t40-t44", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-5"], description = "The near-cap harness MC_Cap: from states a few steps below VERSION_CAP, InvMC (with InvVerCap and LiveAll) and StepProperty hold up to u32::MAX: 64,644 distinct states, depth 9" }
+  TLA-EXEC = { id = "TLA-EXEC", status = "in-progress", layer = "tla", evidence = "model-check", cross = [], harness = "Executor.tla, MC_Executor_W2.cfg, MC_Executor_W3.cfg (tla/run.sh executor); 12 witnesses; mutants t49-t54; tla/run.sh executor-w2-fullview (opt-in) cross-checks the VIEW quotient", depends_on = ["crates/executor/src/lib.rs", "crates/contract/src/lib.rs", "crates/core/src/lib.rs"], assumptions = ["ASM-INTERLEAVE", "ASM-MODEL", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-3"], description = "Executor protocol model Executor.tla: the executor's job window against the lock's record window, every receipt in any order (WINDOW 2 and 3, MAX_JOBS = 2*WINDOW): the executor never forgets the job of a record the lock retains (EX-7; checked as InvRetainedJob: a retained record whose execute made a job still has it), and only refused or in-flight confirmations can fill the job cap (InvCapShape). WINDOW 2: 3,880,089 distinct views (depth 33), WINDOW 3: 7,323,777 (depth 30); InvConfSettles at WINDOW 2 only; the job-cap refusal (T-JOBCAP) is reachable and a documented limit" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.12: Lean (lean/run.sh: Lean 4.34.1, 185 s at
+# 6b120fd; axiom audit 65/65, 3 canaries, 1 regression, 26 of 26 mutants
+# killed, 10 property probes). REF-5L is a trace replay, test-class
+# evidence, recorded as lean/model-check because lean allows no `test`
+# (section 12).
+# ---------------------------------------------------------------------------
+[modules.lean_model]
+source = "crates/core/src/lib.rs"
+lean_model = "lean/PoolLean/Machine.lean"
+
+  [modules.lean_model.properties]
+  LEAN-IND = { id = "LEAN-IND", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/Inv.lean inv_init, inv_step, reach_inv, hard_of_inv, bump_ok, remSum_le", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "Inv (INV-WF with WIN-1 and WIN-2, INV-LEDGER, INV-RES, PV <= B, INV-DEP, INV-VER, INV-VERCAP) holds initially and after every call, at every size" }
+  LEAN-STEP = { id = "LEAN-STEP", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/StepProps.lean stepProps, stepProps_step, exec_auth, term1, term1_cancel, stale1_no_replay, version_mono_run", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "Every call from every state satisfies the step properties (TERM-1: cancel of Completed is InvalidState; the prune step)" }
+  LEAN-LIVE1 = { id = "LEAN-LIVE1", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/Live.lean live1, live1_exec, live1_reach; regression/Live1NoPremise.lean must compile", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "LIVE-1 at every size, now without B = 0 and version < u32::MAX (a corollary of LIVE-ALL)" }
+  # Inverted finding witness (strategy.md section 12): v1.0.0's f1_forever
+  # is now f1_rejected, with f2_rejected, self_executor_invalid,
+  # cap_instance and refresh_instance.
+  LEAN-WIT = { id = "LEAN-WIT", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/Witness.lean (f1_rejected, res_needed, f2_rejected, self_executor_invalid, cap_instance, refresh_instance and the healthy-side instances)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS"], closes = ["F-1", "F-2", "F-4", "F-5", "F-6"], description = "Inverted: the F-1 and F-2 hedges are refused (f1_rejected, f2_rejected), with healthy-side and recovery non-vacuity; F-4 (self_executor_invalid), F-5 (cap_instance, cap_drain) and F-6 (refresh_instance) fixed; INV-RES necessary (res_needed)" }
+  REF-5L = { id = "REF-5L", status = "in-progress", layer = "lean", evidence = "model-check", cross = [], harness = "lean/run.sh replay (pool-lean replay, Main.lean). A replay of the 216 traces: test-class evidence (strategy.md section 5.12 says tested), recorded as model-check because layer lean allows no test (strategy.md section 12)", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-TOOLS"], description = "The Lean machine agrees with the real core on every trace: 216 traces (1 refused at init), 8,865 calls (2,565 Ok), every result and post-state equal (window, first_id, completed_units)" }
+  LEAN-GUARD = { id = "LEAN-GUARD", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/Guard.lean Guard.guards_order, Guard.outcome_mem; Guards.lean (pool-lean-guards) prints the guard table", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], description = "Each call's guard list is the code's order: checked against lib.rs at the pin and the extracted code_events, and equal to the v1.1.0 guard table (guard/5) for all eight call kinds once the sites of decision c2-unreachable are dropped" }
+  LEAN-LIVE-ALL = { id = "LEAN-LIVE-ALL", status = "in-progress", layer = "lean", evidence = "model-proof", cross = [], harness = "PoolLean/Live.lean res_sub, close_ok, live_all, live_all_reach, no_wedge; canary/LiveAllNoRes.lean must fail to compile", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-LEAN-TLA", "ASM-TOOLS", "ASM-SPEC"], closes = ["F-1", "F-2"], description = "LIVE-ALL at every size, no premise beyond Valid and Inv" }
+
+# ---------------------------------------------------------------------------
+# strategy.md section 5.13: Kani refinement links (strategy.md section 17.2).
+# Bounded proofs within the step bounds (h_ref_<op>) that one call of the
+# real core refines tla/SharedPool.tla as transcribed in kani/src/tla.rs;
+# plain mode checks the same on every call of the 216 traces (tests), and
+# with prunes and the ghost fold in checked_step (window_walk).
+# ---------------------------------------------------------------------------
+[modules.kani_refinement]
+source = "crates/core/src/lib.rs"
+tla_model = "tla/SharedPool.tla"
+
+  [modules.kani_refinement.properties]
+  REF-1 = { id = "REF-1", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = [], harness = "kani: h_ref_submit, h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_settle, h_ref_pause, h_ref_observe (checks.rs step_ref against tla.rs, the v1.1.0 hand transcription of tla/SharedPool.tla; the 43 ref covers, every operator value the step domain reaches, SATISFIED; Full needs 256 records and is reached on the traces only; mutant 31, a transcription error, killed by h_ref_cancel); plain mode: the step tests, h_version_max, h_bmc_from_init (depth 5), checked_step (window_walk, cap_walk and the f-tests: REF with prunes, and the ghost fold) and conform.rs h_ref_traces (all 216 traces, 8,865 calls)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; TLA+ image TK (2 metrics, 2 terms, 2 recipes, 2 requirements, 4 records)", kani_run = "CI kani job: h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_pause, h_ref_observe; local record: h_ref_submit, h_ref_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS"], description = "Guard exactness: the core's error is the TLA+ error operator's, so Ok exactly when the action is enabled" }
+  REF-2 = { id = "REF-2", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = [], harness = "kani: h_ref_submit, h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_settle, h_ref_pause, h_ref_observe (checks.rs step_ref against tla.rs, the v1.1.0 hand transcription of tla/SharedPool.tla; the 43 ref covers, every operator value the step domain reaches, SATISFIED; Full needs 256 records and is reached on the traces only; mutant 31, a transcription error, killed by h_ref_cancel); plain mode: the step tests, h_version_max, h_bmc_from_init (depth 5), checked_step (window_walk, cap_walk and the f-tests: REF with prunes, and the ghost fold) and conform.rs h_ref_traces (all 216 traces, 8,865 calls)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; TLA+ image TK (2 metrics, 2 terms, 2 recipes, 2 requirements, 4 records)", kani_run = "CI kani job: h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_pause, h_ref_observe; local record: h_ref_submit, h_ref_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS"], description = "Effect exactness: on Ok, the abstraction of the post-state is the TLA+ action's post-state" }
+  REF-3 = { id = "REF-3", status = "in-progress", layer = "kani", evidence = "bounded-proof", cross = [], harness = "kani: h_ref_submit, h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_settle, h_ref_pause, h_ref_observe (checks.rs step_ref against tla.rs, the v1.1.0 hand transcription of tla/SharedPool.tla; the 43 ref covers, every operator value the step domain reaches, SATISFIED; Full needs 256 records and is reached on the traces only; mutant 31, a transcription error, killed by h_ref_cancel); plain mode: the step tests, h_version_max, h_bmc_from_init (depth 5), checked_step (window_walk, cap_walk and the f-tests: REF with prunes, and the ghost fold) and conform.rs h_ref_traces (all 216 traces, 8,865 calls)", kani_bound = "step shape (1 metric, 1 term, 2 recipes), INV pre-state with exactly 2 records, values Anchored(4) (-1e6, 0, 1e6, each +-4), deltas -3..3, max_units 1..3, weights 1, 2 or 1000, accounts o_, a1, x1, z_ in every role; time, version and expiry arguments free; recipe, units and ids narrow where they are only compared; TLA+ image TK (2 metrics, 2 terms, 2 recipes, 2 requirements, 4 records)", kani_run = "CI kani job: h_ref_dispatch, h_ref_ack, h_ref_cancel, h_ref_pause, h_ref_observe; local record: h_ref_submit, h_ref_settle", depends_on = ["crates/core/src/lib.rs"], assumptions = ["ASM-MODEL", "ASM-TOOLS"], description = "Rejected and idempotent calls stutter in the model" }
+
+# ---------------------------------------------------------------------------
+# Findings (plan-meta section 4; strategy.md section 4). One table per v1.0.0
+# finding and closed docs-vs-code divergence, and the rejected L-1b.
+# found_in v1.0.0 is strategy.md section 4 at a072a2d; `fix` lists upstream
+# PR #4 commits; `hunks` are crates/core/src/lib.rs at the pin unless
+# another file is named. `closed_by` lists the rows whose `closes` names the
+# finding (status-lint checks both directions, and that a closed finding has
+# at least one row at in-progress or above). Kani's fix-revert verdicts
+# (N1-N14 = mutants 32-45) are kani/RESULTS.md's Mutants table: plain mode
+# kills each in CI's mutants job; under Kani, the local record holds the
+# large ones that ran, kani-mutants (manual runs) the hosted ones, and
+# kani/local/not-run.tsv declares the large ones not run at v1.1.0.
+
+[findings.F-1]
+kind = "core"
+severity = "high"
+title = "Disturbed-state hedge wedge: after an observe outside [min, max], a hedge whose reservation cured a metric and whose completion re-violated it was admitted; then both settles failed Bounds and cancel and observe failed Pending, forever (trace 0)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["59e404f"]
+hunks = "H5, the release-aware envelope (:216-228); H6, check_bounds against the violation now and after the reservation (:258-261)"
+closed_by = ["INV-RES", "LIVE-2", "LIVE-ALL", "RT-WEDGE", "MC-1", "TLA-LIVE-F1", "LEAN-WIT", "LEAN-LIVE-ALL"]
+regression = "v1.0.0: trace 0 ok(0), then both settles Bounds; TLC Witness_Wedge and MC_Liveness_F1 violated; Lean f1_forever; MC-1 wedge 228 dead states; RT-WEDGE reproduced on chain. v1.1.0: trace 0's hedge Bounds; the recovery hedge admitted and settled (traces 214, 215; WitStep_Recovery; Lean recovery_admitted); liveness-f1 holds; Lean f1_rejected; MC-1 wedge 0 dead; rt_wedge_f1_refused_and_cure_settles. FR-1 (t33, l18, m22) and FR-2 (t32, l17, m21) killed; Kani N1 not run under Kani at v1.1.0 (not-run.tsv), N2 not run under Kani at v1.1.0 (not-run.tsv)"
+note = "Also closes div-F1-inverse (spec@v1.0.0:46, handoff@v1.0.0:31), which has no table of its own"
+
+[findings.F-2]
+kind = "core"
+severity = "high"
+title = "Healthy-state release wedge in the risk fixture: a hedge admitted on the strength of an unexecuted position's reservation made the position's honest settle(false) fail Bounds (trace 209)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["59e404f"]
+hunks = "H5 (the release term x = -reserve*u, each endpoint within +-10^6), H6"
+closed_by = ["INV-RES", "LIVE-2", "LIVE-ALL", "RT-WEDGE", "C-5", "MC-1", "TLA-LIVE-F2", "LEAN-WIT", "LEAN-LIVE-ALL"]
+regression = "v1.0.0: C-5 20 counterexamples in risk; MC-1 reliance 150 release-blocked states; MC_Liveness_F2 violated. v1.1.0: trace 209's hedge refused (test_model: 7 units Bounds, 6 Ok, then the position's release Ok); C-5 0 blocked in every fixture; MC-1 reliance 0 blocked; liveness-f2 holds; Lean f2_rejected; rt_wedge_f2_honest_release_after_the_hedge. FR-2 (t32, l17, m21) and FR-1 killed; Kani N1 not run under Kani at v1.1.0 (not-run.tsv)"
+note = "Also closes div-F2-fixture-release (spec@v1.0.0:46), which has no table of its own"
+
+[findings.F-2b]
+kind = "core"
+severity = "high"
+title = "Part of F-2: a release could leave +-1,000,000 and fail Arithmetic (trace 208)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["59e404f"]
+hunks = "H5 (each envelope endpoint within +-10^6)"
+closed_by = ["NUM-2", "INV-RES", "LIVE-ALL", "MC-1", "TLA-SAFE"]
+regression = "v1.0.0: trace 208's release Arithmetic. v1.1.0: the release term's endpoint refused at admission (trace 208, MC-1 f2b, TLC Witness_F2bRefused in MC_F2b); FR-2's F-2b part (t34, m23) killed"
+
+[findings.F-3]
+kind = "core"
+severity = "low"
+title = "Lifetime slot exhaustion: 256 lifetime records, then Full for every actor, forever (trace 207)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["1f01d43", "4d69f19"]
+hunks = "H2, H4, H7, H8, H10, H11, H14 (Full only with an open front, :287; prune and first_id + 1, :370; prerequisites read completed_units, :301-305, :519); the executor window (4d69f19)"
+closed_by = ["DEP-1", "WIN-2", "INV-DEP", "WIN-1", "WIN-ESC", "WIN-LIVE", "SH-9", "EX-6", "EX-7", "EX-8", "RT-WINDOW", "RT-D1", "TLA-EXEC"]
+regression = "v1.0.0: trace 207 ends full twice; TLC WinLive violated on the v1.0.0 model (a072a2d); the v1.0.0 executor (s00b) fails \"full\" at job 257. v1.1.0: trace 207 prunes three records (ok(256), ok(257) on a pruned prerequisite, Full on an open front, NotFound on id 0); liveness-win and liveness-win2 hold; MC-1 window, window1; Lean win_esc, dep1_iff; RT-WINDOW (300 records, first_id 44); RT-D1. FR-3, FR-4, FR-13, FR-14 killed (TLA+, Lean, Prolog, near-tests); Kani N5 not run under Kani at v1.1.0 (not-run.tsv), N9 not run under Kani at v1.1.0 (not-run.tsv), N10 not run under Kani at v1.1.0 (not-run.tsv), N11 not run under Kani at v1.1.0 (not-run.tsv), N12 under Kani in CI's manual kani-mutants, N13 not run under Kani at v1.1.0 (not-run.tsv)"
+note = "Head-of-line Full with an open front is a documented limit, not a finding (strategy.md section 4.6; ASM-EXEC)"
+
+[findings.F-4]
+kind = "core"
+severity = "low"
+title = "A principal could attest its own work: validate accepted a recipe whose actor is its executor (trace 210)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["dc774f8"]
+hunks = "H3 (:130)"
+closed_by = ["CFG-2", "AUTH-1", "C-5", "LEAN-WIT"]
+regression = "v1.0.0: trace 210 accepted; code_role_checks(validate, []). v1.1.0: trace 210 is init_error(invalid_config) in the core and every replayer; Lean self_executor_invalid; C-5 CASH-SELF-ENFORCED passes. FR-5 (t39, l22, c10) killed; Kani N6 not run under Kani at v1.1.0 (not-run.tsv)"
+note = "The owner may still be a recipe's executor: a documented limit (amb-owner-roles, ASM-OWNER)"
+
+[findings.F-5]
+kind = "core"
+severity = "low"
+title = "Version saturation: at version u32::MAX every transition failed Arithmetic, settling in-flight records included"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["da43188"]
+hunks = "H1 (VERSION_CAP), H9 (the cap is candidate's last check), H12 (bump_new in dispatch, set_paused and observe; :401, :319-321, :526)"
+closed_by = ["VER-CAP", "INV-VERCAP", "LIVE-ALL", "RT-REVERT", "C-4", "MC-1", "TLA-CAP", "LEAN-WIT"]
+regression = "v1.0.0: Prolog \"F-5 witness\"; Lean mutant 04; Kani h_version_max_*. v1.1.0: Lean cap_reach, cap_instance, cap_drain; TLC MC_Cap; MC-1 cap; test_model \"F-5 fixed\" at 4,294,966,527; RT-REVERT at a patched VERSION_CAP; COV-2 at the 12 reads states at or above the cap. FR-6 (t40-t44, l23, m27, m28, c12) killed; Kani N3 under Kani in CI's manual kani-mutants, N4 not run under Kani at v1.1.0 (not-run.tsv) (FR-6) and N14 not run under Kani at v1.1.0 (not-run.tsv) (FR-6b)"
+
+[findings.F-6]
+kind = "core"
+severity = "low"
+title = "An open record blocked the only snapshot refresh: observe was Pending with any record open, so with max_age > 0 one long-open record froze admission (trace 211)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["3eaf1cb"]
+hunks = "H15 (:538-540)"
+closed_by = ["OBS-1", "OBS-2", "REFRESH-1", "LEAN-WIT"]
+regression = "v1.0.0: trace 211 Pending; TLC REFRESH-1 violated on a072a2d. v1.1.0: trace 211's refresh Ok with record 0 Active, then submit Ok; Lean refresh_ok, refresh_instance; TLC REFRESH-1 and WitStep_Refresh; MC-1 REFRESH-1 and OBS-2 on every state and edge. FR-7 (t45, t46, t47, l24, l26, m29, m30, m31) killed; Kani N7 under Kani in CI's manual kani-mutants"
+
+[findings.NT-F1]
+kind = "build"
+severity = "medium (diagnostics, not safety)"
+title = "The documented build omitted --cfg near, so near-sdk dropped every panic message (a bare unreachable trap) and a caller could not tell Pending from Bounds (= SB-1)"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["effd174"]
+hunks = "scripts/build.sh: RUSTFLAGS=\"--cfg near\" (:9) and the panic_utf8 refusal (:77-78)"
+closed_by = ["SH-5", "SH-11"]
+regression = "v1.0.0: nt_f1_upstream_build_drops_every_panic_message; sandbox sb1_upstream_build_loses_panic_messages. v1.1.0: nt_f1_documented_build_reports_every_panic_message; sandbox sb1_documented_build_reports_panic_messages; SURF-3: build.sh's own checker refuses the no-cfg wasm (FR-12, the negative control)"
+
+[findings.NT-F2]
+kind = "shell"
+severity = "low"
+title = "reconcile (&self) accepted and kept an attached deposit"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["1d441c5"]
+hunks = "crates/contract/src/lib.rs reconcile: an explicit zero-deposit require! (:93-98)"
+closed_by = ["SH-10", "RT-REVERT"]
+regression = "v1.0.0: nt_f2_reconcile_accepts_and_keeps_an_attached_deposit. v1.1.0: nt_f2_reconcile_rejects_an_attached_deposit; on chain a 1-yocto reconcile fails \"Method reconcile doesn't accept deposit\" (RT-REVERT). FR-9 (s22, s00a) killed"
+
+[findings.NT-F3]
+kind = "shell"
+severity = "informational"
+title = "Both contracts imported 15 host functions that deploy, delete accounts, add keys, transfer, stake, or use gas keys or global contracts, so the import surface could not rule out an escape hatch"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["3598902"]
+hunks = "contract and executor: only promise_create, promise_then and promise_return; scripts/build.sh's import allowlist"
+closed_by = ["SH-11", "SH-12"]
+regression = "v1.0.0: SURF-2 expected-fail with 15 forbidden imports. v1.1.0: SURF-2 passes; each wasm's imports equal build.sh's ALLOWED (contract 18, executor 16). FR-11 (s28, s35, s00a, s00b) killed"
+
+[findings.NT-F4]
+kind = "shell"
+severity = "low"
+title = "A promise result that is not a JSON string made #[callback_result] panic; the record stayed where it was instead of becoming Unknown"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["1d441c5"]
+hunks = "crates/contract/src/lib.rs: on_result (:114) reads the raw promise result (promise_result_checked(0, 64), :118-119)"
+closed_by = ["SH-3", "RT-CALLBACK"]
+regression = "v1.0.0: sh3_non_string_promise_results_fail_the_callback. v1.1.0: sh3_non_string_promise_results_become_unknown; on chain rt_callback_non_string_executor_results. FR-10 (s23, s24, s25, s00a) killed"
+
+[findings.div-ack-noop-version]
+kind = "docs-vs-code"
+severity = "unrated (docs vs code)"
+title = "spec@v1.0.0:39 listed Dispatched/Unknown -> Unknown and api@v1.0.0:26 said every successful transition changes the version; the code returned Ok with no bump"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["138ef98"]
+hunks = "docs only: the docs follow the code (spec:41; api:30)"
+closed_by = ["C-3"]
+regression = "C-3 reports no divergence; TLA+ mutant 07 and Prolog m02 pin the behaviour"
+
+[findings.div-cancel-terminal-name]
+kind = "docs-vs-code"
+severity = "unrated (docs vs code)"
+title = "spec@v1.0.0:43 and api@v1.0.0:15: cancelling a Completed record was rejected with Pending"
+found_in = "v1.0.0"
+status = "closed"
+closed_in = "v1.1.0"
+fix = ["138ef98"]
+hunks = "H13: the code follows the docs, InvalidState (:467-469; spec:43; api:17)"
+closed_by = ["TX-CANCEL", "TERM-1", "C-2", "C-3"]
+regression = "v1.0.0: 18 traces Pending. v1.1.0: InvalidState in the 18 traces with cancel(Completed); C-2 and C-3 report no divergence. FR-8 (t48, l25, m32) killed; Kani N8 under Kani in CI's manual kani-mutants"
+
+[findings.L-1b]
+kind = "claim"
+severity = "none"
+title = "In a disturbed state, a reservation that cured the violation cannot be cancelled by the actor or the owner, and the executor's settle(false) fails Bounds"
+found_in = "v1.0.0"
+status = "rejected"
+closed_by = []
+note = "Rejected at v1.0.0 as documented behaviour (spec@v1.0.0:41-42 made cancel and nonexecution a checked inverse; spec@v1.0.0:46: no forced administrative release; strategy.md section 4.8). Moot at v1.1.0: a reservation never changes a metric's violation amount (spec:25, handoff:32), and LIVE-ALL makes the cancel and both settles Ok in every reachable state"

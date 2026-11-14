@@ -1,0 +1,13 @@
+# killed-by: h_step_submit_tx
+# candidate: recovery accepts a completion that does not decrease energy (>= became >)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -312,7 +312,7 @@
+             return Err(Error::Energy);
+         }
+         if self.violations(&self.values).iter().any(|v| *v > 0)
+-            && self.energy(&add(&next, &r.complete, req.units)?)? >= before
++            && self.energy(&add(&next, &r.complete, req.units)?)? > before
+         {
+             return Err(Error::Energy);
+         }

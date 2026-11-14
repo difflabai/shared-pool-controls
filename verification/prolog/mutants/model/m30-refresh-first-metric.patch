@@ -1,0 +1,16 @@
+# mutant: m30-refresh-first-metric
+# mutates: OBS-1/OBS-2: the restatement test compares the first metric only, so changed values pass as a refresh (FR-7; F-6)
+# expect: test_model observe: owner, all terminal or a restatement
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 window:
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -490,7 +490,7 @@
+ % differ and some record is open; v1.0.0: any open record).
+ holds(observe, all_terminal_or_restate, S, observe(_, Vs, _)) :-
+     pool_values(S, V0),
+-    (   Vs == V0 -> true
++    (   Vs = [X | _], V0 = [X | _] -> true
+     ;   pool_records(S, Rs), \+ ( member(c(_, _, _, St), Rs), open_status(St) )
+     ).
+ holds(observe, bounded_values, S, observe(_, Vs, _)) :-

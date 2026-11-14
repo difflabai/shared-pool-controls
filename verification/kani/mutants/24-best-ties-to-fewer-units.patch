@@ -1,0 +1,13 @@
+# killed-by: h_best
+# best_quantity: ties go to the smaller quantity
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -558,7 +558,7 @@
+                 self.candidate(caller, &req, now)
+                     .ok()
+                     .and_then(|v| self.energy(&v).ok())
+-                    .map(|e| (e, std::cmp::Reverse(units), req))
++                    .map(|e| (e, std::cmp::Reverse(u32::MAX - units), req))
+             })
+             .min_by_key(|(e, u, _)| (*e, *u))
+             .map(|(_, _, r)| r)

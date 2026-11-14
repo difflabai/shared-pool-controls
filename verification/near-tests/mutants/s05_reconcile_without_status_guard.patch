@@ -1,0 +1,22 @@
+Mutant s05_reconcile_without_status_guard: SH-7: reconcile no longer refuses records that are not in flight.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -97,15 +97,6 @@
+             "Method reconcile doesn't accept deposit"
+         );
+         let c = must(self.pool.record(id));
+-        assert!(
+-            matches!(
+-                c.status,
+-                pool_core::Status::Dispatched
+-                    | pool_core::Status::Active
+-                    | pool_core::Status::Unknown
+-            ),
+-            "InvalidState"
+-        );
+         let r = &self.pool.config.recipes[c.recipe as usize];
+         let args = near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap();
+         call_then_callback(&r.executor, "status", &args, Gas::from_tgas(10), id);

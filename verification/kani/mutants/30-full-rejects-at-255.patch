@@ -1,0 +1,14 @@
+# killed-by: h_full_255
+# candidate: the 256th record is refused (Full one record early, with an open
+# front)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -284,7 +284,7 @@
+         }
+         // A full window frees a slot by pruning its oldest record, which must
+         // be terminal.
+-        if self.records.len() >= MAX_RECORDS && open(&self.records[0].status) {
++        if self.records.len() >= MAX_RECORDS - 1 && open(&self.records[0].status) {
+             return Err(Error::Full);
+         }
+         let r = self

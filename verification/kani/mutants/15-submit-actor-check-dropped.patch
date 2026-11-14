@@ -1,0 +1,14 @@
+# killed-by: h_step_submit_tx
+# candidate: caller not checked against the recipe actor
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -292,9 +292,6 @@
+             .recipes
+             .get(req.recipe as usize)
+             .ok_or(Error::InvalidRecipe)?;
+-        if caller != r.actor {
+-            return Err(Error::Unauthorized);
+-        }
+         if req.units == 0 || req.units > r.max_units {
+             return Err(Error::InvalidUnits);
+         }

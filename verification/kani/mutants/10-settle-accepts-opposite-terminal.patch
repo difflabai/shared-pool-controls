@@ -1,0 +1,16 @@
+# killed-by: h_step_settle_tx
+# settle: the opposite terminal outcome is applied (Completed can be released)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -500,10 +500,7 @@
+         {
+             return Ok(());
+         }
+-        if !matches!(
+-            c.status,
+-            Status::Dispatched | Status::Active | Status::Unknown
+-        ) {
++        if c.status == Status::Reserved {
+             return Err(Error::InvalidState);
+         }
+         if !completed {

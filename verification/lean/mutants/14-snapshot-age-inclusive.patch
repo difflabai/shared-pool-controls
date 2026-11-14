@@ -1,0 +1,14 @@
+Lean mutant 14-snapshot-age-inclusive
+The snapshot expires at observed_at + max_age itself (`>` becomes `>=`).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -382,7 +382,7 @@
+ def State.record (s : State) (id : Nat) : Rec := s.records.getD id default
+ 
+ def snapshotOld (cfg : Cfg A) (s : State) (now : Nat) : Bool :=
+-  decide (0 < cfg.maxAge ∧ satAdd s.observedAt cfg.maxAge < now)
++  decide (0 < cfg.maxAge ∧ satAdd s.observedAt cfg.maxAge ≤ now)
+ 
+ /-- `self.records.len() >= MAX_RECORDS && open(&self.records[0].status)`
+ (lib.rs 287): 256 records retained and the oldest one open. -/

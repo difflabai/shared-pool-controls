@@ -1,0 +1,13 @@
+# killed-by: h_step_dispatch_tx
+# dispatch: dispatch at the expiry instant is accepted (>= became >)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -416,7 +416,7 @@
+         if c.status != Status::Reserved {
+             return Err(Error::InvalidState);
+         }
+-        if now >= c.expires_at {
++        if now > c.expires_at {
+             return Err(Error::Expired);
+         }
+         if self.config.max_age_seconds > 0

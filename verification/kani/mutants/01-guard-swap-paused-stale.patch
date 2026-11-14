@@ -1,0 +1,20 @@
+# killed-by: h_step_submit_tx
+# candidate: Stale checked before Paused
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -265,12 +265,12 @@
+         Ok(())
+     }
+     fn candidate(&self, caller: &str, req: &Request, now: u64) -> Result<Vec<i64>, Error> {
+-        if self.paused {
+-            return Err(Error::Paused);
+-        }
+         if req.version != self.version {
+             return Err(Error::Stale);
+         }
++        if self.paused {
++            return Err(Error::Paused);
++        }
+         if req.expires_at <= now || req.expires_at > now.saturating_add(86_400) {
+             return Err(Error::Expired);
+         }

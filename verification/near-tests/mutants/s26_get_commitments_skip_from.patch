@@ -1,0 +1,15 @@
+Mutant s26_get_commitments_skip_from: SH-9: get_commitments skips `from` records, not `from - first_id` (pages by index, not id).
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -58,7 +58,7 @@
+         self.pool
+             .records
+             .iter()
+-            .skip(from.saturating_sub(self.pool.first_id) as usize)
++            .skip(from as usize)
+             .take(limit.min(50) as usize)
+             .cloned()
+             .collect()

@@ -1,0 +1,18 @@
+# checks: safety-1
+# FR-3. The ghost ledger does not fold a pruned record into base (a model
+# fault, not a code one: the ghost sanity check). Must be killed by
+# INV-LEDGER / INV-WF (k0 below the window).
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -399,10 +399,7 @@
+            prune == NR >= MaxRecords
+        IN /\ records' = IF prune THEN Append(Tail(records), new) ELSE Append(records, new)
+           /\ firstId' = IF prune THEN firstId + 1 ELSE firstId
+-          /\ IF prune /\ k0 <= firstId
+-             THEN /\ base' = [m \in MIdx |-> base[m] + Contrib(records[1], m)]
+-                  /\ k0' = firstId + 1
+-             ELSE UNCHANGED <<base, k0>>
++          /\ UNCHANGED <<base, k0>>
+     /\ values' = AddVec(values, Rcp(r).reserve, u)
+     /\ version' = version + 1
+     /\ UNCHANGED <<cfg, observedAt, paused, doneU>>

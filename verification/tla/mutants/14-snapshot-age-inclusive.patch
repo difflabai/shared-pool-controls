@@ -1,0 +1,14 @@
+# checks: trace
+# SnapshotExpired at now = observed_at + max_age.
+# It only rejects more calls, which no property forbids: the traces kill it.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -231,7 +231,7 @@
+ \* bump_new() (U:401-406): the cap, then bump (which cannot fail below it).
+ CapErr == IF version >= VersionCap THEN "Arithmetic" ELSE VerErr
+ 
+-SnapExpired(now) == cfg.maxAge > 0 /\ now > observedAt + cfg.maxAge
++SnapExpired(now) == cfg.maxAge > 0 /\ now >= observedAt + cfg.maxAge
+ 
+ -----------------------------------------------------------------------------
+ (* Guards, in the core's order. GuardOrder lists each entry point's exits  *)

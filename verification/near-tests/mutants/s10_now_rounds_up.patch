@@ -1,0 +1,15 @@
+Mutant s10_now_rounds_up: SH-1: now() rounds the block timestamp up to the next second.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -15,7 +15,7 @@
+ }
+ 
+ fn now() -> u64 {
+-    env::block_timestamp() / 1_000_000_000
++    env::block_timestamp().div_ceil(1_000_000_000)
+ }
+ fn caller() -> String {
+     env::predecessor_account_id().to_string()

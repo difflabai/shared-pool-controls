@@ -1,0 +1,14 @@
+Lean mutant 02-envelope-skip-ignored
+The settle/release envelope counts the record being closed (skip ignored).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -266,7 +266,7 @@
+ def hiT (cfg : Cfg A) (r u i : Nat) : Int := max (max (dlt cfg r u i) (xlt cfg r u i)) 0
+ 
+ /-- `open(&c.status) && Some(c.id) != skip` (lib.rs 236). -/
+-def inEnv (skip : Option Nat) (c : Rec) : Bool := c.status.isOpen && (skip != some c.id)
++def inEnv (skip : Option Nat) (c : Rec) : Bool := c.status.isOpen
+ 
+ /-- `Σ t(recipe, units)` over the records the envelope applies. -/
+ def envS (t : Nat → Nat → Nat → Int) (recs : List Rec) (skip : Option Nat) (i : Nat) : Int :=

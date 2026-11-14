@@ -1,0 +1,132 @@
+# shared-pool's local Kani record: the runs' provenance. Written by
+# projects/shared-pool/kani/local/record.py from runs of run-local.py; do
+# not edit. tools/scripts/check-kani-record.py checks it in CI: the input
+# lines (git object ids, tool versions) hash to fingerprint, which must be
+# HEAD's; digest is the sha256 of jobs.tsv, covers.tsv and not-run.tsv (if any).
+commit	2d33d3334a1d11a02b33968e624d4ef3fcdb13bc
+kani_tree	dd55c46b7dc9de1f353ba8987db5ec966c112b28
+input	projects/shared-pool/kani/src	591e237591d0c7aa173094a7e43cff5797a9fbe1
+input	projects/shared-pool/kani/Cargo.toml	521ce97b5b19a83d225d25e22a8cd8142a0d57bb
+input	projects/shared-pool/kani/Cargo.lock	6f99ea3067e790ea8590706df35b69e88587aeed
+input	projects/shared-pool/kani/mutants	ba4b9f7e1fcfeb8055148607fde7628141faa1ca
+input	projects/shared-pool/kani/run.sh	39e7d636fb0edf640f1ec162e50846401fd81365
+input	projects/shared-pool/kani/.gitignore	2f7896d1d1365eafb0da03d9fe456fac81408487
+input	projects/shared-pool/source-mirror	57b3f02d18e85149db3c1035431368c4e07a4d8a
+input	projects/shared-pool/conformance/traces/core.txt	67a3c28134410c887e839e5eb60d8b3ea750fb84
+input	projects/shared-pool/kani/(all but local, *.md)	1928150422dd629b3612bb34922d59285720f3ca7ee591dfb5a67333ff3cbd57
+input	.cargo/config[.toml] above kani/ (the root, projects, projects/shared-pool)	none
+input	tools/versions.env:KANI	0.68.0
+input	tools/versions.env:CBMC	6.11.0
+fingerprint	384dac67293e2caf57f08065b5e61f204ddddb250c3be278dee50073cf3d500f
+digest	61bf703f44371e70b1226a7c84cda32c3b05cfb07214c800e1e64f823a8bb9c8
+kani	Kani Rust Verifier 0.68.0 (cargo plugin)
+cbmc	6.11.0 (cbmc-6.11.0)
+rustc	rustc 1.97.0 (2d8144b78 2026-07-07) (RUSTUP_TOOLCHAIN of the mutant jobs' plain mode, as in CI)
+host	Apple M1 Max 10 cores 64 GB, macOS 27.2.1
+started	2026-11-14T14:30:33Z
+finished	2026-11-14T21:21:04Z
+parallel	3 runs of run-local.py --all (provenance.txt): 2 jobs at a time within 50 GB; 3 jobs at a time within 48 GB; 1 jobs at a time within 60 GB
+kani_max_gb	40 (run.sh's default)
+kani_env	none
+cargo_config	none
+runner	projects/shared-pool/kani/local/run-local.py
+jobs	48 harnesses, 1 mutants, 27 kani-mutants-large mutants declared not run (not-run.tsv)
+assembled	from 3 measurement runs (run-local.py --all), not a separate --record run: the jobs of the workflow's kani-large and kani-mutants-large matrices, each from the latest run that finished and passed it (a failed result never replaces a passed one; the results not taken: superseded.* lines); kani-mutants-large mutants no run finished are declared in not-run.tsv (not_run.* lines)
+run1	/Users/gabehamilton/shared-pool-kani-measure/all-2d33d33
+run1.status	not complete (no ALL DONE): 35 of 143 jobs finished; progress.log ends '18:10:12Z stopped by signal 15; not complete'
+run1.finished	2026-11-14T18:10:08Z (the last finished job's end; env.txt has none)
+run1.commit	2d33d3334a1d11a02b33968e624d4ef3fcdb13bc
+run1.kani-tree	dd55c46b7dc9de1f353ba8987db5ec966c112b28
+run1.core-pin	57b3f02d18e85149db3c1035431368c4e07a4d8a
+run1.kani	Kani Rust Verifier 0.68.0 (cargo plugin)
+run1.CBMC	6.11.0
+run1.cbmc	6.11.0 (cbmc-6.11.0)
+run1.rustc	rustc 1.97.0 (2d8144b78 2026-07-07) (RUSTUP_TOOLCHAIN of the mutant jobs' plain mode, as in CI)
+run1.host	Apple M1 Max 10 cores 64 GB, macOS 27.2.1
+run1.lanes	2
+run1.budget-gb	50
+run1.kani-max-gb	40 (run.sh's default)
+run1.kani-env	none
+run1.cargo-config	none
+run1.runner	projects/shared-pool/kani/local/run-local.py
+run1.started	2026-11-14T14:30:33Z
+run1.mode	measurement (run-local.py --all: every harness of run.sh list and every mutant; not a record)
+run1.fingerprint	384dac67293e2caf57f08065b5e61f204ddddb250c3be278dee50073cf3d500f
+run1.lock	/tmp/sp-heavy.lock (waited 0 s)
+run1.estimates	V11_MEASURED, then a072a2dec788:projects/shared-pool/kani/RESULTS.md (peak x1.25), mutants from their harnesses + 240 s, unknown 40 GB 1800 s
+run1.recorded	25 jobs: h_energy_exact h_preview h_preview_post h_live_all h_full_255 h_full_256_prune h_version_cap_submit h_version_cap_settle h_wf_submit h_wf_settle h_bmc_from_init_s_cancel h_bmc_from_init_s_pause h_step_submit_tx h_step_submit_post h_step_cancel_post h_step_cancel_inv h_step_settle_tx h_step_settle_inv h_step_submit_inv_1 h_step_submit_inv_3 h_step_cancel_inv_3 h_step_settle_inv_1 h_step_settle_inv_3 h_ref_submit h_ref_settle
+run2	/Users/gabehamilton/shared-pool-kani-measure/run3-2d33d33
+run2.status	not complete (no ALL DONE): 39 of 51 jobs finished; progress.log ends '21:13:14Z stopped by signal 15; not complete'
+run2.finished	2026-11-14T21:08:28Z (the last finished job's end; env.txt has none)
+run2.commit	2d33d3334a1d11a02b33968e624d4ef3fcdb13bc
+run2.kani-tree	dd55c46b7dc9de1f353ba8987db5ec966c112b28
+run2.core-pin	57b3f02d18e85149db3c1035431368c4e07a4d8a
+run2.kani	Kani Rust Verifier 0.68.0 (cargo plugin)
+run2.CBMC	6.11.0
+run2.cbmc	6.11.0 (cbmc-6.11.0)
+run2.rustc	rustc 1.97.0 (2d8144b78 2026-07-07) (RUSTUP_TOOLCHAIN of the mutant jobs' plain mode, as in CI)
+run2.host	Apple M1 Max 10 cores 64 GB, macOS 27.2.1
+run2.lanes	3
+run2.budget-gb	48
+run2.kani-max-gb	40 (run.sh's default)
+run2.kani-env	none
+run2.cargo-config	none
+run2.runner	projects/shared-pool/kani/local/run-local.py
+run2.started	2026-11-14T18:12:53Z
+run2.mode	measurement (run-local.py --all: --only h_bmc_from_init_po,h_bmc_from_init_s_submit,h_step_submit_inv,h_slot_cycle_2,h_validate,h_wedge,h_init,h_slot_cycle_0,h_energy_max,h_step_submit_inv_0,h_step_settle_post,h_bmc_from_init_s_settle,h_bmc_from_init_s_ack,h_bmc_from_init_s_observe,h_bmc_from_init_s_dispatch,h_step_submit_cov,h_step_observe_tx,h_step_observe_post,h_step_observe_inv_3,h_energy,h_step_dispatch_inv_3,h_step_settle_cov,h_step_cancel_inv_1,h_step_observe_inv,h_step_ack_inv_3,h_step_pause_inv_3,h_step_dispatch_inv,h_step_cancel_tx,h_canary,h_step_observe_inv_1,h_step_pause_inv,h_wedge_healthy,h_step_cancel_cov,h_step_ack_inv,h_step_ack_post,h_step_dispatch_post,h_step_dispatch_inv_1,h_step_pause_post,h_full_256,mutant-21,mutant-45,mutant-32,mutant-33,mutant-40,mutant-37,mutant-36,mutant-42,mutant-35,mutant-44,mutant-41,mutant-20: 39 harnesses, 12 mutants; not a record)
+run2.fingerprint	384dac67293e2caf57f08065b5e61f204ddddb250c3be278dee50073cf3d500f
+run2.lock	/tmp/sp-heavy.lock (waited 0 s)
+run2.estimates	V11_MEASURED, then a072a2dec788:projects/shared-pool/kani/RESULTS.md (peak x1.25), mutants from their harnesses + 240 s, unknown 40 GB 1800 s
+run2.estimates-from	/Users/gabehamilton/shared-pool-kani-measure/estimates-run3.tsv (36 harnesses measured there come first)
+run2.recorded	23 jobs: h_init h_validate h_energy h_wedge h_wedge_healthy h_bmc_from_init_po h_slot_cycle_0 h_slot_cycle_2 h_full_256 h_bmc_from_init_s_submit h_bmc_from_init_s_dispatch h_bmc_from_init_s_ack h_bmc_from_init_s_settle h_bmc_from_init_s_observe h_step_submit_inv h_step_submit_cov h_step_cancel_cov h_step_settle_post h_step_settle_cov h_step_observe_post h_step_submit_inv_0 h_step_dispatch_inv_3 20-observe-length-check-dropped
+run3	/Users/gabehamilton/shared-pool-kani-measure/run4-2d33d33
+run3.status	complete (ALL DONE): 1 of 1 jobs finished
+run3.finished	2026-11-14T21:21:04Z (env.txt)
+run3.commit	2d33d3334a1d11a02b33968e624d4ef3fcdb13bc
+run3.kani-tree	dd55c46b7dc9de1f353ba8987db5ec966c112b28
+run3.core-pin	57b3f02d18e85149db3c1035431368c4e07a4d8a
+run3.kani	Kani Rust Verifier 0.68.0 (cargo plugin)
+run3.CBMC	6.11.0
+run3.cbmc	6.11.0 (cbmc-6.11.0)
+run3.rustc	rustc 1.97.0 (2d8144b78 2026-07-07) (RUSTUP_TOOLCHAIN of the mutant jobs' plain mode, as in CI)
+run3.host	Apple M1 Max 10 cores 64 GB, macOS 27.2.1
+run3.lanes	1
+run3.budget-gb	60
+run3.kani-max-gb	40 (run.sh's default)
+run3.kani-env	none
+run3.cargo-config	none
+run3.runner	projects/shared-pool/kani/local/run-local.py
+run3.started	2026-11-14T21:13:56Z
+run3.mode	measurement (run-local.py --all: --only h_energy_max: 1 harnesses, 0 mutants; not a record)
+run3.fingerprint	384dac67293e2caf57f08065b5e61f204ddddb250c3be278dee50073cf3d500f
+run3.lock	/tmp/sp-heavy.lock (waited 0 s)
+run3.estimates	V11_MEASURED, then a072a2dec788:projects/shared-pool/kani/RESULTS.md (peak x1.25), mutants from their harnesses + 240 s, unknown 40 GB 1800 s
+run3.estimates-from	/Users/gabehamilton/shared-pool-kani-measure/estimates-run3.tsv (36 harnesses measured there come first)
+run3.recorded	1 jobs: h_energy_max
+not_run.01-guard-swap-paused-stale	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.03-submit-expiry-off-by-one	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.05-check-bounds-without-skip	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.06-envelope-ignores-reserved	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.10-settle-accepts-opposite-terminal	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.11-release-counts-completed-units	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.12-energy-ge	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.15-submit-actor-check-dropped	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.16-settle-executor-check-dropped	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.18-preview-candidate-divergence	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.19-recovery-gt	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.23-envelope-ignores-extra	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.25-energy-excess-sign	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.28-check-bounds-vs-candidate	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.29-observe-keeps-observed-at	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.30-full-rejects-at-255	not run locally at v1.1.0 before the deadline; plain-mode kill in CI
+not_run.21-full-off-by-one	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.32-envelope-no-release-term	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.33-check-bounds-old-only	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.35-candidate-without-cap	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.36-full-ignores-front	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.37-validate-actor-is-executor	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.40-settle-no-completed-units	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.41-completed-units-wrap	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.42-prune-keeps-first-id	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.44-prereq-scan-retained	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI
+not_run.45-cap-in-submit-only	not run locally at v1.1.0 before the deadline (run 3 stopped first); plain-mode kill in CI

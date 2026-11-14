@@ -1,0 +1,15 @@
+Mutant s15_reconcile_status_gas_30: SH-7: reconcile attaches 30 Tgas to status instead of 10.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -108,7 +108,7 @@
+         );
+         let r = &self.pool.config.recipes[c.recipe as usize];
+         let args = near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap();
+-        call_then_callback(&r.executor, "status", &args, Gas::from_tgas(10), id);
++        call_then_callback(&r.executor, "status", &args, Gas::from_tgas(30), id);
+     }
+     #[private]
+     pub fn on_result(&mut self, id: u32) {

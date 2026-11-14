@@ -1,0 +1,18 @@
+# mutant: m18-best-tie-smaller
+# mutates: RD-BEST: an energy tie in best_quantity goes to the smaller units
+# expect: test_model RD-BEST (model)
+# expect: test_reads RD-PREVIEW/RD-BEST differential
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -607,9 +607,9 @@
+     findall(E-Neg, ( between(1, Hi, K),
+                      admissible(S, Caller, req(RI, K, V, Exp, Now)),
+                      submit_next(S, submit(Caller, RI, K, V, Exp, Now), Next),
+-                     energy(C, Next, E), Neg is -K ), Cands),
++                     energy(C, Next, E), Neg is K ), Cands),
+     (   Cands == [] -> Best = none
+-    ;   keysort_first(Cands, _-NegB), K0 is -NegB, Best = some(K0)
++    ;   keysort_first(Cands, _-NegB), K0 is NegB, Best = some(K0)
+     ).
+ 
+ %% keysort_first(+Pairs, -Least): the least E-Neg pair in standard order

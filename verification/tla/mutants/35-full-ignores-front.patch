@@ -1,0 +1,14 @@
+# checks: safety-1 trace
+# FR-3. v1.0's Full: the record count alone, whatever the oldest record's
+# status, so a full window never prunes. Must be killed by WIN-ESC.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -134,7 +134,7 @@
+ AnyOpen     == \E k \in 1 .. NR : Open(records[k].status)
+ \* candidate()'s Full (U:287-289): the window is full and its oldest
+ \* record, which a submit would prune, is open.
+-WinFull == NR >= MaxRecords /\ Open(records[1].status)
++WinFull == NR >= MaxRecords
+ 
+ \* Config::validate (CFG-2), names omitted. requires is a sequence of
+ \* <<prerequisite recipe, units>>. v1.1 adds actor # executor (U:130).

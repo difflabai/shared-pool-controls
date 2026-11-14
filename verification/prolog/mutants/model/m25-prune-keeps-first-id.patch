@@ -1,0 +1,16 @@
+# mutant: m25-prune-keeps-first-id
+# mutates: WIN-1: a pruning submit drops the front but does not advance first_id (FR-3; F-3)
+# expect: test_model F-3 fixed: 256 submit+cancel cycles
+# expect: test_mc2 MC-2: all traces replay
+# expect: test_mc1 MC-1 window:
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -531,7 +531,7 @@
+     length(Recs, L), Id is F + L,
+     window_size(W),
+     (   L >= W
+-    ->  Recs = [_ | Kept], F1 is F + 1          % record_bound passed: the front is terminal
++    ->  Recs = [_ | Kept], F1 = F          % record_bound passed: the front is terminal
+     ;   Kept = Recs, F1 = F
+     ),
+     append(Kept, [c(RI, U, Exp, reserved)], Recs1),

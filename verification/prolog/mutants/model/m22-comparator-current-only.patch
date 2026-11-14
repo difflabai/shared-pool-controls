@@ -1,0 +1,16 @@
+# mutant: m22-comparator-current-only
+# mutates: INV-RES/HARD-STEP: the bounds comparator is the violation before the call only (v1.0.0 E > PV(values)) (FR-1; F-1)
+# expect: test_model F-1 fixed: in the disturbed state
+# expect: test_mc2 MC-2 F-1 fixed
+# expect: test_mc1 MC-1 wedge
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -303,7 +303,7 @@
+     point_violation(Ms, Current, PV),
+     point_violation(Ms, Cand, PN),
+     interval_violation(Ms, Low, High, EV),
+-    \+ ( nth0(I, EV, E), nth0(I, PV, P), nth0(I, PN, Q), E > min(P, Q) ).
++    \+ ( nth0(I, EV, E), nth0(I, PV, P), nth0(I, PN, _), E > P ).
+ 
+ %% energy(+Cfg, +Values, -E): spec:33, sum of w * r^2 with r the target
+ %% deviation |v - t|, excess max(0, v - t) or deficit max(0, t - v).

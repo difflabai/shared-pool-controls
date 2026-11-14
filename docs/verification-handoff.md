@@ -1,6 +1,6 @@
 # Handoff for formal verification
 
-The formal verification of v1.1.0 (source revision `57b3f02`) lives in [difflabai/formalver PR #32](https://github.com/difflabai/formalver/pull/32); this repository holds no proofs itself. The implementation intentionally focuses on small Rust APIs, tests, synthetic execution and static UIs.
+The formal verification of v1.1.0 (source revision `57b3f02`) lives in [difflabai/formalver PR #32](https://github.com/difflabai/formalver/pull/32). A verbatim copy is in [`verification/`](../verification/); it is not yet wired into this repository's CI (see [`verification/README.md`](../verification/README.md)). The implementation intentionally focuses on small Rust APIs, tests, synthetic execution and static UIs.
 
 Start with `crates/core/src/lib.rs` and `docs/spec.md`. The default pool-core build has **zero dependencies**, no unsafe code, no NEAR imports, and no external I/O. Optional serde/borsh are serialization only. `cargo test -p pool-core --no-default-features` exercises the proof-facing configuration.
 

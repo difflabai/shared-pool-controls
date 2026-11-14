@@ -1,0 +1,13 @@
+# checks: cap
+# FR-6. bump_new's cap check is strict: one gated call at VERSION_CAP.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -229,7 +229,7 @@
+ \* bump(): version.checked_add(1) (U:395-398).
+ VerErr == IF version >= MaxVersion THEN "Arithmetic" ELSE "Ok"
+ \* bump_new() (U:401-406): the cap, then bump (which cannot fail below it).
+-CapErr == IF version >= VersionCap THEN "Arithmetic" ELSE VerErr
++CapErr == IF version > VersionCap THEN "Arithmetic" ELSE VerErr
+ 
+ SnapExpired(now) == cfg.maxAge > 0 /\ now > observedAt + cfg.maxAge
+ 

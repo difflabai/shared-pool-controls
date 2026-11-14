@@ -1,0 +1,17 @@
+Mutant s08_on_result_promise_error_is_active: SH-3: a failed execute (PromiseError::Failed) acknowledges the record as Active.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -117,6 +117,10 @@
+         // and no id makes this callback panic.
+         let status = if env::promise_results_count() == 1 {
+             env::promise_result_checked(0, 64)
++                .or_else(|e| match e {
++                    near_sdk::PromiseError::Failed => Ok(b"\"active\"".to_vec()),
++                    e => Err(e),
++                })
+                 .ok()
+                 .and_then(|b| near_sdk::serde_json::from_slice::<String>(&b).ok())
+         } else {

@@ -1,0 +1,19 @@
+Lean mutant 17-hull-without-release-term
+FR-2 (X H5): the v1.0.0 envelope, without the release term
+x = -reserve*units (lib.rs 206-244): low/high cover only the completion.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -260,10 +260,10 @@
+ def xlt (cfg : Cfg A) (r u i : Nat) : Int := -(get (cfg.recipe r).reserve i * (u : Int))
+ 
+ /-- `d.min(x).min(0)` (lib.rs 224): one record's low term. -/
+-def loT (cfg : Cfg A) (r u i : Nat) : Int := min (min (dlt cfg r u i) (xlt cfg r u i)) 0
++def loT (cfg : Cfg A) (r u i : Nat) : Int := min (dlt cfg r u i) 0
+ 
+ /-- `d.max(x).max(0)` (lib.rs 227): one record's high term. -/
+-def hiT (cfg : Cfg A) (r u i : Nat) : Int := max (max (dlt cfg r u i) (xlt cfg r u i)) 0
++def hiT (cfg : Cfg A) (r u i : Nat) : Int := max (dlt cfg r u i) 0
+ 
+ /-- `open(&c.status) && Some(c.id) != skip` (lib.rs 236). -/
+ def inEnv (skip : Option Nat) (c : Rec) : Bool := c.status.isOpen && (skip != some c.id)

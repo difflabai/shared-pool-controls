@@ -1,0 +1,18 @@
+# killed-by: h_step_cancel_tx
+# fix-revert: FR-8 (N8; div-cancel; upstream 138ef98)
+# cancel: a Completed record is Pending (the v1.0.0 result), not
+# InvalidState (TERM-1).
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -462,11 +462,6 @@
+         if c.status == Status::Cancelled {
+             return Ok(());
+         }
+-        // Completed is conflicting terminal evidence, as in settle. An
+-        // in-flight record waits for its executor's evidence.
+-        if c.status == Status::Completed {
+-            return Err(Error::InvalidState);
+-        }
+         if c.status != Status::Reserved {
+             return Err(Error::Pending);
+         }

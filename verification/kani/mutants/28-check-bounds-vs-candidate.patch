@@ -1,0 +1,17 @@
+# killed-by: h_step_submit_tx
+# check_bounds: compares against the violations of the candidate only (old
+# computed on the candidate, the v1.0 mutant's change), not min(current,
+# candidate). Values in bounds, the candidate out by the
+# reservation and the envelope back at the values: the original is Bounds,
+# the mutant Ok.
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -254,7 +254,7 @@
+         skip: Option<u32>,
+     ) -> Result<(), Error> {
+         let (low, high) = self.envelope(candidate, extra, skip)?;
+-        let old = self.violations(&self.values);
++        let old = self.violations(candidate);
+         let new = self.violations(candidate);
+         for (i, m) in self.config.metrics.iter().enumerate() {
+             let v = (m.min - low[i]).max(0) as u64 + (high[i] - m.max).max(0) as u64;

@@ -1,0 +1,15 @@
+Lean mutant 19-full-ignores-front
+FR-3 (X H7): v1.0.0's Full, whenever 256 records are retained, whatever
+the front's status (lib.rs 287-289).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -387,7 +387,7 @@
+ /-- `self.records.len() >= MAX_RECORDS && open(&self.records[0].status)`
+ (lib.rs 287): 256 records retained and the oldest one open. -/
+ def fullFires (s : State) : Bool :=
+-  decide (MAX_RECORDS ≤ s.records.length - s.firstId) && (s.record s.firstId).status.isOpen
++  decide (MAX_RECORDS ≤ s.records.length - s.firstId)
+ 
+ /-- `candidate` + `submit` (lib.rs 267, 360). -/
+ def submitGuards (cfg : Cfg A) (s : State) (caller : A) (r u ver exp now : Nat) : List Guard :=

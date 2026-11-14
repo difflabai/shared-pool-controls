@@ -1,0 +1,15 @@
+Mutant s23_on_result_reads_65_bytes: SH-3: on_result accepts a 65-byte promise result.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/contract/src/lib.rs
++++ b/crates/contract/src/lib.rs
+@@ -116,7 +116,7 @@
+         // 64 bytes, or anything but one JSON string is "unknown". No promise result
+         // and no id makes this callback panic.
+         let status = if env::promise_results_count() == 1 {
+-            env::promise_result_checked(0, 64)
++            env::promise_result_checked(0, 65)
+                 .ok()
+                 .and_then(|b| near_sdk::serde_json::from_slice::<String>(&b).ok())
+         } else {

@@ -1,0 +1,13 @@
+# killed-by: h_step_submit_tx
+# candidate: a request expiring now is accepted (<= became <)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -271,7 +271,7 @@
+         if req.version != self.version {
+             return Err(Error::Stale);
+         }
+-        if req.expires_at <= now || req.expires_at > now.saturating_add(86_400) {
++        if req.expires_at < now || req.expires_at > now.saturating_add(86_400) {
+             return Err(Error::Expired);
+         }
+         if self.config.max_age_seconds > 0

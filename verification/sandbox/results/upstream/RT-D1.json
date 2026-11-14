@@ -1,0 +1,192 @@
+{
+  "also": "EX-7 (checked after every transaction), EX-8 (on_settled on the real runtime)",
+  "checkpoints": [
+    {
+      "confirmation": 0,
+      "first_id": 0,
+      "job_ids": "0..=0",
+      "jobs": 1,
+      "newest": 0
+    },
+    {
+      "confirmation": 50,
+      "first_id": 0,
+      "job_ids": "0..=50",
+      "jobs": 51,
+      "newest": 50
+    },
+    {
+      "confirmation": 100,
+      "first_id": 0,
+      "job_ids": "0..=100",
+      "jobs": 101,
+      "newest": 100
+    },
+    {
+      "confirmation": 150,
+      "first_id": 0,
+      "job_ids": "0..=150",
+      "jobs": 151,
+      "newest": 150
+    },
+    {
+      "confirmation": 200,
+      "first_id": 0,
+      "job_ids": "0..=200",
+      "jobs": 201,
+      "newest": 200
+    },
+    {
+      "confirmation": 250,
+      "first_id": 0,
+      "job_ids": "0..=250",
+      "jobs": 251,
+      "newest": 250
+    },
+    {
+      "confirmation": 255,
+      "first_id": 0,
+      "job_ids": "0..=255",
+      "jobs": 256,
+      "newest": 255
+    },
+    {
+      "confirmation": 256,
+      "first_id": 1,
+      "job_ids": "1..=256",
+      "jobs": 256,
+      "newest": 256
+    },
+    {
+      "confirmation": 257,
+      "first_id": 2,
+      "job_ids": "2..=257",
+      "jobs": 256,
+      "newest": 257
+    },
+    {
+      "confirmation": 299,
+      "first_id": 44,
+      "job_ids": "44..=299",
+      "jobs": 256,
+      "newest": 299
+    }
+  ],
+  "confirmation_299_receipts_ok": {
+    "executor": [
+      true,
+      true
+    ],
+    "lock": [
+      true
+    ]
+  },
+  "confirmations": 300,
+  "decision": "D-1 (owner decision Q4)",
+  "ex7_checks": 606,
+  "final": {
+    "by_status": {
+      "Cancelled": 255,
+      "Completed": 1
+    },
+    "completed_units": [
+      1
+    ],
+    "first_id": 46,
+    "paused": false,
+    "records": 256,
+    "values": [
+      0
+    ],
+    "version": 1207
+  },
+  "max_jobs_during_confirmations": 256,
+  "near_sandbox": "2.13.4 (near-workspaces 0.23.0 / near-sandbox 0.3.16 default)",
+  "pool_contract_sha256": "e6383aabed62dcf694ac2f97da4520a019b18c9db637b1ee2afc7180c697e2ea",
+  "pool_executor_sha256": "b92f146919be69f36f517edc10f1e04e6ee96430ba0d745e4422132615634e83",
+  "port_of": "upstream crates/sandbox/tests/integration.rs confirmed_failed_executes_keep_the_executor_at_256_jobs (operator kept apart from the owner here)",
+  "property": "RT-D1",
+  "result": "pass",
+  "seconds": 504,
+  "steps": [
+    {
+      "observed_panic": [
+        "panicked at crates/executor/src/lib.rs:134:9:\nstale id",
+        "panicked at crates/executor/src/lib.rs:114:14:\nunknown job"
+      ],
+      "step": "operator confirm_not_executed(43), finish(43, false)",
+      "storage_unchanged": true
+    },
+    {
+      "job_kept": true,
+      "lock_storage_unchanged": true,
+      "newest": 299,
+      "observed_panic": "NotFound",
+      "receipts_ok": {
+        "executor": [
+          true,
+          true
+        ],
+        "lock": [
+          false
+        ]
+      },
+      "step": "operator confirm_not_executed(10000) (unassigned id)"
+    },
+    {
+      "executor_storage_unchanged": true,
+      "observed_panic": [
+        "Method on_settled is private",
+        "Method on_settled is private",
+        "panicked at crates/executor/src/lib.rs:155:9:\nassertion `left == right` failed: not a settle callback\n  left: 0\n right: 1"
+      ],
+      "step": "on_settled({id: 600}) by the owner, the operator, the executor's own key"
+    },
+    {
+      "job_kept": true,
+      "observed_panic": "InvalidState",
+      "receipts_ok": {
+        "executor": [
+          true,
+          true
+        ],
+        "lock": [
+          false
+        ]
+      },
+      "step": "submit 300; operator confirm_not_executed(300) while Reserved"
+    },
+    {
+      "execute_returns": "cancelled (stored job)",
+      "job_44_held": true,
+      "newest": 299,
+      "status": "Cancelled",
+      "step": "actor dispatch(300)"
+    },
+    {
+      "job_44_forgotten": true,
+      "newest": 300,
+      "receipts_ok": {
+        "executor": [
+          true,
+          true
+        ],
+        "lock": [
+          true
+        ]
+      },
+      "step": "operator finish(300, false)"
+    },
+    {
+      "completed_units": [
+        1
+      ],
+      "executor_jobs": 257,
+      "first_id": 46,
+      "newest": 301,
+      "status": "Completed",
+      "step": "submit, dispatch, finish(301, true)"
+    }
+  ],
+  "wasm_variant": "upstream"
+}

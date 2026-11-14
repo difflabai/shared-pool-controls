@@ -1,0 +1,15 @@
+Lean mutant 18-bounds-against-old-only
+FR-1 (X H6): the v1.0.0 comparator, EV > PV(old values) instead of
+EV > min(PV(old), PV(new)) (lib.rs 250-266).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -302,7 +302,7 @@
+ def boundsFail (cfg : Cfg A) (s : State) (v : List Int) (extra : Option (Nat × Nat))
+     (skip : Option Nat) : Bool :=
+   anyLt cfg.n fun i =>
+-    decide (min (viol cfg s.values i) (viol cfg v i) < ev cfg s.records v extra skip i)
++    decide (viol cfg s.values i < ev cfg s.records v extra skip i)
+ 
+ /-! ## Energy (lib.rs 169-193) -/
+ 

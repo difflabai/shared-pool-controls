@@ -1,0 +1,13 @@
+# checks: safety-1 trace
+# submit tolerates an energy increase of 1.
+--- a/SharedPool.tla
++++ b/SharedPool.tla
+@@ -277,7 +277,7 @@
+              cb   == CheckBounds(next, r, u, -1)
+              e0   == Energy(values)
+          IN IF cb # "Ok" THEN cb
+-            ELSE IF Energy(next) > e0 THEN "Energy"
++            ELSE IF Energy(next) > e0 + 1 THEN "Energy"
+             ELSE IF Violating /\ AddFails(next, Rcp(r).complete, u) THEN "Arithmetic"
+             ELSE IF Violating /\ Energy(AddVec(next, Rcp(r).complete, u)) >= e0
+                  THEN "Energy"

@@ -1,0 +1,16 @@
+Lean mutant 04-cap-off-by-one
+Re-target of v1.0.0 mutant 04 (version-overflow-off-by-one) to the cap:
+`version >= VERSION_CAP` becomes `>`, so bump_new admits one call at the cap.
+Not a fix revert (no FR id).
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -367,7 +367,7 @@
+ def verGuard (s : State) : Guard := (.err .arithmetic, decide (U32_MAX ≤ s.version))
+ 
+ /-- `self.version >= VERSION_CAP` (lib.rs 319, 402). -/
+-def capGuard (s : State) : Guard := (.err .arithmetic, decide (VERSION_CAP ≤ s.version))
++def capGuard (s : State) : Guard := (.err .arithmetic, decide (VERSION_CAP < s.version))
+ 
+ /-- `bump_new()?` (lib.rs 401): the cap, then the plain increment. -/
+ def bumpNewGuards (s : State) : List Guard := [capGuard s, verGuard s]

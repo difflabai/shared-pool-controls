@@ -1,0 +1,14 @@
+# mutant: c10-validate-accepts-self-executor
+# mutates: F-4 revert (FR-5): Config::validate no longer rejects actor = executor (v1.0.0 behaviour); C-5 CASH-SELF-ENFORCED must fail. Replaces c09, whose change (validate rejects actor = executor) is the v1.1.0 code.
+# expect: test_requirements C-5 fixture conservation
+# expect: test_requirements C-5 reproduces no finding
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -127,7 +127,6 @@
+             if !short(&r.name)
+                 || !short(&r.actor)
+                 || !short(&r.executor)
+-                || r.actor == r.executor
+                 || r.reserve.len() != n
+                 || r.complete.len() != n
+                 || r.max_units == 0

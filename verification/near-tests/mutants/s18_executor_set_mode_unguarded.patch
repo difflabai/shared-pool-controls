@@ -1,0 +1,14 @@
+Mutant s18_executor_set_mode_unguarded: EX-3: anyone may set the executor's mode.
+Applied with `patch -p1` from the source-mirror root by near-tests/run-mutants.sh;
+the near-tests suite must fail on it.
+
+--- a/crates/executor/src/lib.rs
++++ b/crates/executor/src/lib.rs
+@@ -48,7 +48,6 @@
+         }
+     }
+     pub fn set_mode(&mut self, mode: String) {
+-        self.operator();
+         assert!(
+             ["normal", "reject", "unknown", "panic"].contains(&mode.as_str()),
+             "invalid mode"

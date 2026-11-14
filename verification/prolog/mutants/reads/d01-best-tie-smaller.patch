@@ -1,0 +1,14 @@
+# mutant: d01-best-tie-smaller
+# mutates: RD-BEST (code side): the real core's best_quantity breaks an energy tie to the smaller units; reads.txt is regenerated from this core
+# expect: test_reads RD-PREVIEW/RD-BEST differential
+--- a/source-mirror/crates/core/src/lib.rs
++++ b/source-mirror/crates/core/src/lib.rs
+@@ -484,7 +484,7 @@
+                 self.candidate(caller, &req, now)
+                     .ok()
+                     .and_then(|v| self.energy(&v).ok())
+-                    .map(|e| (e, std::cmp::Reverse(units), req))
++                    .map(|e| (e, units, req))
+             })
+             .min_by_key(|(e, u, _)| (*e, *u))
+             .map(|(_, _, r)| r)

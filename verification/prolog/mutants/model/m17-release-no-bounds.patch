@@ -1,0 +1,13 @@
+# mutant: m17-release-no-bounds
+# mutates: F-2 hidden: a release (cancel, settle(false)) skips the envelope bounds check. At v1.1.0 no reachable release fails Bounds (INV-RES), so only the hand-built v1.0.0 wedge state kills it
+# expect: test_model LIVE-1, LIVE-ALL and INV-RES fire
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -460,6 +460,7 @@
+ holds(Kind, envelope_arith, S, Op) :-
+     terminal_kind(Kind), op_id(Op, Id), terminal_next(Kind, S, Id, Next),
+     pool_envelope(S, Next, none, Id, _, _).
++holds(Kind, bounds, _, _) :- release_kind(Kind).
+ holds(Kind, bounds, S, Op) :-
+     terminal_kind(Kind), op_id(Op, Id), terminal_next(Kind, S, Id, Next),
+     pool_config(S, C), pool_values(S, V),

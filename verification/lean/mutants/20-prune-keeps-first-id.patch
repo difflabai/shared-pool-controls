@@ -1,0 +1,16 @@
+Lean mutant 20-prune-keeps-first-id
+FR-3 (window): a submit on a full window with a terminal front appends
+without pruning (first_id not advanced, lib.rs 368-371), so the window
+grows past MAX_RECORDS.
+
+--- a/PoolLean/Machine.lean
++++ b/PoolLean/Machine.lean
+@@ -530,7 +530,7 @@
+ def effect (cfg : Cfg A) (s : State) : Op A → State
+   | .submit _ r u _ exp _ =>
+     { s with records := s.records ++ [⟨s.records.length, r, u, exp, .reserved⟩],
+-             firstId := if MAX_RECORDS ≤ s.records.length - s.firstId then s.firstId + 1
++             firstId := if MAX_RECORDS ≤ s.records.length - s.firstId then s.firstId
+                         else s.firstId,
+              values := addv s.values (cfg.recipe r).reserve u,
+              version := s.version + 1 }

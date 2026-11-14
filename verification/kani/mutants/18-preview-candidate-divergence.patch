@@ -1,0 +1,13 @@
+# killed-by: h_preview
+# preview: admission evaluated one second later than submit would (preview/candidate divergence)
+--- a/crates/core/src/lib.rs
++++ b/crates/core/src/lib.rs
+@@ -329,7 +329,7 @@
+                 None
+             }
+         });
+-        let result = self.candidate(caller, req, now);
++        let result = self.candidate(caller, req, now.saturating_add(1));
+         Decision {
+             allowed: result.is_ok(),
+             reason: result

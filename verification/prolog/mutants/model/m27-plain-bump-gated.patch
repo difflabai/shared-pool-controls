@@ -1,0 +1,15 @@
+# mutant: m27-plain-bump-gated
+# mutates: VER-CAP: dispatch, set_paused and observe check the plain u32::MAX increment, not VERSION_CAP (FR-6; F-5)
+# expect: test_model F-5 fixed
+# expect: test_mc1 MC-1 cap
+--- a/prolog/model/pool_machine.pl
++++ b/prolog/model/pool_machine.pl
+@@ -368,7 +368,7 @@
+ % spec:50: ack, cancel and settle keep the plain checked increment (bump).
+ holds(_, version_overflow, S, _) :- pool_version(S, N), u32_max(M), N < M.
+ % spec:50: submit (last), dispatch, set_paused, observe stop at VERSION_CAP (bump_new).
+-holds(_, version_cap, S, _) :- pool_version(S, N), version_cap(Cap), N < Cap.
++holds(Kind, version_cap, S, _) :- pool_version(S, N), ( Kind == submit -> version_cap(Cap) ; u32_max(Cap) ), N < Cap.
+ % spec:27 "A pruned id is NotFound for every call"; api:28.
+ holds(_, found, S, Op) :- op_id(Op, Id), record_of(S, Id, _).
+ 
