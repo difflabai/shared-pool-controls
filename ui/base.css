@@ -1690,3 +1690,18 @@ body:not(.story-site) .row {
   .deploy-guide { grid-template-columns:1fr; gap:28px; }
   .deploy-code { position:static; }
 }
+
+/* Hero: what the project is, how it is verified, and that docking is an example */
+.orbital-hero h1 { font-size:clamp(2.5rem,3.9vw,3.9rem); line-height:1.06; margin:22px 0 20px; }
+.orbital-hero .hero-what { color:#d3e1f6; font-size:.98rem; line-height:1.65; max-width:520px; }
+.proof-strip { margin:22px 0 4px; padding:14px 16px; max-width:520px; border:1px solid #88dfff3a; border-left:3px solid #88dfff; border-radius:10px; background:#88dfff0d; }
+.proof-badges { display:flex; flex-wrap:wrap; gap:8px; }
+.proof-badges span { font:600 .66rem ui-monospace,SFMono-Regular,monospace; letter-spacing:.04em; color:#bdf0ff; padding:5px 10px; border:1px solid #88dfff55; border-radius:20px; background:#08142a; }
+.proof-badges span:before { content:"✓ "; color:#78dfcb; }
+.proof-note { margin-top:10px; font-size:.74rem; line-height:1.55; color:#a6b6d1; }
+.proof-note a { color:#bdf0ff; white-space:nowrap; }
+.orbital-hero .hero-actions { margin-top:24px; }
+.example-tag { color:#ffb574; }
+@media(max-width:760px) { .orbital-hero h1 { font-size:clamp(2.2rem,9vw,3.2rem); } .proof-strip { max-width:none; } }
+.scene-topline { font-size:.62rem; }
+.example-tag { font-weight:700; padding:4px 9px; border:1px solid #ffa96766; border-radius:20px; background:#ffa9671a; }

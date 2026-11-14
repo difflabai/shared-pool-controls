@@ -9,7 +9,7 @@ The contribution is checking combined consequences, including pending commitment
 ## A 90-second presentation
 
 1. **Arrival (15 seconds):** Three independent ships share a station's power. Life support always retains 4 of the 12 MW available in each docking window.
-2. **The conflict (25 seconds):** Click **Begin docking sequence**. Atlas reserves 4 MW, then Lyra 2 MW. Vega's 4 MW request is rejected: **WAIT TO DOCK**. The illustration changes from blue power routes to an amber holding marker. The reserved power remains 6 MW.
+2. **The conflict (25 seconds):** Click **Watch an example: docking**. Atlas reserves 4 MW, then Lyra 2 MW. Vega's 4 MW request is rejected: **WAIT TO DOCK**. The illustration changes from blue power routes to an amber holding marker. The reserved power remains 6 MW.
 3. **A new decision (15 seconds):** Click **Request Vega docking in window 02**. A new request reserves 4 MW in a separate allocation period. Waiting does not create an authorization or silently queue a transaction. Dispatch is a separate lifecycle step.
 4. **The real product (35 seconds):** This is an MIT-licensed Rust / NEAR contract the ecosystem can adapt and deploy. Show the same gate in compute or agent hiring, then the contract, evidence, and verification scope. Explain that the station is a synthetic example; its power values are policy fixtures, not telemetry.
 
@@ -23,7 +23,7 @@ From the repository root, with the Rust toolchain installed:
 cargo run -p pool-demo -- serve
 ```
 
-Open `http://127.0.0.1:8080/` and click **Begin docking sequence**. It resets the station and runs three decisions, pausing briefly between them unless reduced motion is enabled. Expect **WAIT TO DOCK**, 6 / 8 MW docking power, and the protected 4 MW life-support allocation. The explorer records **Bounds**, prospective score 20 → 44, while the committed score stays 20.
+Open `http://127.0.0.1:8080/` and click **Watch an example: docking**. It resets the station and runs three decisions, pausing briefly between them unless reduced motion is enabled. Expect **WAIT TO DOCK**, 6 / 8 MW docking power, and the protected 4 MW life-support allocation. The explorer records **Bounds**, prospective score 20 → 44, while the committed score stays 20.
 
 Continue to submit Vega's new window-02 request. Expect 4 / 8 MW reserved in window 02, score 20 → 4, and a blue admitted route. Continue once more for Lyra's remaining 2 MW: window 02 reaches 6 MW and the score reaches zero. These are separate allocation periods, not simultaneous use of twice the station's capacity.
 
@@ -53,11 +53,11 @@ Not implemented: public-network deployment, live LLM agents, real escrow/payment
 
 ## Formal verification
 
-[Formal verification PR #31](https://github.com/difflabai/formalver/pull/31) targets v1.0.0, with contract source pinned at `a4bb5c3`. It reports completed Lean model proofs, bounded TLA+ safety checks, Prolog requirements checks, and conformance traces against the Rust core and NEAR shell. These are substantive verification results, with distinct scopes; they are not a completed proof of every deployed Rust/Wasm behavior.
+[Formal verification PR #32](https://github.com/difflabai/formalver/pull/32) targets v1.1.0, with contract source pinned at `57b3f02`. It covers Lean model proofs, bounded TLA+ safety checks, Prolog requirements checks, Kani on the Rust core, and conformance traces against the Rust core and NEAR shell. These are substantive verification results, with distinct scopes; they are not a completed proof of every deployed Rust/Wasm behavior.
 
 The new station fixture is not part of that pinned verification revision; it has a dedicated Rust regression test.
 
-The PR is a draft labeled **In-Progress**. Kani verification of the real Rust core and refinement obligations remain pending. It reported high-severity settlement/liveness findings F-1 and F-2 and several lower-severity findings. v1.1.0 fixes all of them (F-4 only for a recipe whose actor is its executor; by the repository owner's decision, the owner may be a recipe's executor), which changes admission, record retention and the version limit ([findings](verification-findings.md), [changelog](../CHANGELOG.md)). The fixes are tested but not formally re-verified. Present the findings and fixes alongside the proofs, and inspect the PR's current status before making a deployment claim. Modifying the contract or its policy requires reviewing the proof assumptions and rerunning applicable checks.
+Verification of v1.0.0 (pinned at `a4bb5c3`, [PR #31](https://github.com/difflabai/formalver/pull/31)) reported high-severity settlement/liveness findings F-1 and F-2 and several lower-severity findings. v1.1.0 fixes all of them (F-4 only for a recipe whose actor is its executor; by the repository owner's decision, the owner may be a recipe's executor), which changes admission, record retention and the version limit ([findings](verification-findings.md), [changelog](../CHANGELOG.md)). The v1.1.0 verification checks those fixes. Present the findings and fixes alongside the proofs, and inspect the PR's current status before making a deployment claim. Modifying the contract or its policy requires reviewing the proof assumptions and rerunning applicable checks.
 
 ## Presentation rationale and official sources
 
