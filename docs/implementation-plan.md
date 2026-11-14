@@ -23,7 +23,7 @@ Deliver a pure core, NEAR wrapper, enforced synthetic executor, deterministic sc
 - Per-metric hard bounds and three squared-potential primitives. Aggregate metrics encode coupled constraints.
 - Exact submission only. A Rust planner suggests a reduced quantity; the user/agent explicitly resubmits. Later dates are distinct recipes.
 - Version equality replaces a separate nonce system for accepted-request replay protection.
-- At most 256 lifetime commitments; no pruning or live migrations.
+- A window of the 256 most recent commitments; older terminal ones are pruned; replay protection is the version, not retention. No live migrations.
 - Static synthetic scheduling windows, not a production time/calendar engine.
 - Independent authenticated executor evidence replaces a generalized evidence/signature protocol.
 - No LLM dependency, frontend framework, JavaScript build chain, optimization solver, or database.
@@ -40,8 +40,8 @@ Admission:
 1. Check caller, pause flag, request version, short expiry, observation freshness and record limit.
 2. Check recipe, quantity and completed-unit prerequisites.
 3. Apply owner-defined reservation delta to a copy of the metric vector.
-4. Compute a conservative interval for all outstanding completion effects. Each pending completion may occur independently; do not assume an unfilled hedge offsets an adverse position.
-5. Check hard limits; in a disturbed baseline, require no worsening of each metric's violation.
+4. Compute a conservative interval for every outcome of every open record: each may stay open, complete or be released, independently. Do not assume an unfilled hedge offsets an adverse position, or that an unexecuted position stays in place.
+5. Check hard limits: no metric's interval violation may exceed its violation before the request or after the reservation.
 6. Check nonincreasing potential at reservation. For an already hard-violating state require strict decrease at the proposed completed state as well.
 7. Append an immutable commitment payload and atomically replace the vector.
 
@@ -55,7 +55,7 @@ Reserved -> Dispatched -> Active -> Completed. Missing/malformed/failed acknowle
 
 Reserve before dispatch. Bind dispatch ID to exact recipe and units. Synthetic executor accepts only the lock; an independent operator confirms completion/cancellation. Store terminal evidence before notification so reconciliation can recover a lost callback. Repeated evidence is idempotent; conflicting terminal evidence rejects.
 
-The administrator can pause admissions/dispatch and refresh observed values only with no unresolved records. Neither operation changes policy. Observations may raise energy. No production upgrade-lock claim is made.
+The administrator can pause admissions/dispatch and change observed values only with no unresolved records. Restating the current values, which renews the snapshot timestamp, is allowed at any time. Neither operation changes policy. Observations may raise energy. No production upgrade-lock claim is made.
 
 ## Scenario 1 — GPU cooperative
 

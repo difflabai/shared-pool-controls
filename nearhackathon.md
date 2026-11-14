@@ -15,7 +15,7 @@ This repository is a submission to the **November 2026 NEAR Hackathon**.
 - The Rust core, the NEAR lock contract, and the synthetic executor adapter in [`crates`](crates).
 - Six scenarios (station power, GPU compute, delivery capacity, inventory, worker budgets, and risk headroom) with Rust-generated traces in [`scenarios`](scenarios).
 - A static explorer and NEAR console in [`ui`](ui), plus a guide for configuring and deploying the contract against your own resource contention problem.
-- Formal verification of the contract, in progress, in the companion PR above; it is part of the submission and is evaluated with it. It includes Lean model proofs and TLA+ checks; Rust-core Kani verification is pending and that PR reports settlement/liveness findings that are not yet resolved.
+- Formal verification of the contract, in progress, in the companion PR above; it is part of the submission and is evaluated with it. It includes Lean model proofs and TLA+ checks of v1.0.0; Rust-core Kani verification is pending. v1.1.0 fixes the settlement/liveness and other findings that PR reported ([findings](docs/verification-findings.md)); the fixes are tested but not formally re-verified.
 
 The [judge walkthrough](docs/judges-guide.md) has a 90-second demo script and a claim-to-evidence map. The contract is not independently audited and has not been deployed to a public network.
 

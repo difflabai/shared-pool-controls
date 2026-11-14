@@ -2,6 +2,8 @@
 //! See docs/spec.md for the transition system and explicit trust assumptions.
 #![forbid(unsafe_code)]
 
+#[cfg(test)]
+mod findings;
 pub mod fixtures;
 #[cfg(test)]
 mod tests;
@@ -9,10 +11,17 @@ mod tests;
 pub const MAX_METRICS: usize = 32;
 pub const MAX_RECIPES: usize = 32;
 pub const MAX_TERMS: usize = 64;
+/// Records retained in a pool's window (`Pool::records`).
 pub const MAX_RECORDS: usize = 256;
 pub const MAX_VALUE: i64 = 1_000_000;
 pub const MAX_WEIGHT: u32 = 1_000;
 pub const MAX_UNITS: u32 = 100;
+/// Submit, dispatch, set_paused and observe fail Arithmetic from this
+/// version on. The 3 * MAX_RECORDS versions above it are a reserve: an open
+/// record needs at most three more increments to become terminal
+/// (Dispatched -> Unknown -> Active -> terminal), so acknowledgment,
+/// settlement and cancellation can never overflow the version.
+pub const VERSION_CAP: u32 = u32::MAX - 3 * MAX_RECORDS as u32;
 
 macro_rules! data {
     ($($item:item)*) => {$ (
@@ -37,7 +46,11 @@ data! {
     pub enum Status { Reserved, Dispatched, Active, Unknown, Completed, Cancelled }
     pub struct Commitment { pub id: u32, pub recipe: u32, pub units: u32, pub expires_at: u64, pub status: Status }
     pub struct Decision { pub allowed: bool, pub reason: String, pub before: String, pub after: Option<String>, pub terms_before: Vec<String>, pub terms_after: Vec<String>, pub candidate: Option<Vec<i64>> }
-    pub struct Pool { pub config: Config, pub values: Vec<i64>, pub version: u32, pub observed_at: u64, pub paused: bool, pub records: Vec<Commitment> }
+    /// `records` holds the at most MAX_RECORDS most recent commitments, oldest
+    /// first: `records[k].id == first_id + k`. Older records were terminal
+    /// when submit pruned them. `completed_units[r]` counts recipe r's
+    /// Completed units over the pool's lifetime, pruned records included.
+    pub struct Pool { pub config: Config, pub values: Vec<i64>, pub version: u32, pub observed_at: u64, pub paused: bool, pub records: Vec<Commitment>, pub first_id: u32, pub completed_units: Vec<u32> }
     pub enum Error { InvalidConfig, Unauthorized, Paused, Stale, Expired, SnapshotExpired, InvalidRecipe, InvalidUnits, Prerequisite, Full, Arithmetic, Bounds, Energy, InvalidState, NotFound, Pending }
 }
 impl std::fmt::Display for Error {
@@ -110,9 +123,11 @@ impl Config {
             }
         }
         for (i, r) in self.recipes.iter().enumerate() {
+            // An actor that is also its recipe's executor would attest its own work.
             if !short(&r.name)
                 || !short(&r.actor)
                 || !short(&r.executor)
+                || r.actor == r.executor
                 || r.reserve.len() != n
                 || r.complete.len() != n
                 || r.max_units == 0
@@ -139,6 +154,7 @@ impl Pool {
     pub fn new(config: Config, now: u64) -> Result<Self, Error> {
         config.validate()?;
         let values = config.metrics.iter().map(|m| m.initial).collect();
+        let completed_units = vec![0; config.recipes.len()];
         Ok(Self {
             config,
             values,
@@ -146,6 +162,8 @@ impl Pool {
             observed_at: now,
             paused: false,
             records: vec![],
+            first_id: 0,
+            completed_units,
         })
     }
     pub fn energy_terms(&self, values: &[i64]) -> Result<Vec<u64>, Error> {
@@ -180,8 +198,11 @@ impl Pool {
             .map(|(v, m)| (m.min - v).max(0) as u64 + (v - m.max).max(0) as u64)
             .collect()
     }
-    /// Check all pending completion subsets conservatively per metric. A pending
-    /// hedge cannot provide hard-limit headroom before the hedge executes.
+    /// Per metric, an interval that contains every outcome of every open record
+    /// (it stays open, completes, or releases its reservation) and of `extra`,
+    /// with record `skip` left out. A pending hedge gives no hard-limit headroom
+    /// before it executes, and no admission can rely on another record's
+    /// reservation staying in place.
     fn envelope(
         &self,
         values: &[i64],
@@ -192,11 +213,19 @@ impl Pool {
         let mut high = values.to_vec();
         let mut apply = |r: &Recipe, units: u32| -> Result<(), Error> {
             for i in 0..values.len() {
+                // d: completion delta; x: release delta (cancel or settle(false)).
                 let d = r.complete[i]
                     .checked_mul(i64::from(units))
                     .ok_or(Error::Arithmetic)?;
-                low[i] = low[i].checked_add(d.min(0)).ok_or(Error::Arithmetic)?;
-                high[i] = high[i].checked_add(d.max(0)).ok_or(Error::Arithmetic)?;
+                let x = r.reserve[i]
+                    .checked_mul(-i64::from(units))
+                    .ok_or(Error::Arithmetic)?;
+                low[i] = low[i]
+                    .checked_add(d.min(x).min(0))
+                    .ok_or(Error::Arithmetic)?;
+                high[i] = high[i]
+                    .checked_add(d.max(x).max(0))
+                    .ok_or(Error::Arithmetic)?;
                 if !bounded(low[i]) || !bounded(high[i]) {
                     return Err(Error::Arithmetic);
                 }
@@ -213,6 +242,11 @@ impl Pool {
         }
         Ok((low, high))
     }
+    /// No metric's interval violation may exceed its violation now or at
+    /// `candidate`. Since every admission passes this check, in every reachable
+    /// state each metric's interval violation equals its current violation, and
+    /// every completion or release of an open record passes this check too
+    /// (LIVE, docs/verification-handoff.md).
     fn check_bounds(
         &self,
         candidate: &[i64],
@@ -221,9 +255,10 @@ impl Pool {
     ) -> Result<(), Error> {
         let (low, high) = self.envelope(candidate, extra, skip)?;
         let old = self.violations(&self.values);
+        let new = self.violations(candidate);
         for (i, m) in self.config.metrics.iter().enumerate() {
             let v = (m.min - low[i]).max(0) as u64 + (high[i] - m.max).max(0) as u64;
-            if v > old[i] {
+            if v > old[i].min(new[i]) {
                 return Err(Error::Bounds);
             }
         }
@@ -247,7 +282,9 @@ impl Pool {
         {
             return Err(Error::SnapshotExpired);
         }
-        if self.records.len() >= MAX_RECORDS {
+        // A full window frees a slot by pruning its oldest record, which must
+        // be terminal.
+        if self.records.len() >= MAX_RECORDS && open(&self.records[0].status) {
             return Err(Error::Full);
         }
         let r = self
@@ -261,14 +298,10 @@ impl Pool {
         if req.units == 0 || req.units > r.max_units {
             return Err(Error::InvalidUnits);
         }
-        if r.requires.iter().any(|(p, units)| {
-            self.records
-                .iter()
-                .filter(|c| c.recipe == *p && c.status == Status::Completed)
-                .map(|c| c.units)
-                .sum::<u32>()
-                < *units
-        }) {
+        if r.requires
+            .iter()
+            .any(|(p, units)| self.completed_units[*p as usize] < *units)
+        {
             return Err(Error::Prerequisite);
         }
         let next = add(&self.values, &r.reserve, req.units)?;
@@ -282,6 +315,9 @@ impl Pool {
             && self.energy(&add(&next, &r.complete, req.units)?)? >= before
         {
             return Err(Error::Energy);
+        }
+        if self.version >= VERSION_CAP {
+            return Err(Error::Arithmetic);
         }
         Ok(next)
     }
@@ -324,7 +360,15 @@ impl Pool {
     pub fn submit(&mut self, caller: &str, req: Request, now: u64) -> Result<u32, Error> {
         let next = self.candidate(caller, &req, now)?;
         let version = self.version.checked_add(1).ok_or(Error::Arithmetic)?;
-        let id = self.records.len() as u32;
+        let id = self
+            .first_id
+            .checked_add(self.records.len() as u32)
+            .ok_or(Error::Arithmetic)?;
+        // candidate() checked that the oldest record is terminal.
+        if self.records.len() >= MAX_RECORDS {
+            self.records.remove(0);
+            self.first_id += 1;
+        }
         self.records.push(Commitment {
             id,
             recipe: req.recipe,
@@ -336,12 +380,29 @@ impl Pool {
         self.version = version;
         Ok(id)
     }
-    fn record(&self, id: u32) -> Result<&Commitment, Error> {
-        self.records.get(id as usize).ok_or(Error::NotFound)
+    /// Position of the record with this id in `records`. A pruned id, or one
+    /// not yet issued, is `NotFound`.
+    fn index(&self, id: u32) -> Result<usize, Error> {
+        id.checked_sub(self.first_id)
+            .map(|k| k as usize)
+            .filter(|k| *k < self.records.len())
+            .ok_or(Error::NotFound)
+    }
+    /// The retained record with this id, or `NotFound`.
+    pub fn record(&self, id: u32) -> Result<&Commitment, Error> {
+        Ok(&self.records[self.index(id)?])
     }
     fn bump(&mut self) -> Result<(), Error> {
         self.version = self.version.checked_add(1).ok_or(Error::Arithmetic)?;
         Ok(())
+    }
+    /// The increment for calls that start or administer work. It stops at
+    /// VERSION_CAP, which keeps the reserve for resolving open records.
+    fn bump_new(&mut self) -> Result<(), Error> {
+        if self.version >= VERSION_CAP {
+            return Err(Error::Arithmetic);
+        }
+        self.bump()
     }
     pub fn dispatch(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {
         let c = self.record(id)?;
@@ -366,8 +427,9 @@ impl Pool {
         {
             return Err(Error::SnapshotExpired);
         }
-        self.bump()?;
-        self.records[id as usize].status = Status::Dispatched;
+        let k = self.index(id)?;
+        self.bump_new()?;
+        self.records[k].status = Status::Dispatched;
         Ok(())
     }
     /// Wrapper must only call this from its private runtime callback.
@@ -383,11 +445,12 @@ impl Pool {
         };
         // reconcile is permissionless: a no-op must not bump the version, or
         // anyone could repeatedly invalidate every in-flight request.
-        if self.records[id as usize].status == next {
+        let k = self.index(id)?;
+        if self.records[k].status == next {
             return Ok(());
         }
         self.bump()?;
-        self.records[id as usize].status = next;
+        self.records[k].status = next;
         Ok(())
     }
     pub fn cancel(&mut self, caller: &str, id: u32, now: u64) -> Result<(), Error> {
@@ -398,6 +461,11 @@ impl Pool {
         }
         if c.status == Status::Cancelled {
             return Ok(());
+        }
+        // Completed is conflicting terminal evidence, as in settle. An
+        // in-flight record waits for its executor's evidence.
+        if c.status == Status::Completed {
+            return Err(Error::InvalidState);
         }
         if c.status != Status::Reserved {
             return Err(Error::Pending);
@@ -410,12 +478,13 @@ impl Pool {
         let r = &self.config.recipes[c.recipe as usize];
         let undo: Vec<i64> = r.reserve.iter().map(|d| -d).collect();
         let next = add(&self.values, &undo, c.units)?;
-        // A dependent commitment can prevent release. Retain encumbrance until
-        // dependencies are resolved; do not corrupt a downstream reservation.
+        // The release is still checked. Admission counted it in the envelope,
+        // so in a reachable state this check passes; no release is forced.
         self.check_bounds(&next, None, Some(id))?;
+        let k = self.index(id)?;
         self.bump()?;
         self.values = next;
-        self.records[id as usize].status = Status::Cancelled;
+        self.records[k].status = Status::Cancelled;
         Ok(())
     }
     /// Authenticated executor attests completion or definitive nonexecution.
@@ -442,33 +511,38 @@ impl Pool {
         }
         let next = add(&self.values, &r.complete, c.units)?;
         self.check_bounds(&next, None, Some(id))?;
+        let (k, recipe, units) = (self.index(id)?, c.recipe as usize, c.units);
         self.bump()?;
         self.values = next;
-        self.records[id as usize].status = Status::Completed;
+        self.records[k].status = Status::Completed;
+        // Lifetime count for prerequisites; pruning the record keeps it.
+        self.completed_units[recipe] = self.completed_units[recipe].saturating_add(units);
         Ok(())
     }
     pub fn set_paused(&mut self, caller: &str, paused: bool) -> Result<(), Error> {
         if caller != self.config.owner {
             return Err(Error::Unauthorized);
         }
-        self.bump()?;
+        self.bump_new()?;
         self.paused = paused;
         Ok(())
     }
     /// New externally observed baseline, only when no obligations are unresolved.
-    /// Does not change immutable policy. May expose a hard-limit violation.
+    /// Restating the current values is allowed at any time: it changes no
+    /// value or record and renews the snapshot timestamp. Does not change
+    /// immutable policy. New values may expose a hard-limit violation.
     pub fn observe(&mut self, caller: &str, values: Vec<i64>, now: u64) -> Result<(), Error> {
         if caller != self.config.owner {
             return Err(Error::Unauthorized);
         }
-        if self.records.iter().any(|c| open(&c.status)) {
+        if values != self.values && self.records.iter().any(|c| open(&c.status)) {
             return Err(Error::Pending);
         }
         if values.len() != self.values.len() || values.iter().any(|v| !bounded(*v)) {
             return Err(Error::Bounds);
         }
         self.energy(&values)?;
-        self.bump()?;
+        self.bump_new()?;
         self.values = values;
         self.observed_at = now;
         Ok(())

@@ -222,7 +222,15 @@ fn arithmetic_and_record_limits() {
             status: Status::Cancelled,
         })
         .collect();
+    // A full window is Full only while its oldest record is open.
+    p.records[0].status = Status::Reserved;
+    let before = p.clone();
     assert_eq!(submit(&mut p, 0, 1), Err(Error::Full));
+    assert_eq!(p, before);
+    p.records[0].status = Status::Cancelled;
+    assert_eq!(submit(&mut p, 0, 1), Ok(MAX_RECORDS as u32));
+    assert_eq!((p.first_id, p.records.len()), (1, MAX_RECORDS));
+    assert_eq!(p.records[MAX_RECORDS - 1].id, MAX_RECORDS as u32);
 }
 
 #[test]

@@ -1,5 +1,5 @@
 //! Thin NEAR shell: identity, storage, receipts, and asynchronous execution.
-use near_sdk::{env, near, AccountId, Gas, PanicOnDefault, Promise, PromiseError};
+use near_sdk::{env, near, require, AccountId, Gas, NearToken, PanicOnDefault};
 use pool_core::{Commitment, Config, Decision, Pool, Request};
 
 #[near(contract_state)]
@@ -51,11 +51,14 @@ impl Contract {
     pub fn get_pool(&self) -> Pool {
         self.pool.clone()
     }
+    /// Up to `limit` (at most 50) retained records, from id `from` on. Ids
+    /// below `get_pool().first_id` were pruned; a page starting there begins
+    /// at the oldest retained record.
     pub fn get_commitments(&self, from: u32, limit: u32) -> Vec<Commitment> {
         self.pool
             .records
             .iter()
-            .skip(from as usize)
+            .skip(from.saturating_sub(self.pool.first_id) as usize)
             .take(limit.min(50) as usize)
             .cloned()
             .collect()
@@ -76,26 +79,24 @@ impl Contract {
         );
         Submission { decision, id }
     }
-    pub fn dispatch(&mut self, id: u32) -> Promise {
+    pub fn dispatch(&mut self, id: u32) {
         must(self.pool.dispatch(&caller(), id, now()));
-        let c = &self.pool.records[id as usize];
+        let c = must(self.pool.record(id));
         let r = &self.pool.config.recipes[c.recipe as usize];
         let args = near_sdk::serde_json::to_vec(
             &near_sdk::serde_json::json!({"id":id,"recipe":c.recipe,"units":c.units}),
         )
         .unwrap();
-        Promise::new(r.executor.parse().unwrap())
-            .function_call(
-                "execute",
-                args,
-                near_sdk::NearToken::from_yoctonear(0),
-                Gas::from_tgas(30),
-            )
-            .then(self.callback(id))
+        call_then_callback(&r.executor, "execute", &args, Gas::from_tgas(30), id);
     }
     /// Any observer may request reconciliation; no authority is granted by this call.
-    pub fn reconcile(&self, id: u32) -> Promise {
-        let c = self.pool.records.get(id as usize).expect("NotFound");
+    pub fn reconcile(&self, id: u32) {
+        // NT-F2: near-sdk generates the nonpayable check only for &mut self methods.
+        require!(
+            env::attached_deposit().is_zero(),
+            "Method reconcile doesn't accept deposit"
+        );
+        let c = must(self.pool.record(id));
         assert!(
             matches!(
                 c.status,
@@ -106,24 +107,30 @@ impl Contract {
             "InvalidState"
         );
         let r = &self.pool.config.recipes[c.recipe as usize];
-        Promise::new(r.executor.parse().unwrap())
-            .function_call(
-                "status",
-                near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
-                near_sdk::NearToken::from_yoctonear(0),
-                Gas::from_tgas(10),
-            )
-            .then(self.callback(id))
+        let args = near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap();
+        call_then_callback(&r.executor, "status", &args, Gas::from_tgas(10), id);
     }
     #[private]
-    pub fn on_result(&mut self, id: u32, #[callback_result] result: Result<String, PromiseError>) {
-        let executor = self
-            .pool
-            .records
-            .get(id as usize)
-            .map(|c| self.pool.config.recipes[c.recipe as usize].executor.clone())
-            .expect("NotFound");
-        let status = result.unwrap_or_else(|_| "unknown".into());
+    pub fn on_result(&mut self, id: u32) {
+        // NT-F4: read the raw result. A failed call, a missing result, more than
+        // 64 bytes, or anything but one JSON string is "unknown". No promise result
+        // and no id makes this callback panic.
+        let status = if env::promise_results_count() == 1 {
+            env::promise_result_checked(0, 64)
+                .ok()
+                .and_then(|b| near_sdk::serde_json::from_slice::<String>(&b).ok())
+        } else {
+            None
+        }
+        .unwrap_or_else(|| "unknown".into());
+        let Ok(c) = self.pool.record(id) else {
+            // No such record: nothing to update, so log the result and return.
+            return event(
+                "reconciled",
+                near_sdk::serde_json::json!({"id":id,"outcome":status,"error":"NotFound"}),
+            );
+        };
+        let executor = self.pool.config.recipes[c.recipe as usize].executor.clone();
         let update = match status.as_str() {
             "completed" => self.pool.settle(&executor, id, true),
             "cancelled" => self.pool.settle(&executor, id, false),
@@ -159,20 +166,32 @@ impl Contract {
         );
     }
 }
-impl Contract {
-    fn callback(&self, id: u32) -> Promise {
-        Promise::new(env::current_account_id()).function_call(
-            "on_result",
-            near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
-            near_sdk::NearToken::from_yoctonear(0),
-            Gas::from_tgas(30),
-        )
-    }
+/// Calls `method` on the executor with no deposit, then this contract's
+/// `on_result({id})` with 30 Tgas, and makes the callback's result the result
+/// of the current call. NT-F3: this uses near-sdk's low-level promise functions.
+/// Its `Promise` type links the host functions for every action (deploy, keys,
+/// transfer, stake, accounts); build.sh fails if any of them is imported.
+fn call_then_callback(executor: &str, method: &str, args: &[u8], gas: Gas, id: u32) {
+    let zero = NearToken::from_yoctonear(0);
+    let call = env::promise_create(executor.parse().unwrap(), method, args, zero, gas);
+    let callback = env::promise_then(
+        call,
+        env::current_account_id(),
+        "on_result",
+        near_sdk::serde_json::to_vec(&near_sdk::serde_json::json!({"id":id})).unwrap(),
+        zero,
+        Gas::from_tgas(30),
+    );
+    env::promise_return(callback);
 }
 #[cfg(test)]
 mod tests {
     use super::*;
-    use near_sdk::{test_utils::VMContextBuilder, testing_env};
+    use near_sdk::mock::MockAction;
+    use near_sdk::serde_json::{json, Value};
+    use near_sdk::test_utils::{get_created_receipts, get_logs, VMContextBuilder};
+    use near_sdk::{testing_env, NearToken, PromiseResult};
+    use pool_core::Status;
     fn context(actor: &str) {
         let mut b = VMContextBuilder::new();
         b.current_account_id("pool.test.near".parse().unwrap())
@@ -197,5 +216,237 @@ mod tests {
         assert_eq!(c.submit(q).id, Some(0));
         assert_eq!(c.get_pool().values[3], 4);
         assert_eq!(c.get_commitments(0, 100).len(), 1);
+    }
+    /// The pool calling its own callback, with these promise results.
+    fn callback_context(results: Vec<PromiseResult>) {
+        let mut b = VMContextBuilder::new();
+        b.current_account_id("pool.test.near".parse().unwrap())
+            .predecessor_account_id("pool.test.near".parse().unwrap())
+            .block_timestamp(100_000_000_000);
+        testing_env!(
+            b.build(),
+            near_sdk::test_vm_config(),
+            near_sdk::RuntimeFeesConfig::test(),
+            Default::default(),
+            results
+        );
+    }
+    /// The gpu pool with record 0 (recipe 0, 4 units) Dispatched.
+    fn dispatched() -> Contract {
+        context("pool.test.near");
+        let mut c = Contract::new(pool_core::fixtures::config("gpu").unwrap());
+        context("research.test.near");
+        let q = Request {
+            recipe: 0,
+            units: 4,
+            version: 0,
+            expires_at: 200,
+        };
+        assert_eq!(c.submit(q).id, Some(0));
+        c.dispatch(0);
+        assert_eq!(c.get_pool().records[0].status, Status::Dispatched);
+        c
+    }
+    /// The single event logged by the last call.
+    fn last_event() -> near_sdk::serde_json::Value {
+        let logs = get_logs();
+        assert_eq!(logs.len(), 1, "{logs:?}");
+        near_sdk::serde_json::from_str(logs[0].strip_prefix("EVENT_JSON:").unwrap()).unwrap()
+    }
+    /// A function call: (method, JSON args, deposit in yocto, gas in Tgas, unused-gas weight).
+    type Call = (String, Value, u128, u64, u64);
+    /// Every receipt created by the last call: (receiver, receipts it waits for, calls).
+    fn receipts() -> Vec<(String, Vec<u64>, Vec<Call>)> {
+        get_created_receipts()
+            .into_iter()
+            .map(|r| {
+                let calls = r.actions.into_iter().map(|a| match a {
+                    MockAction::FunctionCallWeight {
+                        method_name,
+                        args,
+                        attached_deposit,
+                        prepaid_gas,
+                        gas_weight,
+                        ..
+                    } => (
+                        String::from_utf8(method_name).unwrap(),
+                        near_sdk::serde_json::from_slice(&args).unwrap(),
+                        attached_deposit.as_yoctonear(),
+                        prepaid_gas.as_tgas(),
+                        gas_weight.0,
+                    ),
+                    other => panic!("not a function call: {other:?}"),
+                });
+                (
+                    r.receiver_id.to_string(),
+                    r.receipt_indices,
+                    calls.collect(),
+                )
+            })
+            .collect()
+    }
+    #[test]
+    fn dispatch_and_reconcile_call_the_executor_then_on_result() {
+        let call = |method: &str, args: Value, tgas: u64| (method.to_string(), args, 0, tgas, 0);
+        let on_result = (
+            "pool.test.near".to_string(),
+            vec![0],
+            vec![call("on_result", json!({"id":0}), 30)],
+        );
+        let c = dispatched();
+        let execute = call("execute", json!({"id":0,"recipe":0,"units":4}), 30);
+        assert_eq!(
+            receipts(),
+            vec![
+                ("executor.test.near".into(), vec![], vec![execute]),
+                on_result.clone()
+            ]
+        );
+        context("anyone.test.near");
+        c.reconcile(0);
+        let status = call("status", json!({"id":0}), 10);
+        assert_eq!(
+            receipts(),
+            vec![
+                ("executor.test.near".into(), vec![], vec![status]),
+                on_result
+            ]
+        );
+    }
+    #[test]
+    #[should_panic(expected = "Method reconcile doesn't accept deposit")]
+    fn nt_f2_reconcile_rejects_deposit() {
+        let c = dispatched();
+        let mut b = VMContextBuilder::new();
+        b.current_account_id("pool.test.near".parse().unwrap())
+            .predecessor_account_id("anyone.test.near".parse().unwrap())
+            .attached_deposit(NearToken::from_yoctonear(1));
+        testing_env!(b.build());
+        c.reconcile(0);
+    }
+    #[test]
+    fn reconcile_without_deposit_is_open_to_anyone() {
+        let c = dispatched();
+        context("anyone.test.near");
+        c.reconcile(0);
+    }
+    #[test]
+    fn nt_f4_non_string_result_becomes_unknown() {
+        use Status::{Active, Cancelled, Completed, Unknown};
+        let ok = |b: &[u8]| vec![PromiseResult::Successful(b.to_vec())];
+        // "completed" as a JSON string padded with trailing whitespace to n bytes.
+        let padded = |n: usize| {
+            let mut s = b"\"completed\"".to_vec();
+            s.resize(n, b' ');
+            s
+        };
+        let long = format!("\"{}\"", "a".repeat(10_000));
+        // (case, promise results, record status afterwards, logged outcome)
+        let cases: Vec<(&str, Vec<PromiseResult>, Status, &str)> = vec![
+            ("number", ok(b"5"), Unknown, "unknown"),
+            ("object", ok(br#"{"status":"active"}"#), Unknown, "unknown"),
+            ("array", ok(br#"["active"]"#), Unknown, "unknown"),
+            ("null", ok(b"null"), Unknown, "unknown"),
+            ("empty", ok(b""), Unknown, "unknown"),
+            ("unquoted", ok(b"completed"), Unknown, "unknown"),
+            ("invalid UTF-8", ok(b"\"\xff\xfe\""), Unknown, "unknown"),
+            ("10 kB string", ok(long.as_bytes()), Unknown, "unknown"),
+            ("65 bytes", ok(&padded(65)), Unknown, "unknown"),
+            ("failed", vec![PromiseResult::Failed], Unknown, "unknown"),
+            ("no result", vec![], Unknown, "unknown"),
+            (
+                "two results",
+                vec![
+                    PromiseResult::Successful(b"\"active\"".to_vec()),
+                    PromiseResult::Successful(b"\"active\"".to_vec()),
+                ],
+                Unknown,
+                "unknown",
+            ),
+            ("other string", ok(b"\"bogus\""), Unknown, "bogus"),
+            ("active", ok(b"\"active\""), Active, "active"),
+            ("64 bytes", ok(&padded(64)), Completed, "completed"),
+            ("cancelled", ok(b"\"cancelled\""), Cancelled, "cancelled"),
+        ];
+        for (name, results, status, outcome) in cases {
+            let mut c = dispatched();
+            callback_context(results);
+            c.on_result(0);
+            let p = c.get_pool();
+            assert_eq!(p.records[0].status, status, "{name}");
+            // Only a definitive cancellation releases the 4 reserved units.
+            let held = if status == Cancelled { 0 } else { 4 };
+            assert_eq!(p.values[3], held, "{name}");
+            let e = last_event();
+            assert_eq!(e["event"], "reconciled", "{name}");
+            assert_eq!(e["data"][0]["outcome"], outcome, "{name}");
+            assert!(e["data"][0]["error"].is_null(), "{name}");
+        }
+    }
+    /// The gpu pool after 257 submit and cancel cycles: record 0 is pruned,
+    /// records 1-256 are retained and Cancelled.
+    fn pruned() -> Contract {
+        context("pool.test.near");
+        let mut c = Contract::new(pool_core::fixtures::config("gpu").unwrap());
+        for id in 0..=pool_core::MAX_RECORDS as u32 {
+            context("research.test.near");
+            let q = Request {
+                recipe: 0,
+                units: 1,
+                version: c.get_pool().version,
+                expires_at: 200,
+            };
+            assert_eq!(c.submit(q).id, Some(id));
+            c.cancel(id);
+        }
+        let p = c.get_pool();
+        assert_eq!((p.first_id, p.records.len()), (1, pool_core::MAX_RECORDS));
+        c
+    }
+    /// F-3: `get_commitments.from` is an id, and a result for a pruned id is
+    /// logged like any unknown id.
+    #[test]
+    fn f3_commitments_page_by_id_after_a_prune() {
+        let mut c = pruned();
+        let ids = |from: u32, limit: u32| -> Vec<u32> {
+            c.get_commitments(from, limit)
+                .iter()
+                .map(|r| r.id)
+                .collect()
+        };
+        assert_eq!(ids(0, 3), vec![1, 2, 3]);
+        assert_eq!(ids(1, 3), vec![1, 2, 3]);
+        assert_eq!(ids(255, 50), vec![255, 256]);
+        assert_eq!(ids(257, 5), Vec::<u32>::new());
+        assert_eq!(ids(100, 100), (100..150).collect::<Vec<u32>>());
+        let before = c.get_pool();
+        callback_context(vec![PromiseResult::Successful(b"\"completed\"".to_vec())]);
+        c.on_result(0);
+        assert_eq!(c.get_pool(), before);
+        assert_eq!(
+            last_event()["data"][0],
+            json!({"id":0,"outcome":"completed","error":"NotFound"})
+        );
+    }
+    #[test]
+    #[should_panic(expected = "NotFound")]
+    fn f3_reconcile_of_a_pruned_id_is_not_found() {
+        let c = pruned();
+        context("anyone.test.near");
+        c.reconcile(0);
+    }
+    #[test]
+    fn nt_f4_result_for_unknown_id_is_logged() {
+        let mut c = dispatched();
+        let before = c.get_pool();
+        for id in [1, 7, u32::MAX] {
+            callback_context(vec![PromiseResult::Successful(b"\"completed\"".to_vec())]);
+            c.on_result(id);
+            assert_eq!(c.get_pool(), before);
+            assert_eq!(
+                last_event()["data"][0],
+                near_sdk::serde_json::json!({"id":id,"outcome":"completed","error":"NotFound"})
+            );
+        }
     }
 }
